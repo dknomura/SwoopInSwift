@@ -240,9 +240,9 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
 
             UIView.animateWithDuration(0.3, animations: {
                 self.secondaryDayAndTimeView.hidden = false
-                self.heightConstraintOfTimeAndDayContainer.constant = 70
-                self.centerYConstraintForPrimaryTimeDayView.constant = -self.heightConstraintOfTimeAndDayContainer.constant / 4
-                self.centerYConstraintForSecondaryTimeDayView.constant = self.heightConstraintOfTimeAndDayContainer.constant / 4
+                self.heightConstraintOfTimeAndDayContainer.constant = 80
+                self.centerYConstraintForPrimaryTimeDayView.constant = -self.heightConstraintOfTimeAndDayContainer.constant / 5
+                self.centerYConstraintForSecondaryTimeDayView.constant = self.heightConstraintOfTimeAndDayContainer.constant / 5
                 self.view.layoutIfNeeded()
             })
         } else if isInTimeRangeMode {
