@@ -1,0 +1,799 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		63D1C4EB52AFB020182655BB /* Pods_SwoopParkingApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56327B640CD4999BE162E2BD /* Pods_SwoopParkingApp.framework */; };
+		9C215D9C1D6652D9006C1E3E /* SPTimeAndDayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C215D9B1D6652D9006C1E3E /* SPTimeAndDayViewController.swift */; };
+		9C42DAB31D5A589E004ECA97 /* SPDataAccessObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C42DAB21D5A589E004ECA97 /* SPDataAccessObject.swift */; };
+		9C5279C81CEB62B900AF88FF /* SPQuickGCD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C5279C71CEB62B900AF88FF /* SPQuickGCD.swift */; };
+		9C617EF51D51BF5100FFA51A /* SPTileLayerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C617EF41D51BF5100FFA51A /* SPTileLayerManager.swift */; };
+		9C96EE901D625EC4007C4EC8 /* SPViewControllerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C96EE8F1D625EC4007C4EC8 /* SPViewControllerExtension.swift */; };
+		9CA7DDAC1D579B300050B75D /* swoop-sqlite.db in Resources */ = {isa = PBXBuildFile; fileRef = 9CA7DDAB1D579B300050B75D /* swoop-sqlite.db */; };
+		9CA7DDC11D57EAB50050B75D /* LFHeatMap-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CA7DDBC1D57EAB50050B75D /* LFHeatMap-dummy.m */; };
+		9CA7DDC21D57EAB50050B75D /* LFHeatMap.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CA7DDBF1D57EAB50050B75D /* LFHeatMap.m */; };
+		9CA7DDC51D590BEF0050B75D /* SPGroundOverlayManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CA7DDC41D590BEF0050B75D /* SPGroundOverlayManager.swift */; };
+		9CBBB4681D5CD19D00AE1511 /* SPTimeAndDayManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CBBB4671D5CD19D00AE1511 /* SPTimeAndDayManager.swift */; };
+		9CBE25BB1D552BD500B5384B /* SPSQLiteReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CBE25BA1D552BD500B5384B /* SPSQLiteReader.swift */; };
+		9CBE25CF1D552C2800B5384B /* libsqlite3.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 9CBE25CE1D552C2800B5384B /* libsqlite3.0.tbd */; };
+		9CBE25D21D554F3300B5384B /* libsqlite3.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 9CBE25CE1D552C2800B5384B /* libsqlite3.0.tbd */; };
+		9CBE25DE1D555CEE00B5384B /* FMDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CBE25D41D555CEE00B5384B /* FMDatabase.m */; };
+		9CBE25DF1D555CEE00B5384B /* FMDatabaseAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CBE25D61D555CEE00B5384B /* FMDatabaseAdditions.m */; };
+		9CBE25E01D555CEE00B5384B /* FMDatabasePool.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CBE25D81D555CEE00B5384B /* FMDatabasePool.m */; };
+		9CBE25E11D555CEE00B5384B /* FMDatabaseQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CBE25DA1D555CEE00B5384B /* FMDatabaseQueue.m */; };
+		9CBE25E21D555CEE00B5384B /* FMResultSet.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CBE25DD1D555CEE00B5384B /* FMResultSet.m */; };
+		9CC46A101D26C26500AC0717 /* AWSCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9CC46A0E1D26C26500AC0717 /* AWSCore.framework */; };
+		9CC46A111D26C26500AC0717 /* AWSLambda.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9CC46A0F1D26C26500AC0717 /* AWSLambda.framework */; };
+		9CC46A131D2EAFE500AC0717 /* SPLambdaManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CC46A121D2EAFE500AC0717 /* SPLambdaManager.swift */; };
+		9CD51DC91CE24662006B741D /* SPSignAndLocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CD51DC81CE24662006B741D /* SPSignAndLocationManager.swift */; };
+		9CFEE37A1CDA6D7900CE5D53 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CFEE3791CDA6D7900CE5D53 /* AppDelegate.swift */; };
+		9CFEE37C1CDA6D7900CE5D53 /* SPMapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CFEE37B1CDA6D7900CE5D53 /* SPMapViewController.swift */; };
+		9CFEE37F1CDA6D7A00CE5D53 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9CFEE37D1CDA6D7A00CE5D53 /* Main.storyboard */; };
+		9CFEE3811CDA6D7A00CE5D53 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9CFEE3801CDA6D7A00CE5D53 /* Assets.xcassets */; };
+		9CFEE3841CDA6D7A00CE5D53 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9CFEE3821CDA6D7A00CE5D53 /* LaunchScreen.storyboard */; };
+		9CFEE38F1CDA6D7A00CE5D53 /* SwoopParkingAppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CFEE38E1CDA6D7A00CE5D53 /* SwoopParkingAppTests.swift */; };
+		9CFEE39A1CDA6D7A00CE5D53 /* SwoopParkingAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CFEE3991CDA6D7A00CE5D53 /* SwoopParkingAppUITests.swift */; };
+		9CFEE3A81CDA6E6600CE5D53 /* SPConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CFEE3A71CDA6E6600CE5D53 /* SPConstants.swift */; };
+		9CFEE3E91CDC140E00CE5D53 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9CFEE3E81CDC140E00CE5D53 /* CoreLocation.framework */; };
+		9CFF46E71D501FBE00504407 /* SPPolylineManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CFF46E61D501FBE00504407 /* SPPolylineManager.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		9CFEE38B1CDA6D7A00CE5D53 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9CFEE36E1CDA6D7900CE5D53 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9CFEE3751CDA6D7900CE5D53;
+			remoteInfo = SwoopParkingApp;
+		};
+		9CFEE3961CDA6D7A00CE5D53 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9CFEE36E1CDA6D7900CE5D53 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9CFEE3751CDA6D7900CE5D53;
+			remoteInfo = SwoopParkingApp;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		417B93AEFD2458765145BA97 /* Pods-SwoopParkingApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwoopParkingApp.release.xcconfig"; path = "Pods/Target Support Files/Pods-SwoopParkingApp/Pods-SwoopParkingApp.release.xcconfig"; sourceTree = "<group>"; };
+		56327B640CD4999BE162E2BD /* Pods_SwoopParkingApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SwoopParkingApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		5ACFCA4B78275422A004D327 /* Pods-SwoopParkingApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwoopParkingApp.debug.xcconfig"; path = "Pods/Target Support Files/Pods-SwoopParkingApp/Pods-SwoopParkingApp.debug.xcconfig"; sourceTree = "<group>"; };
+		9C215D9B1D6652D9006C1E3E /* SPTimeAndDayViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPTimeAndDayViewController.swift; sourceTree = "<group>"; };
+		9C42DAB21D5A589E004ECA97 /* SPDataAccessObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPDataAccessObject.swift; sourceTree = "<group>"; };
+		9C5279C71CEB62B900AF88FF /* SPQuickGCD.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPQuickGCD.swift; sourceTree = "<group>"; };
+		9C617EF41D51BF5100FFA51A /* SPTileLayerManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPTileLayerManager.swift; sourceTree = "<group>"; };
+		9C96EE8F1D625EC4007C4EC8 /* SPViewControllerExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPViewControllerExtension.swift; sourceTree = "<group>"; };
+		9CA7DDAB1D579B300050B75D /* swoop-sqlite.db */ = {isa = PBXFileReference; lastKnownFileType = file; path = "swoop-sqlite.db"; sourceTree = "<group>"; };
+		9CA7DDBC1D57EAB50050B75D /* LFHeatMap-dummy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "LFHeatMap-dummy.m"; sourceTree = "<group>"; };
+		9CA7DDBD1D57EAB50050B75D /* LFHeatMap-umbrella.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "LFHeatMap-umbrella.h"; sourceTree = "<group>"; };
+		9CA7DDBE1D57EAB50050B75D /* LFHeatMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LFHeatMap.h; sourceTree = "<group>"; };
+		9CA7DDBF1D57EAB50050B75D /* LFHeatMap.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LFHeatMap.m; sourceTree = "<group>"; };
+		9CA7DDC01D57EAB50050B75D /* LFHeatMap.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; path = LFHeatMap.modulemap; sourceTree = "<group>"; };
+		9CA7DDC41D590BEF0050B75D /* SPGroundOverlayManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPGroundOverlayManager.swift; sourceTree = "<group>"; };
+		9CBBB4671D5CD19D00AE1511 /* SPTimeAndDayManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPTimeAndDayManager.swift; sourceTree = "<group>"; };
+		9CBE25BA1D552BD500B5384B /* SPSQLiteReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPSQLiteReader.swift; sourceTree = "<group>"; };
+		9CBE25BC1D552BFA00B5384B /* SwoopParkingApp-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SwoopParkingApp-Bridging-Header.h"; sourceTree = "<group>"; };
+		9CBE25CE1D552C2800B5384B /* libsqlite3.0.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.0.tbd; path = usr/lib/libsqlite3.0.tbd; sourceTree = SDKROOT; };
+		9CBE25D31D555CEE00B5384B /* FMDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FMDatabase.h; sourceTree = "<group>"; };
+		9CBE25D41D555CEE00B5384B /* FMDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FMDatabase.m; sourceTree = "<group>"; };
+		9CBE25D51D555CEE00B5384B /* FMDatabaseAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FMDatabaseAdditions.h; sourceTree = "<group>"; };
+		9CBE25D61D555CEE00B5384B /* FMDatabaseAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FMDatabaseAdditions.m; sourceTree = "<group>"; };
+		9CBE25D71D555CEE00B5384B /* FMDatabasePool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FMDatabasePool.h; sourceTree = "<group>"; };
+		9CBE25D81D555CEE00B5384B /* FMDatabasePool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FMDatabasePool.m; sourceTree = "<group>"; };
+		9CBE25D91D555CEE00B5384B /* FMDatabaseQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FMDatabaseQueue.h; sourceTree = "<group>"; };
+		9CBE25DA1D555CEE00B5384B /* FMDatabaseQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FMDatabaseQueue.m; sourceTree = "<group>"; };
+		9CBE25DB1D555CEE00B5384B /* FMDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FMDB.h; sourceTree = "<group>"; };
+		9CBE25DC1D555CEE00B5384B /* FMResultSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FMResultSet.h; sourceTree = "<group>"; };
+		9CBE25DD1D555CEE00B5384B /* FMResultSet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FMResultSet.m; sourceTree = "<group>"; };
+		9CC46A0A1D26C18B00AC0717 /* libAWSCore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libAWSCore.a; path = "Pods/../build/Debug-iphoneos/AWSCore/libAWSCore.a"; sourceTree = "<group>"; };
+		9CC46A0B1D26C18B00AC0717 /* libAWSLambda.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libAWSLambda.a; path = "Pods/../build/Debug-iphoneos/AWSLambda/libAWSLambda.a"; sourceTree = "<group>"; };
+		9CC46A0E1D26C26500AC0717 /* AWSCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AWSCore.framework; path = "Pods/../build/Debug-iphoneos/AWSCore/AWSCore.framework"; sourceTree = "<group>"; };
+		9CC46A0F1D26C26500AC0717 /* AWSLambda.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AWSLambda.framework; path = "Pods/../build/Debug-iphoneos/AWSLambda/AWSLambda.framework"; sourceTree = "<group>"; };
+		9CC46A121D2EAFE500AC0717 /* SPLambdaManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPLambdaManager.swift; sourceTree = "<group>"; };
+		9CD51DC81CE24662006B741D /* SPSignAndLocationManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPSignAndLocationManager.swift; sourceTree = "<group>"; };
+		9CFEE3761CDA6D7900CE5D53 /* SwoopParkingApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwoopParkingApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9CFEE3791CDA6D7900CE5D53 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		9CFEE37B1CDA6D7900CE5D53 /* SPMapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SPMapViewController.swift; sourceTree = "<group>"; };
+		9CFEE37E1CDA6D7A00CE5D53 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		9CFEE3801CDA6D7A00CE5D53 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		9CFEE3831CDA6D7A00CE5D53 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		9CFEE3851CDA6D7A00CE5D53 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9CFEE38A1CDA6D7A00CE5D53 /* SwoopParkingAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwoopParkingAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		9CFEE38E1CDA6D7A00CE5D53 /* SwoopParkingAppTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwoopParkingAppTests.swift; sourceTree = "<group>"; };
+		9CFEE3901CDA6D7A00CE5D53 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9CFEE3951CDA6D7A00CE5D53 /* SwoopParkingAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwoopParkingAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		9CFEE3991CDA6D7A00CE5D53 /* SwoopParkingAppUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwoopParkingAppUITests.swift; sourceTree = "<group>"; };
+		9CFEE39B1CDA6D7A00CE5D53 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9CFEE3A71CDA6E6600CE5D53 /* SPConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPConstants.swift; sourceTree = "<group>"; };
+		9CFEE3E81CDC140E00CE5D53 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		9CFF46E61D501FBE00504407 /* SPPolylineManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPPolylineManager.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		9CFEE3731CDA6D7900CE5D53 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9CBE25D21D554F3300B5384B /* libsqlite3.0.tbd in Frameworks */,
+				9CC46A101D26C26500AC0717 /* AWSCore.framework in Frameworks */,
+				9CC46A111D26C26500AC0717 /* AWSLambda.framework in Frameworks */,
+				9CFEE3E91CDC140E00CE5D53 /* CoreLocation.framework in Frameworks */,
+				63D1C4EB52AFB020182655BB /* Pods_SwoopParkingApp.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9CFEE3871CDA6D7A00CE5D53 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9CFEE3921CDA6D7A00CE5D53 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9CBE25CF1D552C2800B5384B /* libsqlite3.0.tbd in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		02FD136995ED7A2E0F6ECFA1 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				9CBE25CE1D552C2800B5384B /* libsqlite3.0.tbd */,
+				9CC46A0E1D26C26500AC0717 /* AWSCore.framework */,
+				9CC46A0F1D26C26500AC0717 /* AWSLambda.framework */,
+				9CC46A0A1D26C18B00AC0717 /* libAWSCore.a */,
+				9CC46A0B1D26C18B00AC0717 /* libAWSLambda.a */,
+				9CFEE3E81CDC140E00CE5D53 /* CoreLocation.framework */,
+				56327B640CD4999BE162E2BD /* Pods_SwoopParkingApp.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		8C2F48E909083423E5DE808A /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				5ACFCA4B78275422A004D327 /* Pods-SwoopParkingApp.debug.xcconfig */,
+				417B93AEFD2458765145BA97 /* Pods-SwoopParkingApp.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		9C42DAB41D5A6A37004ECA97 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				9CFEE37B1CDA6D7900CE5D53 /* SPMapViewController.swift */,
+				9C215D9B1D6652D9006C1E3E /* SPTimeAndDayViewController.swift */,
+				9C96EE8F1D625EC4007C4EC8 /* SPViewControllerExtension.swift */,
+			);
+			name = Controller;
+			sourceTree = "<group>";
+		};
+		9C42DAB51D5A6A47004ECA97 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				9CFF46E61D501FBE00504407 /* SPPolylineManager.swift */,
+				9C617EF41D51BF5100FFA51A /* SPTileLayerManager.swift */,
+				9CA7DDC41D590BEF0050B75D /* SPGroundOverlayManager.swift */,
+			);
+			name = Views;
+			sourceTree = "<group>";
+		};
+		9C42DAB61D5A6A63004ECA97 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				9CD51DC81CE24662006B741D /* SPSignAndLocationManager.swift */,
+				9CC46A121D2EAFE500AC0717 /* SPLambdaManager.swift */,
+				9CBE25BA1D552BD500B5384B /* SPSQLiteReader.swift */,
+				9C42DAB21D5A589E004ECA97 /* SPDataAccessObject.swift */,
+				9CBBB4671D5CD19D00AE1511 /* SPTimeAndDayManager.swift */,
+			);
+			name = Model;
+			sourceTree = "<group>";
+		};
+		9CA7DDBB1D57EAB50050B75D /* LFHeatMap */ = {
+			isa = PBXGroup;
+			children = (
+				9CA7DDBC1D57EAB50050B75D /* LFHeatMap-dummy.m */,
+				9CA7DDBD1D57EAB50050B75D /* LFHeatMap-umbrella.h */,
+				9CA7DDBE1D57EAB50050B75D /* LFHeatMap.h */,
+				9CA7DDBF1D57EAB50050B75D /* LFHeatMap.m */,
+				9CA7DDC01D57EAB50050B75D /* LFHeatMap.modulemap */,
+			);
+			path = LFHeatMap;
+			sourceTree = "<group>";
+		};
+		9CA7DDC31D57EAC90050B75D /* ObjC Header files */ = {
+			isa = PBXGroup;
+			children = (
+				9CA7DDBB1D57EAB50050B75D /* LFHeatMap */,
+				9CBE25CD1D552C0600B5384B /* FMDB */,
+			);
+			name = "ObjC Header files";
+			sourceTree = "<group>";
+		};
+		9CBE25CD1D552C0600B5384B /* FMDB */ = {
+			isa = PBXGroup;
+			children = (
+				9CBE25D31D555CEE00B5384B /* FMDatabase.h */,
+				9CBE25D41D555CEE00B5384B /* FMDatabase.m */,
+				9CBE25D51D555CEE00B5384B /* FMDatabaseAdditions.h */,
+				9CBE25D61D555CEE00B5384B /* FMDatabaseAdditions.m */,
+				9CBE25D71D555CEE00B5384B /* FMDatabasePool.h */,
+				9CBE25D81D555CEE00B5384B /* FMDatabasePool.m */,
+				9CBE25D91D555CEE00B5384B /* FMDatabaseQueue.h */,
+				9CBE25DA1D555CEE00B5384B /* FMDatabaseQueue.m */,
+				9CBE25DB1D555CEE00B5384B /* FMDB.h */,
+				9CBE25DC1D555CEE00B5384B /* FMResultSet.h */,
+				9CBE25DD1D555CEE00B5384B /* FMResultSet.m */,
+			);
+			name = FMDB;
+			sourceTree = "<group>";
+		};
+		9CF750811D354F4F00000823 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				9CFEE3A71CDA6E6600CE5D53 /* SPConstants.swift */,
+				9C5279C71CEB62B900AF88FF /* SPQuickGCD.swift */,
+			);
+			name = Utils;
+			sourceTree = "<group>";
+		};
+		9CFEE36D1CDA6D7900CE5D53 = {
+			isa = PBXGroup;
+			children = (
+				9CFEE3781CDA6D7900CE5D53 /* SwoopParkingApp */,
+				9CFEE38D1CDA6D7A00CE5D53 /* SwoopParkingAppTests */,
+				9CFEE3981CDA6D7A00CE5D53 /* SwoopParkingAppUITests */,
+				9CFEE3771CDA6D7900CE5D53 /* Products */,
+				02FD136995ED7A2E0F6ECFA1 /* Frameworks */,
+				8C2F48E909083423E5DE808A /* Pods */,
+			);
+			sourceTree = "<group>";
+		};
+		9CFEE3771CDA6D7900CE5D53 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				9CFEE3761CDA6D7900CE5D53 /* SwoopParkingApp.app */,
+				9CFEE38A1CDA6D7A00CE5D53 /* SwoopParkingAppTests.xctest */,
+				9CFEE3951CDA6D7A00CE5D53 /* SwoopParkingAppUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		9CFEE3781CDA6D7900CE5D53 /* SwoopParkingApp */ = {
+			isa = PBXGroup;
+			children = (
+				9CFEE3791CDA6D7900CE5D53 /* AppDelegate.swift */,
+				9C42DAB61D5A6A63004ECA97 /* Model */,
+				9C42DAB51D5A6A47004ECA97 /* Views */,
+				9C42DAB41D5A6A37004ECA97 /* Controller */,
+				9CA7DDAB1D579B300050B75D /* swoop-sqlite.db */,
+				9CA7DDC31D57EAC90050B75D /* ObjC Header files */,
+				9CF750811D354F4F00000823 /* Utils */,
+				9CFEE37D1CDA6D7A00CE5D53 /* Main.storyboard */,
+				9CFEE3801CDA6D7A00CE5D53 /* Assets.xcassets */,
+				9CFEE3821CDA6D7A00CE5D53 /* LaunchScreen.storyboard */,
+				9CFEE3851CDA6D7A00CE5D53 /* Info.plist */,
+				9CBE25BC1D552BFA00B5384B /* SwoopParkingApp-Bridging-Header.h */,
+			);
+			path = SwoopParkingApp;
+			sourceTree = "<group>";
+		};
+		9CFEE38D1CDA6D7A00CE5D53 /* SwoopParkingAppTests */ = {
+			isa = PBXGroup;
+			children = (
+				9CFEE38E1CDA6D7A00CE5D53 /* SwoopParkingAppTests.swift */,
+				9CFEE3901CDA6D7A00CE5D53 /* Info.plist */,
+			);
+			path = SwoopParkingAppTests;
+			sourceTree = "<group>";
+		};
+		9CFEE3981CDA6D7A00CE5D53 /* SwoopParkingAppUITests */ = {
+			isa = PBXGroup;
+			children = (
+				9CFEE3991CDA6D7A00CE5D53 /* SwoopParkingAppUITests.swift */,
+				9CFEE39B1CDA6D7A00CE5D53 /* Info.plist */,
+			);
+			path = SwoopParkingAppUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		9CFEE3751CDA6D7900CE5D53 /* SwoopParkingApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9CFEE39E1CDA6D7A00CE5D53 /* Build configuration list for PBXNativeTarget "SwoopParkingApp" */;
+			buildPhases = (
+				3BC7A1948F41896105A49D91 /* [CP] Check Pods Manifest.lock */,
+				9CFEE3721CDA6D7900CE5D53 /* Sources */,
+				9CFEE3731CDA6D7900CE5D53 /* Frameworks */,
+				9CFEE3741CDA6D7900CE5D53 /* Resources */,
+				6F194348258B439909E3DB6F /* [CP] Embed Pods Frameworks */,
+				4DA3F7AAB988456A1A8AFA32 /* [CP] Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SwoopParkingApp;
+			productName = SwoopParkingApp;
+			productReference = 9CFEE3761CDA6D7900CE5D53 /* SwoopParkingApp.app */;
+			productType = "com.apple.product-type.application";
+		};
+		9CFEE3891CDA6D7A00CE5D53 /* SwoopParkingAppTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9CFEE3A11CDA6D7A00CE5D53 /* Build configuration list for PBXNativeTarget "SwoopParkingAppTests" */;
+			buildPhases = (
+				9CFEE3861CDA6D7A00CE5D53 /* Sources */,
+				9CFEE3871CDA6D7A00CE5D53 /* Frameworks */,
+				9CFEE3881CDA6D7A00CE5D53 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				9CFEE38C1CDA6D7A00CE5D53 /* PBXTargetDependency */,
+			);
+			name = SwoopParkingAppTests;
+			productName = SwoopParkingAppTests;
+			productReference = 9CFEE38A1CDA6D7A00CE5D53 /* SwoopParkingAppTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		9CFEE3941CDA6D7A00CE5D53 /* SwoopParkingAppUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9CFEE3A41CDA6D7A00CE5D53 /* Build configuration list for PBXNativeTarget "SwoopParkingAppUITests" */;
+			buildPhases = (
+				9CFEE3911CDA6D7A00CE5D53 /* Sources */,
+				9CFEE3921CDA6D7A00CE5D53 /* Frameworks */,
+				9CFEE3931CDA6D7A00CE5D53 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				9CFEE3971CDA6D7A00CE5D53 /* PBXTargetDependency */,
+			);
+			name = SwoopParkingAppUITests;
+			productName = SwoopParkingAppUITests;
+			productReference = 9CFEE3951CDA6D7A00CE5D53 /* SwoopParkingAppUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		9CFEE36E1CDA6D7900CE5D53 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0730;
+				LastUpgradeCheck = 0700;
+				ORGANIZATIONNAME = "Daniel Nomura";
+				TargetAttributes = {
+					9CFEE3751CDA6D7900CE5D53 = {
+						CreatedOnToolsVersion = 7.0.1;
+						DevelopmentTeam = WLAW6CTQBE;
+					};
+					9CFEE3891CDA6D7A00CE5D53 = {
+						CreatedOnToolsVersion = 7.0.1;
+						TestTargetID = 9CFEE3751CDA6D7900CE5D53;
+					};
+					9CFEE3941CDA6D7A00CE5D53 = {
+						CreatedOnToolsVersion = 7.0.1;
+						TestTargetID = 9CFEE3751CDA6D7900CE5D53;
+					};
+				};
+			};
+			buildConfigurationList = 9CFEE3711CDA6D7900CE5D53 /* Build configuration list for PBXProject "SwoopParkingApp" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 9CFEE36D1CDA6D7900CE5D53;
+			productRefGroup = 9CFEE3771CDA6D7900CE5D53 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				9CFEE3751CDA6D7900CE5D53 /* SwoopParkingApp */,
+				9CFEE3891CDA6D7A00CE5D53 /* SwoopParkingAppTests */,
+				9CFEE3941CDA6D7A00CE5D53 /* SwoopParkingAppUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		9CFEE3741CDA6D7900CE5D53 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9CFEE3841CDA6D7A00CE5D53 /* LaunchScreen.storyboard in Resources */,
+				9CFEE3811CDA6D7A00CE5D53 /* Assets.xcassets in Resources */,
+				9CA7DDAC1D579B300050B75D /* swoop-sqlite.db in Resources */,
+				9CFEE37F1CDA6D7A00CE5D53 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9CFEE3881CDA6D7A00CE5D53 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9CFEE3931CDA6D7A00CE5D53 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		3BC7A1948F41896105A49D91 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		4DA3F7AAB988456A1A8AFA32 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-SwoopParkingApp/Pods-SwoopParkingApp-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		6F194348258B439909E3DB6F /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-SwoopParkingApp/Pods-SwoopParkingApp-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		9CFEE3721CDA6D7900CE5D53 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9CBE25BB1D552BD500B5384B /* SPSQLiteReader.swift in Sources */,
+				9CBE25DE1D555CEE00B5384B /* FMDatabase.m in Sources */,
+				9CD51DC91CE24662006B741D /* SPSignAndLocationManager.swift in Sources */,
+				9CBE25E21D555CEE00B5384B /* FMResultSet.m in Sources */,
+				9CFEE37C1CDA6D7900CE5D53 /* SPMapViewController.swift in Sources */,
+				9C215D9C1D6652D9006C1E3E /* SPTimeAndDayViewController.swift in Sources */,
+				9C96EE901D625EC4007C4EC8 /* SPViewControllerExtension.swift in Sources */,
+				9CA7DDC51D590BEF0050B75D /* SPGroundOverlayManager.swift in Sources */,
+				9CBE25DF1D555CEE00B5384B /* FMDatabaseAdditions.m in Sources */,
+				9CA7DDC11D57EAB50050B75D /* LFHeatMap-dummy.m in Sources */,
+				9CFEE37A1CDA6D7900CE5D53 /* AppDelegate.swift in Sources */,
+				9CA7DDC21D57EAB50050B75D /* LFHeatMap.m in Sources */,
+				9C5279C81CEB62B900AF88FF /* SPQuickGCD.swift in Sources */,
+				9CFF46E71D501FBE00504407 /* SPPolylineManager.swift in Sources */,
+				9CC46A131D2EAFE500AC0717 /* SPLambdaManager.swift in Sources */,
+				9CFEE3A81CDA6E6600CE5D53 /* SPConstants.swift in Sources */,
+				9C617EF51D51BF5100FFA51A /* SPTileLayerManager.swift in Sources */,
+				9CBE25E01D555CEE00B5384B /* FMDatabasePool.m in Sources */,
+				9CBBB4681D5CD19D00AE1511 /* SPTimeAndDayManager.swift in Sources */,
+				9CBE25E11D555CEE00B5384B /* FMDatabaseQueue.m in Sources */,
+				9C42DAB31D5A589E004ECA97 /* SPDataAccessObject.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9CFEE3861CDA6D7A00CE5D53 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9CFEE38F1CDA6D7A00CE5D53 /* SwoopParkingAppTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9CFEE3911CDA6D7A00CE5D53 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9CFEE39A1CDA6D7A00CE5D53 /* SwoopParkingAppUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		9CFEE38C1CDA6D7A00CE5D53 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9CFEE3751CDA6D7900CE5D53 /* SwoopParkingApp */;
+			targetProxy = 9CFEE38B1CDA6D7A00CE5D53 /* PBXContainerItemProxy */;
+		};
+		9CFEE3971CDA6D7A00CE5D53 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9CFEE3751CDA6D7900CE5D53 /* SwoopParkingApp */;
+			targetProxy = 9CFEE3961CDA6D7A00CE5D53 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		9CFEE37D1CDA6D7A00CE5D53 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				9CFEE37E1CDA6D7A00CE5D53 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		9CFEE3821CDA6D7A00CE5D53 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				9CFEE3831CDA6D7A00CE5D53 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		9CFEE39C1CDA6D7A00CE5D53 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				"FRAMEWORK_SEARCH_PATHS[arch=*]" = "$(inherited)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		9CFEE39D1CDA6D7A00CE5D53 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				"FRAMEWORK_SEARCH_PATHS[arch=*]" = "$(inherited)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		9CFEE39F1CDA6D7A00CE5D53 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5ACFCA4B78275422A004D327 /* Pods-SwoopParkingApp.debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				"FRAMEWORK_SEARCH_PATHS[arch=*]" = "$(inherited)";
+				INFOPLIST_FILE = SwoopParkingApp/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				PRODUCT_BUNDLE_IDENTIFIER = dnom.SwoopParkingApp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "SwoopParkingApp/SwoopParkingApp-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		9CFEE3A01CDA6D7A00CE5D53 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 417B93AEFD2458765145BA97 /* Pods-SwoopParkingApp.release.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				"FRAMEWORK_SEARCH_PATHS[arch=*]" = "$(inherited)";
+				INFOPLIST_FILE = SwoopParkingApp/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				PRODUCT_BUNDLE_IDENTIFIER = dnom.SwoopParkingApp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "SwoopParkingApp/SwoopParkingApp-Bridging-Header.h";
+			};
+			name = Release;
+		};
+		9CFEE3A21CDA6D7A00CE5D53 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				"FRAMEWORK_SEARCH_PATHS[arch=*]" = "$(inherited)";
+				INFOPLIST_FILE = SwoopParkingAppTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = dnom.SwoopParkingAppTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SwoopParkingApp.app/SwoopParkingApp";
+			};
+			name = Debug;
+		};
+		9CFEE3A31CDA6D7A00CE5D53 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				"FRAMEWORK_SEARCH_PATHS[arch=*]" = "$(inherited)";
+				INFOPLIST_FILE = SwoopParkingAppTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = dnom.SwoopParkingAppTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SwoopParkingApp.app/SwoopParkingApp";
+			};
+			name = Release;
+		};
+		9CFEE3A51CDA6D7A00CE5D53 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				"FRAMEWORK_SEARCH_PATHS[arch=*]" = "$(inherited)";
+				INFOPLIST_FILE = SwoopParkingAppUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = dnom.SwoopParkingAppUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_TARGET_NAME = SwoopParkingApp;
+				USES_XCTRUNNER = YES;
+			};
+			name = Debug;
+		};
+		9CFEE3A61CDA6D7A00CE5D53 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				"FRAMEWORK_SEARCH_PATHS[arch=*]" = "$(inherited)";
+				INFOPLIST_FILE = SwoopParkingAppUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = dnom.SwoopParkingAppUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_TARGET_NAME = SwoopParkingApp;
+				USES_XCTRUNNER = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		9CFEE3711CDA6D7900CE5D53 /* Build configuration list for PBXProject "SwoopParkingApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9CFEE39C1CDA6D7A00CE5D53 /* Debug */,
+				9CFEE39D1CDA6D7A00CE5D53 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9CFEE39E1CDA6D7A00CE5D53 /* Build configuration list for PBXNativeTarget "SwoopParkingApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9CFEE39F1CDA6D7A00CE5D53 /* Debug */,
+				9CFEE3A01CDA6D7A00CE5D53 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9CFEE3A11CDA6D7A00CE5D53 /* Build configuration list for PBXNativeTarget "SwoopParkingAppTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9CFEE3A21CDA6D7A00CE5D53 /* Debug */,
+				9CFEE3A31CDA6D7A00CE5D53 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9CFEE3A41CDA6D7A00CE5D53 /* Build configuration list for PBXNativeTarget "SwoopParkingAppUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9CFEE3A51CDA6D7A00CE5D53 /* Debug */,
+				9CFEE3A61CDA6D7A00CE5D53 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 9CFEE36E1CDA6D7900CE5D53 /* Project object */;
+}

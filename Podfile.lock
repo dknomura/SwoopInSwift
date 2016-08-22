@@ -1,0 +1,22 @@
+PODS:
+  - AWSCognito (2.4.5):
+    - AWSCore (= 2.4.5)
+  - AWSCore (2.4.5)
+  - AWSLambda (2.4.5):
+    - AWSCore (= 2.4.5)
+  - GoogleMaps (1.13.2)
+
+DEPENDENCIES:
+  - AWSCognito
+  - AWSLambda
+  - GoogleMaps
+
+SPEC CHECKSUMS:
+  AWSCognito: 96e1762404831ffb87f67c87a5ee68fde543bb69
+  AWSCore: 2f356385bcea9b81ea47f9be0228c71697d9597d
+  AWSLambda: 295ed268e30556aa55b13b01495a1d47593af178
+  GoogleMaps: b20a103ff307f58392e603cf142e59d7e30374c1
+
+PODFILE CHECKSUM: 10d7be5b540223cabf4b6189cde9c5607c9a8121
+
+COCOAPODS: 1.0.1

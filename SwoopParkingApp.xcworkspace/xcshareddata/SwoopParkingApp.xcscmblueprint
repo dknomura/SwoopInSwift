@@ -1,0 +1,37 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "C5D36C2E03469F85ACC390306AFC740463D5637B",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "C5D36C2E03469F85ACC390306AFC740463D5637B" : 0,
+    "3E943C8B5CB17792E67F329EF4B04F594DCEFC0A" : 0,
+    "C99E6D02D694EA03F1CA3073DCE6D50F2F041C7E" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "C0022F1B-DE7F-4187-8A0C-90A59267D90D",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "C5D36C2E03469F85ACC390306AFC740463D5637B" : "SwoopInSwift\/",
+    "3E943C8B5CB17792E67F329EF4B04F594DCEFC0A" : "",
+    "C99E6D02D694EA03F1CA3073DCE6D50F2F041C7E" : "SwoopParkingApp\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "SwoopParkingApp",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "SwoopParkingApp.xcworkspace",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/dknomura\/SwoopParking.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "3E943C8B5CB17792E67F329EF4B04F594DCEFC0A"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/dknomura\/SwoopInSwift.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "C5D36C2E03469F85ACC390306AFC740463D5637B"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/dknomura\/SwoopParkingApp.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "C99E6D02D694EA03F1CA3073DCE6D50F2F041C7E"
+    }
+  ]
+}
