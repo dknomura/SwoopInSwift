@@ -172,6 +172,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     }
     
     private func getSignsForCurrentMapView() {
+        print("SwoopSwitch.on: \(swoopSwitch.on). Zoom: \(mapView.camera.zoom). isInNYC: \(dao.isInNYC(mapView))")
         if swoopSwitch.on && mapView.camera.zoom >= 15 && dao.isInNYC(mapView) {
             dao.getSigns(forCurrentMapView: mapView)
         }
