@@ -42,7 +42,7 @@ struct SPPolylineManager {
             let fromLocation = CLLocation(latitude: fromCoordinate.latitude, longitude: fromCoordinate.longitude)
             let toLocation = CLLocation(latitude: toCoordinate.latitude, longitude: toCoordinate.longitude)
             let distanceInMetersCL = fromLocation.distanceFromLocation(toLocation)
-
+            
             
             guard let signs = location.signs else {
                 print("No signs for location \(location.locationNumber)")
@@ -77,9 +77,9 @@ struct SPPolylineManager {
                 let pathCoordinate1 = coordinateOnLine(fromCoordinate, toCoordinate: toCoordinate, positionInMeters: metersDownPath)
                 path.addCoordinate(pathCoordinate1)
                 let pathCoordinate2 = previousCoordinate
-
+                
                 previousCoordinate = pathCoordinate1
-        
+                
                 path.addCoordinate(pathCoordinate2)
                 var polyline = GMSPolyline(path: path)
                 do {
@@ -90,7 +90,7 @@ struct SPPolylineManager {
                     print("Not enough points on path to make a line")
                     continue
                 } catch PolylineError.unableToRotate {
-//                    print("Unable to rotate geographical bearing for sign \(sign.signIndex) at location \(location.locationNumber). \nLocation streets \(location.street) from: \(location.fromCrossStreet) to: \(location.toCrossStreet). \nLocation Coordinates from: \(location.fromCoordinate) to:\(location.toCoordinate). \nBearing is not between pi and -pi")
+                    //                    print("Unable to rotate geographical bearing for sign \(sign.signIndex) at location \(location.locationNumber). \nLocation streets \(location.street) from: \(location.fromCrossStreet) to: \(location.toCrossStreet). \nLocation Coordinates from: \(location.fromCoordinate) to:\(location.toCoordinate). \nBearing is not between pi and -pi")
                     continue
                 } catch PolylineError.noPath(let polyline) {
                     print("No path for polyline: \(polyline)")
@@ -108,11 +108,11 @@ struct SPPolylineManager {
             }
         }
         
-//        var total = 0.0
-//        for percent in percentChanges {
-//            total += percent
-//        }
-//        print("Avereage percent change: \(total / Double(percentChanges.count))")
+        //        var total = 0.0
+        //        for percent in percentChanges {
+        //            total += percent
+        //        }
+        //        print("Avereage percent change: \(total / Double(percentChanges.count))")
         print("Time to initialize polylines: \(date.timeIntervalSinceNow)")
         return returnArray
     }
@@ -121,9 +121,9 @@ struct SPPolylineManager {
     private func coordinateOnLine(fromCoordinate: CLLocationCoordinate2D, toCoordinate: CLLocationCoordinate2D, positionInMeters: Double) ->CLLocationCoordinate2D {
         let totalDistance = distanceInMeters(fromCoordinate: fromCoordinate, toCoordinate: toCoordinate)
         
-//         For some reason, some of the signs.positionInFeet are longer than the street, so the lines extend beyond the street intersection, so return the intersection coordinate if positionInFeet > totalDistance
+        //         For some reason, some of the signs.positionInFeet are longer than the street, so the lines extend beyond the street intersection, so return the intersection coordinate if positionInFeet > totalDistance
         if positionInMeters > totalDistance {
-//            print("positionInFeet is longer than total distance. Returned toCoordinate")
+            //            print("positionInFeet is longer than total distance. Returned toCoordinate")
             return toCoordinate
         }
         
@@ -151,10 +151,10 @@ struct SPPolylineManager {
         return fromLocation.distanceFromLocation(toLocation)
     }
     
-
+    
     
     //MARK: - Polyline displacement
-
+    
     
     // For multiple polylines will return displaced polylines
     func displace(polylines polylines: [GMSPolyline], xMeters meters:Double, sideOfStreet:String) -> [GMSPolyline] {
@@ -196,7 +196,7 @@ struct SPPolylineManager {
         let polyline = GMSPolyline(path: path)
         polyline.strokeColor = UIColor.greenColor()
         polyline.strokeWidth = 2
-
+        
         return polyline
     }
     
@@ -265,8 +265,8 @@ struct SPPolylineManager {
                 bearing -= M_PI_2
             default: break
             }
-//        case (bearing.isNaN):
-//            let slope = (fromCoordinate.latitude - toCoordinate.latitude) / (fromCoordinate.longitude - toCoordinate.longitude)
+            //        case (bearing.isNaN):
+            //            let slope = (fromCoordinate.latitude - toCoordinate.latitude) / (fromCoordinate.longitude - toCoordinate.longitude)
             
             
         default: throw PolylineError.unableToRotate(geographicalBearing: bearing)
@@ -283,15 +283,15 @@ struct SPPolylineManager {
         let newLat = asin(sin(lat1) * cos(angularDistance) + cos(lat1) * sin(angularDistance) * cos(bearing))
         let newLong = long1 + atan2(sin(bearing) * sin(angularDistance) * cos(lat1), cos(angularDistance) - sin(lat1) * sin(newLat))
         
-//        let fromLocation = CLLocation(latitude: fromCoordinate.latitude, longitude: fromCoordinate.longitude)
-//        let toLocation = CLLocation(latitude:radiansToDegrees(newLat), longitude:radiansToDegrees(newLong))
-//        let distance = fromLocation.distanceFromLocation(toLocation)
-//        print("distance is: \(distance), margin of error: \((distance - meters) / meters)")
+        //        let fromLocation = CLLocation(latitude: fromCoordinate.latitude, longitude: fromCoordinate.longitude)
+        //        let toLocation = CLLocation(latitude:radiansToDegrees(newLat), longitude:radiansToDegrees(newLong))
+        //        let distance = fromLocation.distanceFromLocation(toLocation)
+        //        print("distance is: \(distance), margin of error: \((distance - meters) / meters)")
         
         
         return CLLocationCoordinate2DMake(radiansToDegrees(newLat) - fromCoordinate.latitude, radiansToDegrees(newLong) - fromCoordinate.longitude)
     }
-
+    
     private func degreesToRadians(degrees:Double) -> Double {
         return degrees * M_PI  / 180
     }
@@ -330,7 +330,24 @@ struct SPPolylineManager {
         let meters = points * worldMeters / worldPoints
         return meters
     }
-
+    
+    
+    
+    func initialZoom(forViewWidth viewWidth: Double) -> Float {
+        // Using the logic above to find zoom, local points / world width point = local meters / world width meters
+        // world width points = local points * world width meters / local meters
+        // 2 ^ N = world width points / 256
+        // N = log2(world width points / 256)
+        // local points = map width, local meters = 27425.3366774176
+        let localPoints = viewWidth
+        let localMeters = 36000.0
+        let worldMeters = 40075000.0
+        let worldPoints = localPoints * worldMeters / localMeters
+        let zoom = log2(worldPoints / 256.0)
+        return Float(zoom)
+    }
+    
+    
     // MARK: - Polyline Color
     
     private func polylineColor(fromSign:SPSign) -> UIColor {

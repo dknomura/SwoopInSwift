@@ -11,8 +11,8 @@ import CoreLocation
 import GoogleMaps
 import AWSLambda
 
-struct SPSignAndLocationManager {
-    //MARK: - Parse lambda response and create sign and location structs
+struct SPSignAndLocationParser {
+    //MARK: - Parse lambda response to create sign and location objects
     func parseLambdaSignsAndLocationsFromCoordinates(response:NSArray) -> [SPLocation] {
         var returnArray = [SPLocation]()
         for i in 0 ..< response.count {
@@ -26,12 +26,12 @@ struct SPSignAndLocationManager {
                 location.toCrossStreet = locDictionary[kSPToCrossStreetJSON] as? String
                 
                 if let fromLat = locDictionary[kSPFromLatitudeJSON] as? CLLocationDegrees,
-                let fromLong = locDictionary[kSPFromLongitudeJSON] as? CLLocationDegrees {
+                    let fromLong = locDictionary[kSPFromLongitudeJSON] as? CLLocationDegrees {
                     location.fromCoordinate = CLLocationCoordinate2DMake(fromLat, fromLong)
                 }
                 
                 if let toLat = locDictionary[kSPToLatitudeJSON] as? CLLocationDegrees,
-                let toLong = locDictionary[kSPToLongitudeJSON] as? CLLocationDegrees{
+                    let toLong = locDictionary[kSPToLongitudeJSON] as? CLLocationDegrees{
                     location.toCoordinate = CLLocationCoordinate2DMake(toLat, toLong)
                 }
                 
@@ -56,52 +56,98 @@ struct SPSignAndLocationManager {
         return returnArray
     }
     
-    //MARK: - Determine if current mapView is within NYC
-    let maxNYCCoordinate = CLLocationCoordinate2DMake(40.91295931663856, -73.70059684703173)
-    let minNYCCoordinate = CLLocationCoordinate2DMake(40.49785967315467, -74.25453161899142)
-
-    func isVisibleRegionWithinNYC (region: GMSCoordinateBounds) -> Bool {
-        if isCoordinateWithinRegion(region.northEast, NECoordinate: maxNYCCoordinate, SWCoordinate: minNYCCoordinate) || isCoordinateWithinRegion(region.southWest, NECoordinate: maxNYCCoordinate, SWCoordinate: minNYCCoordinate) {
-            return true
-        } else {
-            return false
-        }
-    }
-    
-    private func isCoordinateWithinRegion (testCoordinate: CLLocationCoordinate2D, NECoordinate: CLLocationCoordinate2D, SWCoordinate: CLLocationCoordinate2D) -> Bool {
-        if testCoordinate.latitude < NECoordinate.latitude && testCoordinate.latitude > SWCoordinate.latitude {
-            if testCoordinate.longitude < NECoordinate.longitude && testCoordinate.longitude > SWCoordinate.longitude {
-                return true
-            } else {
-                return false
+    func parseSQLSignsAndLocationsFromCoordinates(results:FMResultSet, queryType:String) -> [SPLocation] {
+        var locationResults = [SPLocation]()
+        var location = SPLocation()
+        let totalDate = NSDate()
+        var signCounter = 0
+        
+        while results.next() {
+            if location.locationNumber != results.stringForColumn("l." + kSPLocationNumberSQL) {
+                if location.locationNumber != nil {
+                    locationResults.append(location)
+                }
+                location.id = Int(results.intForColumn("l." + kSPIdSQL))
+                location.locationNumber = results.stringForColumn("l." + kSPLocationNumberSQL)
+                location.borough = results.stringForColumn(kSPBoroughSQL)
+                location.sideOfStreet = results.stringForColumn(kSPSideOfStreetSQL)
+                location.street = results.stringForColumn(kSPStreetSQL)
+                location.toCrossStreet = results.stringForColumn(kSPToCrossStreetSQL)
+                location.fromCrossStreet = results.stringForColumn(kSPFromCrossStreetSQL)
+                
+                location.fromCoordinate = CLLocationCoordinate2D()
+                location.fromCoordinate?.latitude = results.doubleForColumn(kSPFromLatitudeSQL)
+                location.fromCoordinate?.longitude = results.doubleForColumn(kSPFromLongitudeSQL)
+                
+                location.toCoordinate = CLLocationCoordinate2D()
+                location.toCoordinate?.latitude = results.doubleForColumn(kSPToLatitudeSQL)
+                location.toCoordinate?.longitude = results.doubleForColumn(kSPToLongitudeSQL)
+                location.signs = [SPSign]()
             }
-        } else {
-            return false
+            var sign = SPSign()
+            sign.signIndex = Int(results.intForColumn(kSPSignIndexSQL))
+            sign.directionOfArrow = results.stringForColumn(kSPDirectionOfArrowSQL)
+            sign.positionInFeet = results.doubleForColumn(kSPPositionInFeetSQL)
+            sign.signContent = results.stringForColumn(kSPSignContentSQL)
+            location.signs?.append(sign)
+            signCounter += 1
         }
+        
+        print("Time lapse for query \(queryType): \(totalDate.timeIntervalSinceNow) \nNumber of signs: \(signCounter)")
+        return locationResults
     }
-    //MARK: Sign and Location Constants
-    //Location JSON properties/dictionary keys
-    let kSPSignsJSON = "signs"
-    let kSPSignIndexJSON = "signIndex"
-    let kSPPositionInFeetJSON = "positionInFeet"
-    let kSPDirectionOfArrowJSON = "directionOfArrow"
-    let kSPSignContentJSON = "signContent"
-    let kSPSignTypeJSON = "signType"
-    let kSPBoroughJSON = "borough"
-    let kSPlocationNumberJSON = "locationNumber"
+    
+    func parseSQLLocationsWithOneStreetCleaningSignAtPosition(results: FMResultSet) -> [SPLocation] {
+        var locationResults = [SPLocation]()
+        var location = SPLocation()
+        location.signs = [SPSign]()
+        var locationCounter = 0
+        let totalDate = NSDate()
+        
+        while results.next() {
+            if location.id != Int(results.intForColumn("l." + kSPIdSQL)) {
+                if location.id != nil {
+                    location.hasUniqueStreetCleaningSign = isUniqueSignPositionIn(location.signs!)
+                    if location.hasUniqueStreetCleaningSign! {
+                        locationCounter += 1
+                        locationResults.append(location)
+                    }
+                }
+                location.hasUniqueStreetCleaningSign = false
+                location.id = Int(results.intForColumn("l." + kSPIdSQL))
+                location.fromCoordinate = CLLocationCoordinate2D()
+                location.fromCoordinate?.latitude = results.doubleForColumn(kSPFromLatitudeSQL)
+                location.fromCoordinate?.longitude = results.doubleForColumn(kSPFromLongitudeSQL)
+                location.signs?.removeAll()
+            }
+            var sign = SPSign()
+            sign.signContent = results.stringForColumn(kSPSignContentSQL)
+            sign.positionInFeet = results.doubleForColumn(kSPPositionInFeetSQL)
+            location.signs?.append(sign)
+            //            if sign.positionInFeet != nil {
+            //                signPositions.append(sign.positionInFeet!)
+            //            }
+        }
+        print("Time lapse for location only query: \(totalDate.timeIntervalSinceNow)\nNumber of locations: \(locationCounter)")
+        return locationResults
+    }
     
     
-    //Sign JSON properties/dictionary keys
-    let kSPStreetJSON = "street"
-    let kSPFromCrossStreetJSON = "fromCrossStreet"
-    let kSPToCrossStreetJSON = "toCrossStreet"
-    let kSPSideOfStreetJSON = "sideOfStreet"
-    let kSPFromLatitudeJSON = "fromLatitude"
-    let kSPFromLongitudeJSON = "fromLongitude"
-    let kSPToLatitudeJSON = "toLatitude"
-    let kSPToLongitudeJSON = "toLongitude"
-    let kSPSnappedPointsJSON = "snappedPoints"
-
+    private func isUniqueSignPositionIn(signs:[SPSign]) -> Bool {
+        var numberOfSignsAtPosition = [Double:Int]()
+        
+        for sign in signs {
+            if sign.positionInFeet != nil {
+                numberOfSignsAtPosition[sign.positionInFeet!] = (numberOfSignsAtPosition[sign.positionInFeet!] ?? 0) + 1
+            }
+        }
+        for (_, value) in numberOfSignsAtPosition {
+            if value == 1 {
+                return true
+            }
+        }
+        return false
+    }
 }
 
 
@@ -123,12 +169,12 @@ struct SPLocation {
     var fromCrossStreet: String?
     var toCrossStreet: String?
     var sideOfStreet: String?
-//    var sortedCoordinate: CLLocationCoordinate2D?
+    //    var sortedCoordinate: CLLocationCoordinate2D?
     var fromCoordinate: CLLocationCoordinate2D?
     var toCoordinate: CLLocationCoordinate2D?
     var signs: [SPSign]?
     var snappedPoints: [SPSnappedPoint]?
-    var isGoodStreetCleaning: Bool?
+    var hasUniqueStreetCleaningSign: Bool?
 }
 
 struct SPSnappedPoint {
@@ -139,13 +185,6 @@ struct SPSnappedPoint {
 
 
 
-//Snapped point prop/dict key
-let kSPLocation = "location"
-let kSPLatitude = "latitude"
-let kSPLongitude = "longitude"
-let kSPOriginalIndex = "originalIndex"
-let kSPPlaceID = "placeId"
-
 // File reading, parsing, and filtering data on local JSON file
 
 //    private enum SPLocationArrayType: String {
@@ -155,36 +194,36 @@ let kSPPlaceID = "placeId"
 //        case ToLong = "ToLong"
 //        case SortedByLocationNumber
 //    }
-//    
+//
 //    var bronxSigns = Array<SPSign>?()
 //    var brooklynSigns = Array<SPSign>?()
 //    var manhattanSigns = Array<SPSign>?()
 //    var queensSigns = Array<SPSign>?()
 //    var statenIslandSigns = Array<SPSign>?()
-//    
+//
 //    var locationsSortedByFromLat = Array<SPLocation>?()
 //    var locationsSortedByToLat = Array<SPLocation>?()
 //    var locationsSortedByFromLong = Array<SPLocation>?()
 //    var locationsSortedByToLong = Array<SPLocation>?()
-//    
+//
 //    private var maxNYCCoordinate: CLLocationCoordinate2D?
 //    private var minNYCCoordinate: CLLocationCoordinate2D?
 //    private var visibleRegionNECoordinate: CLLocationCoordinate2D?
 //    private var visibleRegionSWCoordinate: CLLocationCoordinate2D?
-//    
+//
 //    var visibleRegionBounds: GMSCoordinateBounds?
-//    
+//
 //    var currentLocationsAndSigns = [(location:SPLocation, signs:[SPSign])]()
 //    var currentLocations = [SPLocation]()
 //    var currentSigns = [SPSign]()
-//    
+//
 //    static let sharedManager = SPSignAndLocationManager()
-//    
+//
 //    //MARK: - Get Master Location and Sign arrays and max/min coordinates
 //    func getSignsAndLocations() {
 //        dispatch_barrier_sync(concurrentSignAndLocationQueue) {
 //            self.bronxSigns = self.loadSignsFor("bronx")
-//            
+//
 //            self.locationsSortedByFromLat = self.getLocationsSortedBy(.FromLat)
 //            self.locationsSortedByFromLong = self.getLocationsSortedBy(.FromLong)
 //            self.locationsSortedByToLat = self.getLocationsSortedBy(.ToLat)
@@ -201,7 +240,7 @@ let kSPPlaceID = "placeId"
 //        let signPath = NSBundle.mainBundle().pathForResource("\(borough)Signs", ofType: "json")
 //        let signData = NSData.init(contentsOfFile: signPath!)
 //        var returnArray = [SPSign]()
-//        
+//
 //        let signJSONArray: Array<NSDictionary>?
 //        do {
 //            signJSONArray = try NSJSONSerialization.JSONObjectWithData(signData!, options: NSJSONReadingOptions.MutableContainers) as? Array<NSDictionary>
@@ -239,7 +278,7 @@ let kSPPlaceID = "placeId"
 //                locationObject.street = location.objectForKey(kSPStreet) as? String
 //                locationObject.fromCrossStreet = location.objectForKey(kSPFromCrossStreet) as? String
 //                locationObject.toCrossStreet = location.objectForKey(kSPToCrossStreet) as? String
-//                
+//
 //                if arrayType == SPLocationArrayType.FromLat {
 //                    if let latitude = location.objectForKey(kSPFromLatitude) as? Double {
 //                        let longitude = (location.objectForKey(kSPFromLongitude) as? Double)!
@@ -255,13 +294,13 @@ let kSPPlaceID = "placeId"
 //                    let fromLongitude = (location.objectForKey(kSPFromLongitude) as? Double)!
 //                    locationObject.fromCoordinate = CLLocationCoordinate2D.init(latitude: fromLatitude, longitude: fromLongitude)
 //                }
-//                
-//                
+//
+//
 //                if let toLatitude = location.objectForKey(kSPToLatitude) as? Double {
 //                    let toLongitude = (location.objectForKey(kSPToLongitude) as? Double)!
 //                    locationObject.toCoordinate = CLLocationCoordinate2D.init(latitude: toLatitude, longitude: toLongitude)
 //                }
-//            
+//
 //                if let snappedPoints = location.objectForKey(kSPSnappedPoints) as? [NSDictionary] {
 //                    var points = [SPSnappedPoint]()
 //                    for point in snappedPoints {
@@ -310,7 +349,7 @@ let kSPPlaceID = "placeId"
 //        }
 //        return CLLocationCoordinate2D.init(latitude: minimumLat!, longitude: minimumLong!)
 //    }
-//    
+//
 //    private func findMaximumNYCCoordinate () -> CLLocationCoordinate2D {
 //        var maximumLat: Double?
 //        for location in locationsSortedByToLat!.reverse() {
@@ -340,10 +379,10 @@ let kSPPlaceID = "placeId"
 //
 //    }
 //
-//    
-//    
+//
+//
 //    // MARK: - Get the locations and signs within current visible region
-//    
+//
 //    func getCurrentSignsFor(currentVisibleRegion: GMSVisibleRegion) {
 //        currentLocations = getLocationsFor(currentVisibleRegion)
 //        currentLocationsAndSigns = getCurrentLocationsAndSigns()
@@ -374,7 +413,7 @@ let kSPPlaceID = "placeId"
 //            var lowerIndex = 0
 //            var upperIndex = (signsByBorough?.count)! - 1
 //            var locationIndex = Int()
-//            
+//
 //            while lowerIndex <= upperIndex {
 //                let currentIndex = (lowerIndex + upperIndex) / 2
 //                if signsByBorough![currentIndex].locationNumber == location.locationNumber {
@@ -388,7 +427,7 @@ let kSPPlaceID = "placeId"
 //            }
 //            var searchUp = locationIndex
 //            var searchDown = locationIndex - 1
-//            
+//
 //            while signsByBorough![searchUp].locationNumber == location.locationNumber || searchUp < signsByBorough?.count {
 //                signs.append(signsByBorough![searchUp])
 //                searchUp += 1
@@ -405,26 +444,26 @@ let kSPPlaceID = "placeId"
 //                    }
 //                }
 //            }
-//            
-//            
+//
+//
 //            signAndLocations.signs = signs
-//            
+//
 //            signAndLocationsArray.append(signAndLocations)
 //        }
 //        return signAndLocationsArray
 //    }
-//    
+//
 //    private func getLocationsFor(currentVisibleRegion:GMSVisibleRegion) -> [SPLocation] {
-//        
+//
 //        visibleRegionBounds = GMSCoordinateBounds.init(region: currentVisibleRegion)
-//        
+//
 //        var toLatIndexNE: Int?
 //        var fromLatIndexNE: Int?
 //        var toLatIndexSW: Int?
 //        var fromLatIndexSW: Int?
-//        
+//
 //        let returnLocations = NSMutableSet()
-//        
+//
 //        if isVisibleRegionCoordinateInNYC(visibleRegionBounds!.northEast) || isVisibleRegionCoordinateInNYC(visibleRegionBounds!.southWest) {
 //            toLatIndexSW = binarySearchForLocationIndexWithLatitude(visibleRegionBounds!.southWest.latitude, locationArray: locationsSortedByToLat!).greaterIndex
 //            toLatIndexNE = binarySearchForLocationIndexWithLatitude(visibleRegionBounds!.northEast.latitude, locationArray: locationsSortedByToLat!).lesserIndex
@@ -434,14 +473,14 @@ let kSPPlaceID = "placeId"
 //
 //            let date = NSDate()
 //            returnLocations.addObjectsFromArray(getLocationsInRange(toLatIndexSW!, upper: toLatIndexNE!, visibleRegion:visibleRegionBounds!, typeOfArray: SPLocationArrayType.ToLat))
-//            
+//
 //            returnLocations.addObjectsFromArray(getLocationsInRange(fromLatIndexSW!, upper: fromLatIndexNE!, visibleRegion:visibleRegionBounds!, typeOfArray: SPLocationArrayType.FromLat))
 //            print("Time to find locations in current visible region: \(date.timeIntervalSinceNow)")
 //        }
 //        return returnLocations.allObjects as! [SPLocation]
 //    }
-//    
-//    
+//
+//
 //    private func isVisibleRegionCoordinateInNYC (coordinate: CLLocationCoordinate2D) -> Bool {
 //        return isCoordinateWithinRegion(coordinate, NECoordinate: maxNYCCoordinate!, SWCoordinate: minNYCCoordinate!)
 //    }
@@ -456,11 +495,11 @@ let kSPPlaceID = "placeId"
 //            return false
 //        }
 //    }
-//    
+//
 //    private func binarySearchForLocationIndexWithLatitude (latitude: Double, locationArray: Array<SPLocation>) -> (greaterIndex: Int, lesserIndex: Int) {
 //        var lowerIndex = 0
 //        var upperIndex = locationArray.count - 1
-//        
+//
 //        while upperIndex > lowerIndex {
 //            let binaryIndex = (upperIndex + lowerIndex) / 2
 //            let value = locationArray[binaryIndex].sortedCoordinate?.latitude
@@ -484,9 +523,9 @@ let kSPPlaceID = "placeId"
 //        }
 //        return findClosestGreaterAndLowerValues((upperIndex, lowerIndex), locationArray: locationArray, latitude: latitude)
 //    }
-//    
+//
 //    private func findClosestGreaterAndLowerValues (indices: (upper: Int, lower: Int), locationArray: Array<SPLocation>, latitude: Double) -> (greaterIndex: Int, lesserIndex: Int) {
-//        
+//
 //        var tuple = indices
 //        while tuple.upper < locationArray.count {
 //            if locationArray[tuple.upper].sortedCoordinate?.latitude > latitude {
@@ -504,7 +543,7 @@ let kSPPlaceID = "placeId"
 //        }
 //        return (tuple.upper, tuple.lower)
 //    }
-//    
+//
 //    private func getLocationsInRange(lower:Int, upper:Int, visibleRegion:GMSCoordinateBounds, typeOfArray:SPLocationArrayType) -> [SPLocation] {
 //        var iterateArray = [SPLocation]()
 //        if typeOfArray == SPLocationArrayType.FromLat {
@@ -513,7 +552,7 @@ let kSPPlaceID = "placeId"
 //            iterateArray = locationsSortedByToLat!
 //        }
 //        var returnArray = [SPLocation]()
-//        
+//
 //        if isVisibleRegionCoordinateInNYC(visibleRegion.northEast) || isVisibleRegionCoordinateInNYC(visibleRegion.southWest){
 //            for i in lower...upper {
 //                if let sortedCoordinate = iterateArray[i].sortedCoordinate {
@@ -523,10 +562,10 @@ let kSPPlaceID = "placeId"
 //                }
 //            }
 //        }
-//    
+//
 //        return returnArray
 //    }
-//    //MARK:Manage polylines 
+//    //MARK:Manage polylines
 //    func getPolylinesFromCurrentLocations() -> [GMSPolyline] {
 //        var returnArray = [GMSPolyline]()
 //        for signsAndLocations in currentLocationsAndSigns {

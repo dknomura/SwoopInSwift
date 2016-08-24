@@ -11,7 +11,7 @@ import GoogleMaps
 import AWSLambda
 
 class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDelegate, UITextViewDelegate{
-
+    
     var currentMapPolylines = [GMSPolyline]()
     var currentGroundOverlays = [GMSGroundOverlay]()
     var timeFormat = TimeFormat.format24Hour
@@ -30,34 +30,46 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     @IBOutlet weak var centerYConstraintForSecondaryTimeDayView: NSLayoutConstraint!
     @IBOutlet weak var centerYConstraintForPrimaryTimeDayView: NSLayoutConstraint!
     var zoomOutButton = UIButton.init(type:.RoundedRect)
-
+    
     var isInTimeRangeMode = false
     var userControl = false
+    var animatingFromCityView = true
     
-    let dao = SPDataAccessObject()
+    var dao: SPDataAccessObject?
     
     var format12HrString:String { return "12:00" }
     var format24HrString:String { return "24:00" }
     var timeRangeString:String { return "Range" }
     var singleTimeString:String { return "Single" }
     var initialMapViewCamera: GMSCameraPosition {
-        return GMSCameraPosition.cameraWithTarget(CLLocationCoordinate2DMake(40.7193748839769, -73.9289110153913), zoom: 11.3119)
+        let zoom = SPPolylineManager().initialZoom(forViewWidth: Double(view.frame.width))
+        print("Calculated zoom is: \(zoom), compared to hardcoded zoom = 10.6999")
+        return GMSCameraPosition.cameraWithTarget(CLLocationCoordinate2DMake(40.7193748839769, -73.9289110153913), zoom: zoom)
     }
-
-
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpMap()
         setObservers()
-        dao.setUpLocationManager()
+        dao!.setUpLocationManager()
         setCurrentDayAndTimeLabels()
-        dao.getUpcomingStreetCleaningSigns()
-        setUpButtonsAndViews()
+        setUpButtons()
         setupGestures()
+        activityIndicator.startAnimating()
+        activityIndicator.hidesWhenStopped = true
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
+    }
+    
+    override func viewWillDisappear(animated: Bool) {
+        super.viewWillDisappear(animated)
+        let notificationCenter = NSNotificationCenter.defaultCenter()
+        notificationCenter.removeObserver(self, name: kSPSQLiteCoordinateQuery, object: nil)
+        notificationCenter.removeObserver(self, name: kSPSQLiteTimeAndDayQuery, object: nil)
+        notificationCenter.removeObserver(self, name: kSPSQLiteTimeAndDayLocationsOnlyQuery, object: nil)
     }
     
     //MARK: - Setup methods
@@ -67,13 +79,12 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         let touchGesture = UITapGestureRecognizer.init(target: self, action: #selector(zoomToTapOnMap(_:)))
         mapView.addGestureRecognizer(touchGesture)
     }
-     @objc private func zoomToTapOnMap(gesture:UITapGestureRecognizer) {
+    @objc private func zoomToTapOnMap(gesture:UITapGestureRecognizer) {
         if mapView.camera.zoom < 15 {
             let pointOnMap = gesture.locationInView(mapView)
             let camera = GMSCameraPosition.cameraWithTarget(mapView.projection.coordinateForPoint(pointOnMap), zoom: 15.0)
             mapView.animateToCameraPosition(camera)
             turnSwoopOn()
-            zoomOutButton.hidden = false
         }
     }
     
@@ -83,77 +94,86 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         mapView.settings.myLocationButton = true
         mapView.settings.rotateGestures = false
         mapView.delegate = self
-     }
+    }
     
     private func setObservers() {
         let notificationCenter = NSNotificationCenter.defaultCenter()
-        notificationCenter.addObserver(self, selector: #selector(currentMapViewLocationsSet), name: kSPSQLiteCoordinateQuery, object: nil)
-        notificationCenter.addObserver(self, selector: #selector(currentTimeAndDayLocationsDidSet), name: kSPSQLiteTimeAndDayQuery, object: nil)
-        notificationCenter.addObserver(self, selector: #selector(currentTimeAndDayLocationsDidSet), name: kSPSQLiteTimeAndDayLocationsOnlyQuery, object: nil)
+        notificationCenter.addObserver(self, selector: #selector(currentLocationsByCoordinateSet), name: kSPSQLiteCoordinateQuery, object: nil)
+        notificationCenter.addObserver(self, selector: #selector(currentLocationsByTimeAndDaySet), name: kSPSQLiteTimeAndDayQuery, object: nil)
+        notificationCenter.addObserver(self, selector: #selector(currentLocationsByTimeAndDaySet), name: kSPSQLiteTimeAndDayLocationsOnlyQuery, object: nil)
     }
     
     private func setCurrentDayAndTimeLabels() {
-        do{
-            primaryDayTextView.text = try timeAndDayManager.getDayString(fromInt: dao.currentDayAndTimeInt.day)
-            primaryTimeTextView.text = timeAndDayManager.timeString(fromTime: (dao.currentDayAndTimeInt.hour, dao.currentDayAndTimeInt.min), format: timeFormat)
-            dao.primaryTimeAndDayString = (primaryDayTextView.text, primaryTimeTextView.text)
-        } catch {
-            print("Day \(dao.currentDayAndTimeInt.day) is not between 1 and 7")
-        }
+        primaryDayTextView.text = dao!.dayString(fromInt: dao!.currentDayAndTimeInt.day)
+        primaryTimeTextView.text = timeAndDayManager.timeString(fromTime: (dao!.currentDayAndTimeInt.hour, dao!.currentDayAndTimeInt.min), format: timeFormat)
+        dao!.primaryTimeAndDayString = (primaryDayTextView.text, primaryTimeTextView.text)
     }
     
-    private func setUpButtonsAndViews() {
-        timeRangeButton.setTitle(timeRangeString, forState: .Normal)
-        timeFormatButton.setTitle(format12HrString, forState: .Normal)
-        secondaryDayAndTimeView.hidden = true
+    private func setUpButtons() {
         zoomOutButton.setTitle("Zoom Out", forState: .Normal)
         let buttonSize = zoomOutButton.intrinsicContentSize()
-        zoomOutButton.frame = CGRectMake(mapView.bounds.origin.x + 15.0, mapView.bounds.origin.y + 15, buttonSize.width, buttonSize.height)
+        zoomOutButton.frame = CGRectMake(mapView.bounds.origin.x + 8.0, mapView.bounds.origin.y + 8, buttonSize.width, buttonSize.height)
+        zoomOutButton.backgroundColor = UIColor.whiteColor()
         zoomOutButton.hidden = true
         zoomOutButton.addTarget(self, action: #selector(zoomOut), forControlEvents: .TouchUpInside)
         mapView.addSubview(zoomOutButton)
-        activityIndicator.hidden = true
     }
     
-    // MARK: - Notification Methods
-    @objc private func currentMapViewLocationsSet(notification:NSNotification) {
-        if currentMapPolylines.count > 0 {
-            hide(mapOverlayViews: currentMapPolylines)
-        }
-        currentMapPolylines = SPPolylineManager().polylines(forCurrentLocations: dao.currentMapViewLocations, zoom: Double(mapView.camera.zoom))
-        if currentMapPolylines.count > 0 && mapView.camera.zoom >= 15 {
-            hide(mapOverlayViews: currentGroundOverlays)
-            show(mapOverlayViews: currentMapPolylines)
-            zoomOutButton.hidden = false
-        }
-    }
     
-    @objc private func currentTimeAndDayLocationsDidSet(notification:NSNotification) {
-        currentGroundOverlays =  SPGroundOverlayManager().groundOverlays(forMap: mapView, forLocations: dao.locationsForDayAndTime)
-        show(mapOverlayViews: currentGroundOverlays)
-    }
     
     //MARK: - Hide/Show GMSPolyline/GroundOverLays
     private func hide<MapOverlayType: GMSOverlay>(mapOverlayViews views:[MapOverlayType]) {
         for view in views { view.map = nil }
     }
     private func show<MapOverlayType: GMSOverlay>(mapOverlayViews views:[MapOverlayType]) {
-        let date = NSDate()
         for view in views {  view.map = mapView }
-        print("Time to draw polylines: \(date.timeIntervalSinceNow)")
-    }
-
-//    MARK: - Button Methods
-
-    //MARK: Swoop toggle
-    @IBAction func toggleSwoopSwitch(sender: UISwitch) {
-        if swoopSwitch.on { getSignsForCurrentMapView() }
     }
     
+    
+    // MARK: - Notification Methods
+    @objc private func currentLocationsByCoordinateSet(notification:NSNotification) {
+        if currentMapPolylines.count > 0 {
+            hide(mapOverlayViews: currentMapPolylines)
+        }
+        currentMapPolylines = SPPolylineManager().polylines(forCurrentLocations: dao!.currentMapViewLocations, zoom: Double(mapView.camera.zoom))
+        if currentMapPolylines.count > 0 && mapView.camera.zoom >= 15 {
+            hide(mapOverlayViews: currentGroundOverlays)
+            show(mapOverlayViews: currentMapPolylines)
+        }
+        zoomOutButton.hidden = false
+        activityIndicator.stopAnimating()
+    }
+    
+    @objc private func currentLocationsByTimeAndDaySet(notification:NSNotification) {
+        getNewGroundOverlays()
+        activityIndicator.stopAnimating()
+    }
+    
+    private func getNewGroundOverlays() {
+        hide(mapOverlayViews: currentGroundOverlays)
+        currentGroundOverlays =  SPGroundOverlayManager().groundOverlays(forMap: mapView, forLocations: dao!.locationsForDayAndTime)
+        show(mapOverlayViews: currentGroundOverlays)
+    }
+    
+    //    MARK: - Button Methods
+    
+    //MARK: Swoop toggle
+    @IBAction func toggleSwoopSwitch(sender: UISwitch) {
+        
+        let visibleRegion = mapView.projection.visibleRegion()
+        let lowerLeftLocation = CLLocation.init(latitude: visibleRegion.nearLeft.latitude, longitude: visibleRegion.nearLeft.longitude)
+        let lowerRightLocation = CLLocation.init(latitude: visibleRegion.nearRight.latitude, longitude: visibleRegion.nearRight.longitude)
+        let localMeters = lowerLeftLocation.distanceFromLocation(lowerRightLocation)
+        
+        let visibleRegionBounds = GMSCoordinateBounds.init(region: mapView.projection.visibleRegion())
+        print("NortheastCoordinate: \(visibleRegionBounds.northEast). SW: \(visibleRegionBounds.southWest), zoom: \(mapView.camera.zoom)), distance: \(localMeters)")
+        
+        
+        if swoopSwitch.on { getSignsForCurrentMapView() }
+    }
     @IBAction func toggleSwoopButton(sender: UIButton) {
         toggleSwoop()
     }
-    
     private func toggleSwoop() {
         if swoopSwitch.on {
             swoopSwitch.setOn(false, animated: true)
@@ -172,9 +192,9 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     }
     
     private func getSignsForCurrentMapView() {
-        print("SwoopSwitch.on: \(swoopSwitch.on). Zoom: \(mapView.camera.zoom). isInNYC: \(dao.isInNYC(mapView))")
-        if swoopSwitch.on && mapView.camera.zoom >= 15 && dao.isInNYC(mapView) {
-            dao.getSigns(forCurrentMapView: mapView)
+        if swoopSwitch.on && mapView.camera.zoom >= 15 && dao!.isInNYC(mapView) {
+            activityIndicator.startAnimating()
+            dao!.getSigns(forCurrentMapView: mapView)
         }
     }
     
@@ -187,9 +207,9 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     private func changeDay(forTextView dayTextView:UITextView, function:(String)->String) {
         dayTextView.text = function(dayTextView.text)
         if dayTextView === primaryDayTextView {
-            dao.primaryTimeAndDayString!.day = dayTextView.text
+            dao!.primaryTimeAndDayString!.day = dayTextView.text
         } else if dayTextView === secondaryDayTextView {
-            dao.secondaryTimeAndDayString!.day = dayTextView.text
+            dao!.secondaryTimeAndDayString!.day = dayTextView.text
         }
     }
     
@@ -198,7 +218,6 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     @IBAction func decreaseSecondaryTime(sender: UIButton) { changeTime(forTimeView: secondaryTimeTextView, dayView: secondaryDayTextView, function: timeAndDayManager.decreaseTime) }
     @IBAction func increaseSecondaryTime(sender: UIButton) { changeTime(forTimeView: secondaryTimeTextView, dayView: secondaryDayTextView, function: timeAndDayManager.increaseTime) }
     
-    // --->
     private func changeTime(forTimeView timeView:UITextView, dayView:UITextView, function: ((String, String), TimeFormat) -> (time:String, day:String)) {
         let timeAndDay = function((timeView.text, dayView.text), timeFormat)
         timeView.text = timeAndDay.time
@@ -206,9 +225,9 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
             dayView.text = timeAndDay.day
         }
         if dayView === primaryDayTextView && timeView == primaryTimeTextView {
-            dao.primaryTimeAndDayString = timeAndDay
+            dao!.primaryTimeAndDayString = timeAndDay
         } else if dayView === secondaryDayTextView && timeView === secondaryTimeTextView {
-            dao.secondaryTimeAndDayString = timeAndDay
+            dao!.secondaryTimeAndDayString = timeAndDay
         }
     }
     
@@ -237,13 +256,13 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
             timeRangeButton.setTitle(singleTimeString, forState: .Normal)
             secondaryDayTextView.text = primaryDayTextView.text
             secondaryTimeTextView.text = primaryTimeTextView.text
-            dao.secondaryTimeAndDayString = (secondaryDayTextView.text, secondaryTimeTextView.text)
-
+            dao!.secondaryTimeAndDayString = (secondaryDayTextView.text, secondaryTimeTextView.text)
+            
             UIView.animateWithDuration(0.3, animations: {
                 self.secondaryDayAndTimeView.hidden = false
-                self.heightConstraintOfTimeAndDayContainer.constant = 80
-                self.centerYConstraintForPrimaryTimeDayView.constant = -self.heightConstraintOfTimeAndDayContainer.constant / 5
-                self.centerYConstraintForSecondaryTimeDayView.constant = self.heightConstraintOfTimeAndDayContainer.constant / 5
+                self.heightConstraintOfTimeAndDayContainer.constant = 70
+                self.centerYConstraintForPrimaryTimeDayView.constant = -self.heightConstraintOfTimeAndDayContainer.constant / 4
+                self.centerYConstraintForSecondaryTimeDayView.constant = self.heightConstraintOfTimeAndDayContainer.constant / 4
                 self.view.layoutIfNeeded()
             })
         } else if isInTimeRangeMode {
@@ -278,7 +297,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     }
     
     func moveCameraToUserLocation() {
-        if let currentCoordinate = dao.currentLocation?.coordinate {
+        if let currentCoordinate = dao!.currentLocation?.coordinate {
             let camera = GMSCameraPosition.cameraWithTarget(currentCoordinate, zoom: 15)
             mapView.animateToCameraPosition(camera)
         }
@@ -289,9 +308,28 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         if mapView.camera.zoom < 15 {
             hide(mapOverlayViews: currentMapPolylines)
             show(mapOverlayViews: currentGroundOverlays)
-            if mapView.camera.zoom < 13 { zoomOutButton.hidden = true }
-
-        } else { getSignsForCurrentMapView() }
+            if mapView.camera.zoom < 13 {
+                zoomOutButton.hidden = true
+                getNewGroundOverlays()
+            }
+            if mapView.camera.zoom < 12 { animatingFromCityView = true }
+        } else {
+            getSignsForCurrentMapView()
+        }
+    }
+    
+    func mapView(mapView: GMSMapView, didChangeCameraPosition position: GMSCameraPosition) {
+        if animatingFromCityView{
+            if mapView.camera.zoom < 15 {
+                hide(mapOverlayViews: currentMapPolylines)
+                show(mapOverlayViews: currentGroundOverlays)
+                if mapView.camera.zoom < 13 { zoomOutButton.hidden = true }
+                
+            } else {
+                getSignsForCurrentMapView()
+                animatingFromCityView = false
+            }
+        }
     }
     
     func mapView(mapView: GMSMapView, willMove gesture: Bool) {
@@ -309,18 +347,18 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         do {
             if textView === primaryDayTextView || textView === secondaryDayTextView {
                 textView.text = try SPTimeAndDayManager().dayString(fromTextInput: textView.text)
-                if textView == primaryDayTextView { dao.primaryTimeAndDayString!.day = textView.text }
-                else { dao.secondaryTimeAndDayString!.day = textView.text }
+                if textView == primaryDayTextView { dao!.primaryTimeAndDayString!.day = textView.text }
+                else { dao!.secondaryTimeAndDayString!.day = textView.text }
             } else if textView === primaryTimeTextView || textView === secondaryTimeTextView {
                 textView.text = try SPTimeAndDayManager().timeString(fromTextInput: textView.text, format:timeFormat)
-                if textView == primaryTimeTextView { dao.primaryTimeAndDayString!.time = textView.text }
-                else { dao.secondaryTimeAndDayString!.time = textView.text }
+                if textView == primaryTimeTextView { dao!.primaryTimeAndDayString!.time = textView.text }
+                else { dao!.secondaryTimeAndDayString!.time = textView.text }
             }
         } catch {
-            if textView === primaryTimeTextView { textView.text = dao.primaryTimeAndDayString!.time }
-            else if textView === primaryDayTextView { textView.text = dao.primaryTimeAndDayString!.day }
-            else if textView === secondaryTimeTextView { textView.text = dao.secondaryTimeAndDayString!.time }
-            else if textView === secondaryDayTextView { textView.text = dao.secondaryTimeAndDayString!.day }
+            if textView === primaryTimeTextView { textView.text = dao!.primaryTimeAndDayString!.time }
+            else if textView === primaryDayTextView { textView.text = dao!.primaryTimeAndDayString!.day }
+            else if textView === secondaryTimeTextView { textView.text = dao!.secondaryTimeAndDayString!.time }
+            else if textView === secondaryDayTextView { textView.text = dao!.secondaryTimeAndDayString!.day }
         }
     }
 }

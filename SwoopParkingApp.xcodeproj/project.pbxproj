@@ -10,10 +10,11 @@
 		63D1C4EB52AFB020182655BB /* Pods_SwoopParkingApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56327B640CD4999BE162E2BD /* Pods_SwoopParkingApp.framework */; };
 		9C215D9C1D6652D9006C1E3E /* SPTimeAndDayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C215D9B1D6652D9006C1E3E /* SPTimeAndDayViewController.swift */; };
 		9C42DAB31D5A589E004ECA97 /* SPDataAccessObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C42DAB21D5A589E004ECA97 /* SPDataAccessObject.swift */; };
+		9C4DCF4F1D6D39280060EEBF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9C4DCF4E1D6D39280060EEBF /* Main.storyboard */; };
+		9C4DCF511D6D3AAC0060EEBF /* swoop-sqlite2.db in Resources */ = {isa = PBXBuildFile; fileRef = 9C4DCF501D6D3AAC0060EEBF /* swoop-sqlite2.db */; };
 		9C5279C81CEB62B900AF88FF /* SPQuickGCD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C5279C71CEB62B900AF88FF /* SPQuickGCD.swift */; };
 		9C617EF51D51BF5100FFA51A /* SPTileLayerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C617EF41D51BF5100FFA51A /* SPTileLayerManager.swift */; };
 		9C96EE901D625EC4007C4EC8 /* SPViewControllerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C96EE8F1D625EC4007C4EC8 /* SPViewControllerExtension.swift */; };
-		9CA7DDAC1D579B300050B75D /* swoop-sqlite.db in Resources */ = {isa = PBXBuildFile; fileRef = 9CA7DDAB1D579B300050B75D /* swoop-sqlite.db */; };
 		9CA7DDC11D57EAB50050B75D /* LFHeatMap-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CA7DDBC1D57EAB50050B75D /* LFHeatMap-dummy.m */; };
 		9CA7DDC21D57EAB50050B75D /* LFHeatMap.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CA7DDBF1D57EAB50050B75D /* LFHeatMap.m */; };
 		9CA7DDC51D590BEF0050B75D /* SPGroundOverlayManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CA7DDC41D590BEF0050B75D /* SPGroundOverlayManager.swift */; };
@@ -29,10 +30,9 @@
 		9CC46A101D26C26500AC0717 /* AWSCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9CC46A0E1D26C26500AC0717 /* AWSCore.framework */; };
 		9CC46A111D26C26500AC0717 /* AWSLambda.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9CC46A0F1D26C26500AC0717 /* AWSLambda.framework */; };
 		9CC46A131D2EAFE500AC0717 /* SPLambdaManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CC46A121D2EAFE500AC0717 /* SPLambdaManager.swift */; };
-		9CD51DC91CE24662006B741D /* SPSignAndLocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CD51DC81CE24662006B741D /* SPSignAndLocationManager.swift */; };
+		9CD51DC91CE24662006B741D /* SPSignAndLocationParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CD51DC81CE24662006B741D /* SPSignAndLocationParser.swift */; };
 		9CFEE37A1CDA6D7900CE5D53 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CFEE3791CDA6D7900CE5D53 /* AppDelegate.swift */; };
 		9CFEE37C1CDA6D7900CE5D53 /* SPMapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CFEE37B1CDA6D7900CE5D53 /* SPMapViewController.swift */; };
-		9CFEE37F1CDA6D7A00CE5D53 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9CFEE37D1CDA6D7A00CE5D53 /* Main.storyboard */; };
 		9CFEE3811CDA6D7A00CE5D53 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9CFEE3801CDA6D7A00CE5D53 /* Assets.xcassets */; };
 		9CFEE3841CDA6D7A00CE5D53 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9CFEE3821CDA6D7A00CE5D53 /* LaunchScreen.storyboard */; };
 		9CFEE38F1CDA6D7A00CE5D53 /* SwoopParkingAppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CFEE38E1CDA6D7A00CE5D53 /* SwoopParkingAppTests.swift */; };
@@ -65,10 +65,11 @@
 		5ACFCA4B78275422A004D327 /* Pods-SwoopParkingApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwoopParkingApp.debug.xcconfig"; path = "Pods/Target Support Files/Pods-SwoopParkingApp/Pods-SwoopParkingApp.debug.xcconfig"; sourceTree = "<group>"; };
 		9C215D9B1D6652D9006C1E3E /* SPTimeAndDayViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPTimeAndDayViewController.swift; sourceTree = "<group>"; };
 		9C42DAB21D5A589E004ECA97 /* SPDataAccessObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPDataAccessObject.swift; sourceTree = "<group>"; };
+		9C4DCF4E1D6D39280060EEBF /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
+		9C4DCF501D6D3AAC0060EEBF /* swoop-sqlite2.db */ = {isa = PBXFileReference; lastKnownFileType = file; path = "swoop-sqlite2.db"; sourceTree = "<group>"; };
 		9C5279C71CEB62B900AF88FF /* SPQuickGCD.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPQuickGCD.swift; sourceTree = "<group>"; };
 		9C617EF41D51BF5100FFA51A /* SPTileLayerManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPTileLayerManager.swift; sourceTree = "<group>"; };
 		9C96EE8F1D625EC4007C4EC8 /* SPViewControllerExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPViewControllerExtension.swift; sourceTree = "<group>"; };
-		9CA7DDAB1D579B300050B75D /* swoop-sqlite.db */ = {isa = PBXFileReference; lastKnownFileType = file; path = "swoop-sqlite.db"; sourceTree = "<group>"; };
 		9CA7DDBC1D57EAB50050B75D /* LFHeatMap-dummy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "LFHeatMap-dummy.m"; sourceTree = "<group>"; };
 		9CA7DDBD1D57EAB50050B75D /* LFHeatMap-umbrella.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "LFHeatMap-umbrella.h"; sourceTree = "<group>"; };
 		9CA7DDBE1D57EAB50050B75D /* LFHeatMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LFHeatMap.h; sourceTree = "<group>"; };
@@ -95,11 +96,10 @@
 		9CC46A0E1D26C26500AC0717 /* AWSCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AWSCore.framework; path = "Pods/../build/Debug-iphoneos/AWSCore/AWSCore.framework"; sourceTree = "<group>"; };
 		9CC46A0F1D26C26500AC0717 /* AWSLambda.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AWSLambda.framework; path = "Pods/../build/Debug-iphoneos/AWSLambda/AWSLambda.framework"; sourceTree = "<group>"; };
 		9CC46A121D2EAFE500AC0717 /* SPLambdaManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPLambdaManager.swift; sourceTree = "<group>"; };
-		9CD51DC81CE24662006B741D /* SPSignAndLocationManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPSignAndLocationManager.swift; sourceTree = "<group>"; };
+		9CD51DC81CE24662006B741D /* SPSignAndLocationParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPSignAndLocationParser.swift; sourceTree = "<group>"; };
 		9CFEE3761CDA6D7900CE5D53 /* SwoopParkingApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwoopParkingApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9CFEE3791CDA6D7900CE5D53 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		9CFEE37B1CDA6D7900CE5D53 /* SPMapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SPMapViewController.swift; sourceTree = "<group>"; };
-		9CFEE37E1CDA6D7A00CE5D53 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		9CFEE3801CDA6D7A00CE5D53 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9CFEE3831CDA6D7A00CE5D53 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		9CFEE3851CDA6D7A00CE5D53 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -191,7 +191,7 @@
 		9C42DAB61D5A6A63004ECA97 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				9CD51DC81CE24662006B741D /* SPSignAndLocationManager.swift */,
+				9CD51DC81CE24662006B741D /* SPSignAndLocationParser.swift */,
 				9CC46A121D2EAFE500AC0717 /* SPLambdaManager.swift */,
 				9CBE25BA1D552BD500B5384B /* SPSQLiteReader.swift */,
 				9C42DAB21D5A589E004ECA97 /* SPDataAccessObject.swift */,
@@ -277,11 +277,11 @@
 				9C42DAB61D5A6A63004ECA97 /* Model */,
 				9C42DAB51D5A6A47004ECA97 /* Views */,
 				9C42DAB41D5A6A37004ECA97 /* Controller */,
-				9CA7DDAB1D579B300050B75D /* swoop-sqlite.db */,
+				9C4DCF501D6D3AAC0060EEBF /* swoop-sqlite2.db */,
 				9CA7DDC31D57EAC90050B75D /* ObjC Header files */,
 				9CF750811D354F4F00000823 /* Utils */,
-				9CFEE37D1CDA6D7A00CE5D53 /* Main.storyboard */,
 				9CFEE3801CDA6D7A00CE5D53 /* Assets.xcassets */,
+				9C4DCF4E1D6D39280060EEBF /* Main.storyboard */,
 				9CFEE3821CDA6D7A00CE5D53 /* LaunchScreen.storyboard */,
 				9CFEE3851CDA6D7A00CE5D53 /* Info.plist */,
 				9CBE25BC1D552BFA00B5384B /* SwoopParkingApp-Bridging-Header.h */,
@@ -417,8 +417,8 @@
 			files = (
 				9CFEE3841CDA6D7A00CE5D53 /* LaunchScreen.storyboard in Resources */,
 				9CFEE3811CDA6D7A00CE5D53 /* Assets.xcassets in Resources */,
-				9CA7DDAC1D579B300050B75D /* swoop-sqlite.db in Resources */,
-				9CFEE37F1CDA6D7A00CE5D53 /* Main.storyboard in Resources */,
+				9C4DCF4F1D6D39280060EEBF /* Main.storyboard in Resources */,
+				9C4DCF511D6D3AAC0060EEBF /* swoop-sqlite2.db in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -493,7 +493,7 @@
 			files = (
 				9CBE25BB1D552BD500B5384B /* SPSQLiteReader.swift in Sources */,
 				9CBE25DE1D555CEE00B5384B /* FMDatabase.m in Sources */,
-				9CD51DC91CE24662006B741D /* SPSignAndLocationManager.swift in Sources */,
+				9CD51DC91CE24662006B741D /* SPSignAndLocationParser.swift in Sources */,
 				9CBE25E21D555CEE00B5384B /* FMResultSet.m in Sources */,
 				9CFEE37C1CDA6D7900CE5D53 /* SPMapViewController.swift in Sources */,
 				9C215D9C1D6652D9006C1E3E /* SPTimeAndDayViewController.swift in Sources */,
@@ -547,14 +547,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		9CFEE37D1CDA6D7A00CE5D53 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				9CFEE37E1CDA6D7A00CE5D53 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		9CFEE3821CDA6D7A00CE5D53 /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (

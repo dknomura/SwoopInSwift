@@ -10,7 +10,7 @@ import Foundation
 import GoogleMaps
 
 class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDelegate, SPLambdaManagerDelegate {
-
+    
     var locationsForDayAndTime = [SPLocation]()
     var currentMapViewLocations = [SPLocation]()
     var currentLocation: CLLocation?
@@ -21,32 +21,53 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
     var secondaryTimeAndDayString: (time:String, day:String)?
     
     
+    //MARK: - Time and Day data access methods
+    func dayString(fromInt dayInt:Int) -> String {
+        do{
+            return try SPTimeAndDayManager().getDayString(fromInt: dayInt)
+        } catch {
+            print("Day Int \(dayInt) is not between 1 and 7")
+            return "Mon"
+        }
+    }
+    
+    
+    //MARK: - Determine if current mapView is within NYC
+    var maxNYCCoordinate: CLLocationCoordinate2D { return CLLocationCoordinate2DMake(40.91295931663856, -73.70059684703173) }
+    var minNYCCoordinate: CLLocationCoordinate2D { return CLLocationCoordinate2DMake(40.49785967315467, -74.25453161899142) }
     
     func isInNYC(mapView:GMSMapView) -> Bool {
-        return SPSignAndLocationManager().isVisibleRegionWithinNYC(GMSCoordinateBounds(region: mapView.projection.visibleRegion()))
+        let region = GMSCoordinateBounds.init(region: mapView.projection.visibleRegion())
+        if isCoordinateWithinRegion(region.northEast, NECoordinate: maxNYCCoordinate, SWCoordinate: minNYCCoordinate) || isCoordinateWithinRegion(region.southWest, NECoordinate: maxNYCCoordinate, SWCoordinate: minNYCCoordinate) { return true }
+        else { return false }
     }
+    private func isCoordinateWithinRegion (testCoordinate: CLLocationCoordinate2D, NECoordinate: CLLocationCoordinate2D, SWCoordinate: CLLocationCoordinate2D) -> Bool {
+        if testCoordinate.latitude < NECoordinate.latitude && testCoordinate.latitude > SWCoordinate.latitude {
+            if testCoordinate.longitude < NECoordinate.longitude && testCoordinate.longitude > SWCoordinate.longitude { return true }
+            else { return false }
+        } else { return false }
+    }
+    
     
     // MARK: - SQLite methods
     
     func getUpcomingStreetCleaningSigns() {
         var sqliteReader = SPSQLiteReader()
         sqliteReader.delegate = self
-//        sqliteReader.getAllSignsAndLocations()
+        //        sqliteReader.getAllSignsAndLocations()
         sqliteReader.queryUpcomingStreetCleaningSignsAndLocations(currentDayAndTimeInt)
     }
-
-
+    
     func getSigns(forCurrentMapView mapView:GMSMapView) {
         let visibleRegionBounds = GMSCoordinateBounds.init(region: mapView.projection.visibleRegion())
         
         var sqlReader = SPSQLiteReader()
         sqlReader.delegate = self
         sqlReader.querySignsAndLocations(swCoordinate: visibleRegionBounds.southWest, neCoordinate: visibleRegionBounds.northEast)
-
-        // hit the swoop button to find the current map center and zoom
-//        print("center coordinate = (\((northEastCoordinate.latitude + southWestCoordinate.latitude) / 2), \((northEastCoordinate.longitude + southWestCoordinate.longitude) / 2)) zoom: \(mapView.camera.zoom)")
-    }
         
+        //         hit the swoop button to find the current map center and zoom
+    }
+    
     // MARK: - SQLite and Lambda delegate methods
     func sqlQueryDidFinish(withResults results: (queryType: String, locationResults: [SPLocation])) {
         if results.queryType == kSPSQLiteCoordinateQuery {
@@ -64,7 +85,7 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
         }
         if responseDict["lambdaFunction"] as? String ==  kSPLambdaGetSignsAndLocationsForCoordinates,
             let data = responseDict["response"] as? NSArray {
-            currentMapViewLocations = SPSignAndLocationManager().parseLambdaSignsAndLocationsFromCoordinates(data)
+            currentMapViewLocations = SPSignAndLocationParser().parseLambdaSignsAndLocationsFromCoordinates(data)
             NSNotificationCenter.defaultCenter().postNotificationName(kSPSQLiteCoordinateQuery, object: nil)
         }
     }
@@ -79,13 +100,11 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
         locationManager.requestWhenInUseAuthorization()
         locationManager.startUpdatingLocation()
     }
-
+    
     // MARK: - CLManager delegate
     
     func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         currentLocation = locations.last!
-        if (locations.count == 0) {
-            return
-        }
+        if (locations.count == 0) { return }
     }
 }

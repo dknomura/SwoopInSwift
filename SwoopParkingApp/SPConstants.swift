@@ -42,3 +42,27 @@ let kSPSignContentSQL = "sign_content"
 let kSPSignTypeSQL = "sign_type"
 
 
+//MARK: Sign and Location Constants
+//Location JSON properties/dictionary keys for lambda response
+let kSPSignsJSON = "signs"
+let kSPSignIndexJSON = "signIndex"
+let kSPPositionInFeetJSON = "positionInFeet"
+let kSPDirectionOfArrowJSON = "directionOfArrow"
+let kSPSignContentJSON = "signContent"
+let kSPSignTypeJSON = "signType"
+let kSPBoroughJSON = "borough"
+let kSPlocationNumberJSON = "locationNumber"
+
+
+//Sign JSON properties/dictionary keys
+let kSPStreetJSON = "street"
+let kSPFromCrossStreetJSON = "fromCrossStreet"
+let kSPToCrossStreetJSON = "toCrossStreet"
+let kSPSideOfStreetJSON = "sideOfStreet"
+let kSPFromLatitudeJSON = "fromLatitude"
+let kSPFromLongitudeJSON = "fromLongitude"
+let kSPToLatitudeJSON = "toLatitude"
+let kSPToLongitudeJSON = "toLongitude"
+let kSPSnappedPointsJSON = "snappedPoints"
+
+
