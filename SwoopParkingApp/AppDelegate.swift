@@ -19,12 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         GMSServices.provideAPIKey(kSPGoogleMapsKey)
         setupAWS()
-        let dao = SPDataAccessObject()
-        dao.getUpcomingStreetCleaningSigns()
-        guard let navController = window?.rootViewController as? UINavigationController else { return true }
-        guard let mapController = navController.topViewController as? SPMapViewController else { return true }
-        mapController.dao = dao
-        
+        setupRootViewController()
         // Override point for customization after application launch.
         return true
     }
@@ -51,11 +46,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
     
-    func setupAWS() {
+    
+    //MARK: - Setup Methods
+    private func setupAWS() {
         let credentialProvider = AWSCognitoCredentialsProvider(regionType:.USEast1, identityPoolId: "us-east-1:14495a5f-65b5-4859-b8f5-4de05fbce775")
         let configuration = AWSServiceConfiguration(region: .USEast1, credentialsProvider:credentialProvider)
         AWSServiceManager.defaultServiceManager().defaultServiceConfiguration = configuration
     }
     
+    private func setupRootViewController() {
+        let dao = SPDataAccessObject()
+        dao.getUpcomingStreetCleaningSigns()
+        guard let navController = window?.rootViewController as? UINavigationController else { return }
+        guard let mapController = navController.topViewController as? SPMapViewController else { return }
+        mapController.dao = dao
+
+    }
 }
 

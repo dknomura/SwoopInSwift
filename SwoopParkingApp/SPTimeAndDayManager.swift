@@ -70,6 +70,8 @@ class SPTimeAndDayManager {
         return dayString
     }
     
+    
+    
     func increaseTime(timeAndDay:(time:String, day:String), format:TimeFormat) -> (time:String, day:String) {
         if timeAndDay.time == "" {
             return timeAndDay
