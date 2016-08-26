@@ -329,13 +329,13 @@ struct SPPolylineManager {
     
     
     
-    func initialZoom(forViewWidth viewWidth: Double) -> Float {
+    func initialZoom(forViewHeight viewHeight: Double) -> Float {
         // Using the logic above to find zoom, local points / world width point = local meters / world width meters
         // world width points = local points * world width meters / local meters
         // 2 ^ N = world width points / 256
         // N = log2(world width points / 256)
         // local points = map width, local meters = 27425.3366774176
-        let localPoints = viewWidth
+        let localPoints = viewHeight
         let localMeters = 36000.0
         let worldMeters = 40075000.0
         let worldPoints = localPoints * worldMeters / localMeters

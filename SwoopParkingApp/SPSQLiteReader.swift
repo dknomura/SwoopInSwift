@@ -9,13 +9,13 @@
 import Foundation
 import CoreLocation
 
+enum SQLError: ErrorType {
+    case unableToOpenDB
+    case noResults(ErrorMessage:String)
+    case invalidQuery(query:String)
+}
+
 struct SPSQLiteReader {
-    
-    enum SQLError: ErrorType {
-        case unableToOpenDB
-        case noResults(ErrorMessage:String)
-    }
-    
     weak var delegate: SPSQLiteReaderDelegate?
     weak var dao:SPDataAccessObject?
     
@@ -45,12 +45,6 @@ struct SPSQLiteReader {
     var dbPath:String { return NSBundle.mainBundle().pathForResource("swoop-sqlite2", ofType: "db")! }
     
     
-    //    func getAllSignsAndLocations() {
-    //        let query = beginningOfLocationJoinSignsQuery + "FROM locations l JOIN signs s ON l.id = s.location_id;"
-    //        callSQL(query:query, withValues:[], queryType:kSPSQLiteCoordinateQuery, callback:parseSignsAndLocations)
-    //    }
-    
-    
     // This function is for finding all of the signs and locations within a given coordinate region. The call back passed to the callSQL() function parses all of the signs and location
     func querySignsAndLocations(swCoordinate swCoordinate:CLLocationCoordinate2D, neCoordinate: CLLocationCoordinate2D) {
         var query = beginningOfLocationJoinSignsQuery
@@ -64,7 +58,7 @@ struct SPSQLiteReader {
     }
     
     //This function is for finding all of the locations with at least one street cleaning sign that is the only sign in their position (meaning that it is okay to park there any time after street cleaning). The call back passed to the callSQL() function will find locations that have at least one street cleaning sign that is the only sign at that position
-    func queryUpcomingStreetCleaningSignsAndLocations(forDayAndTime:(day:Int, hour:Int, min:Int)) {
+    func queryUpcomingStreetCleaningSignsAndLocations(forDayAndTime:SPTimeAndDayInt) {
         //        var query = beginningOfLocationJoinSignsQuery
         //        query +=
         let query = "SELECT l.id, sign_content, position_in_feet, from_latitude, from_longitude FROM locations l INNER JOIN signs s1 ON l.id = s1.location_id WHERE s1.position_in_feet || ' ' || s1.location_id IN ( SELECT s2.position_in_feet || ' ' || s2.location_id FROM signs s2 WHERE s2.sign_content MATCH 'sanitation tues* 12*')"
@@ -85,12 +79,6 @@ struct SPSQLiteReader {
             defer {
                 database.close()
             }
-            //            do {
-            //                let pragmaStatement = "PRAGMA foreign_keys = ON;"
-            //                try database.executeQuery(pragmaStatement, values: [])
-            //            } catch {
-            //                print("Error with pragma query: \(error)")
-            //            }
             let pragmaStatement = "PRAGMA foreign_keys = 1;"
             if !database.executeUpdate(pragmaStatement, withArgumentsInArray: []) {
                 print("Error with SQLite pragma statment: \(database.lastErrorMessage())")
@@ -116,8 +104,6 @@ struct SPSQLiteReader {
         })
         
     }
-    
-    
     
     private func parseSignsAndLocations(fromResults results: FMResultSet, queryType:String) {
         var parser = SPSignAndLocationParser()

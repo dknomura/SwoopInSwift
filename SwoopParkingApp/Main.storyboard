@@ -30,6 +30,9 @@
                             </containerView>
                             <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="pSV-hn-f5k">
                                 <rect key="frame" x="0.0" y="556" width="600" height="44"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="44" id="ujL-Xb-6pP"/>
+                                </constraints>
                                 <items>
                                     <barButtonItem style="plain" id="Goq-d2-crx">
                                         <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="DJv-Ap-5OW">
@@ -102,6 +105,7 @@
                     <connections>
                         <outlet property="activityIndicator" destination="oaH-1b-Mge" id="mDg-KL-O0C"/>
                         <outlet property="heightConstraintOfTimeAndDayContainer" destination="kRw-w5-y56" id="TLd-Fh-kLO"/>
+                        <outlet property="heightConstraintOfToolbar" destination="ujL-Xb-6pP" id="59d-XY-c2N"/>
                         <outlet property="mapView" destination="azD-Bj-X44" id="JBZ-aw-atx"/>
                         <outlet property="swoopSwitch" destination="Zek-LR-fRA" id="Em8-uL-M1N"/>
                         <outlet property="timeAndDayContainerView" destination="4Q6-5w-0gr" id="D8K-UP-8si"/>
@@ -171,7 +175,7 @@
                                                         <fontDescription key="fontDescription" type="system" pointSize="13"/>
                                                         <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                                         <connections>
-                                                            <outlet property="delegate" destination="BYZ-38-t0r" id="7kx-ox-lVm"/>
+                                                            <outlet property="delegate" destination="Ygi-5r-sqb" id="5ml-bJ-nFP"/>
                                                         </connections>
                                                     </textView>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="JqZ-EK-ah6">
@@ -213,19 +217,19 @@
                                                 </constraints>
                                                 <variation key="default">
                                                     <mask key="constraints">
-                                                        <exclude reference="vT2-yf-8Ee"/>
                                                         <exclude reference="kSd-4v-fPp"/>
-                                                        <exclude reference="25n-Rs-hX7"/>
+                                                        <exclude reference="vT2-yf-8Ee"/>
                                                         <exclude reference="0xd-rb-HPT"/>
-                                                        <exclude reference="Knu-p7-rBN"/>
+                                                        <exclude reference="25n-Rs-hX7"/>
                                                         <exclude reference="9pn-NG-egf"/>
+                                                        <exclude reference="Knu-p7-rBN"/>
                                                         <exclude reference="aPM-1p-kw1"/>
                                                         <exclude reference="mbC-v3-KxC"/>
-                                                        <exclude reference="d70-K9-OAp"/>
-                                                        <exclude reference="Tcz-Qe-8JV"/>
                                                         <exclude reference="4sW-UE-h07"/>
                                                         <exclude reference="O2G-8X-EsC"/>
                                                         <exclude reference="T26-G0-aEc"/>
+                                                        <exclude reference="Tcz-Qe-8JV"/>
+                                                        <exclude reference="d70-K9-OAp"/>
                                                     </mask>
                                                 </variation>
                                             </view>
@@ -259,7 +263,7 @@
                                                             </mask>
                                                         </variation>
                                                         <connections>
-                                                            <outlet property="delegate" destination="BYZ-38-t0r" id="UN1-Tj-7QM"/>
+                                                            <outlet property="delegate" destination="Ygi-5r-sqb" id="St9-uW-XDC"/>
                                                         </connections>
                                                     </textView>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wYT-tH-c50">
@@ -302,8 +306,8 @@
                                                         <exclude reference="gqR-Ui-Qv1"/>
                                                         <exclude reference="qOF-hD-UU5"/>
                                                         <exclude reference="6cK-Zw-02m"/>
-                                                        <exclude reference="hYm-Nl-kzN"/>
                                                         <exclude reference="bFY-7n-Nee"/>
+                                                        <exclude reference="hYm-Nl-kzN"/>
                                                     </mask>
                                                 </variation>
                                             </view>
@@ -357,7 +361,7 @@
                                                         <fontDescription key="fontDescription" type="system" pointSize="13"/>
                                                         <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                                         <connections>
-                                                            <outlet property="delegate" destination="BYZ-38-t0r" id="nlK-TL-gJk"/>
+                                                            <outlet property="delegate" destination="Ygi-5r-sqb" id="BXR-ta-JqT"/>
                                                         </connections>
                                                     </textView>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="HeQ-JS-zxg">
@@ -401,17 +405,17 @@
                                                     <mask key="constraints">
                                                         <exclude reference="Ibr-mb-NBo"/>
                                                         <exclude reference="Q5q-ha-MUu"/>
-                                                        <exclude reference="afQ-wt-spM"/>
                                                         <exclude reference="6sj-Vq-rg6"/>
-                                                        <exclude reference="Pio-tR-fJK"/>
                                                         <exclude reference="Lf0-sh-g56"/>
                                                         <exclude reference="NIe-J8-ZMW"/>
+                                                        <exclude reference="Pio-tR-fJK"/>
+                                                        <exclude reference="afQ-wt-spM"/>
                                                         <exclude reference="ZCz-zJ-j9P"/>
-                                                        <exclude reference="xGl-sa-Eys"/>
-                                                        <exclude reference="wBi-5o-zdF"/>
-                                                        <exclude reference="lTz-hI-Ntt"/>
                                                         <exclude reference="NtC-OF-EBq"/>
                                                         <exclude reference="dQx-8m-dUE"/>
+                                                        <exclude reference="lTz-hI-Ntt"/>
+                                                        <exclude reference="wBi-5o-zdF"/>
+                                                        <exclude reference="xGl-sa-Eys"/>
                                                     </mask>
                                                 </variation>
                                             </view>
@@ -445,7 +449,7 @@
                                                             </mask>
                                                         </variation>
                                                         <connections>
-                                                            <outlet property="delegate" destination="BYZ-38-t0r" id="cXb-0u-8tE"/>
+                                                            <outlet property="delegate" destination="Ygi-5r-sqb" id="bdX-rP-ahp"/>
                                                         </connections>
                                                     </textView>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qNF-rE-2ih">
@@ -483,13 +487,13 @@
                                                 <variation key="default">
                                                     <mask key="constraints">
                                                         <exclude reference="5Ga-U5-Kwm"/>
-                                                        <exclude reference="hBA-lg-maU"/>
                                                         <exclude reference="Jd3-8B-qgG"/>
+                                                        <exclude reference="hBA-lg-maU"/>
                                                         <exclude reference="5Bm-5f-igq"/>
                                                         <exclude reference="P1h-EM-mym"/>
-                                                        <exclude reference="X1d-da-ms4"/>
                                                         <exclude reference="9uo-iN-rSS"/>
                                                         <exclude reference="Nd9-jI-IC1"/>
+                                                        <exclude reference="X1d-da-ms4"/>
                                                     </mask>
                                                 </variation>
                                             </view>

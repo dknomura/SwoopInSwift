@@ -95,7 +95,7 @@ struct SPSignAndLocationParser {
             signCounter += 1
         }
         
-//        print("Time lapse for query \(queryType): \(totalDate.timeIntervalSinceNow) \nNumber of signs: \(signCounter)")
+        print("Time lapse for query \(queryType): \(totalDate.timeIntervalSinceNow) \nNumber of signs: \(signCounter)")
         return locationResults
     }
     
@@ -131,7 +131,7 @@ struct SPSignAndLocationParser {
             //                signPositions.append(sign.positionInFeet!)
             //            }
         }
-//        print("Time lapse for time and day query: \(totalDate.timeIntervalSinceNow)\nNumber of signs: \(signCounter)")
+        print("Time lapse for time and day query: \(totalDate.timeIntervalSinceNow)\nNumber of signs: \(signCounter)")
         return locationResults
     }
     
@@ -151,7 +151,12 @@ struct SPSignAndLocationParser {
         guard let signs = location.signs else { return [SPSign]() }
         var returnSigns = [SPSign]()
         let numberOfSignsAtPosition = dictionaryOfNumberOfSignsAtPosition(signs)
- 
+        
+        guard dao != nil,
+        let dayAndTime = dao?.primaryTimeAndDayString else {
+            print("DAO was not passed to SPSignAndLocationParser, unable to get timeAndDayString for markStreetCleaningSignsWithUniquePosition")
+            return [SPSign]()
+        }
         var signsWithUniquePositions = [SPSign]()
         for var sign in signs {
             if sign.positionInFeet != nil {
@@ -170,6 +175,12 @@ struct SPSignAndLocationParser {
             guard let signContent = sign.signContent?.lowercaseString else {
                 print("No sign content for sign \(sign.signIndex) at location: \(location.locationNumber)")
                 continue
+            }
+            let searchedDayAndTime = dao!.dayAndTimeForSQLCall(dayAndTime)
+            guard signContent.rangeOfString(searchedDayAndTime.day.lowercaseString) != nil  &&
+                signContent.rangeOfString(searchedDayAndTime.time.lowercaseString) != nil else {
+                    sign.isUniqueStreetCleaningSign = false
+                    continue
             }
             if signContent.rangeOfString("sanitation") != nil || signContent.rangeOfString("broom") != nil {
                 sign.isUniqueStreetCleaningSign = true

@@ -19,10 +19,10 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
     var currentMapViewLocations = [SPLocation]()
     var currentLocation: CLLocation?
     var streetCleaningLocations = [SPLocation]()
-    var currentDayAndTimeInt: (day:Int, hour:Int, min:Int) { return SPTimeAndDayManager().getCurrentDayHourMinutes() }
+    var currentDayAndTimeInt: SPTimeAndDayInt { return SPTimeAndDayManager().getCurrentDayHourMinutes() }
     let locationManager = CLLocationManager()
-    var primaryTimeAndDayString: (time:String, day:String)?
-    var secondaryTimeAndDayString: (time:String, day:String)?
+    var primaryTimeAndDayString: SPTimeAndDayString?
+    var secondaryTimeAndDayString: SPTimeAndDayString?
     
     
     //MARK: - Time and Day data access methods
@@ -35,6 +35,16 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
         }
     }
     
+    func dayAndTimeForSQLCall(dayAndTime:SPTimeAndDayString) -> SPTimeAndDayString {
+        var time = SPTimeAndDayManager().convertTimeString(dayAndTime.time, toFormat: .format12Hour)
+        
+        if let removeRange = dayAndTime.time.rangeOfString(":00") {
+            time.removeRange(removeRange)
+            return SPTimeAndDayString(time: time, day: dayAndTime.day)
+        } else {
+            return SPTimeAndDayString(time: time, day:dayAndTime.day)
+        }
+    }
     
     //MARK: - Determine if current mapView is within NYC
     var maxNYCCoordinate: CLLocationCoordinate2D { return CLLocationCoordinate2DMake(40.91295931663856, -73.70059684703173) }
