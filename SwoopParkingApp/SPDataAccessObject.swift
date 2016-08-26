@@ -9,6 +9,10 @@
 import Foundation
 import GoogleMaps
 
+enum DAOError:ErrorType {
+    case noDao(forFunction: String)
+}
+
 class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDelegate, SPLambdaManagerDelegate {
     
     var locationsForDayAndTime = [SPLocation]()
@@ -63,6 +67,7 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
         
         var sqlReader = SPSQLiteReader()
         sqlReader.delegate = self
+        sqlReader.dao = self
         sqlReader.querySignsAndLocations(swCoordinate: visibleRegionBounds.southWest, neCoordinate: visibleRegionBounds.northEast)
         
         //         hit the swoop button to find the current map center and zoom
@@ -107,4 +112,5 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
         currentLocation = locations.last!
         if (locations.count == 0) { return }
     }
+    
 }

@@ -10,6 +10,8 @@ import UIKit
 import GoogleMaps
 import AWSLambda
 
+
+
 class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDelegate, UITextViewDelegate, SPTimeViewControllerDelegate {
     
     @IBOutlet weak var timeAndDayContainerView: UIView!
@@ -50,25 +52,37 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
+        deregisterObservers()
+    }
+    
+    //MARK: - Setup/breakdown methods
+    
+    private func deregisterObservers() {
         let notificationCenter = NSNotificationCenter.defaultCenter()
         notificationCenter.removeObserver(self, name: kSPSQLiteCoordinateQuery, object: nil)
         notificationCenter.removeObserver(self, name: kSPSQLiteTimeAndDayQuery, object: nil)
         notificationCenter.removeObserver(self, name: kSPSQLiteTimeAndDayLocationsOnlyQuery, object: nil)
     }
     
-    //MARK: - Setup methods
     private func setupGestures() {
         hideKeyboardWhenTapAround()
-        mapView.settings.consumesGesturesInView = false
         let touchGesture = UITapGestureRecognizer.init(target: self, action: #selector(zoomToTapOnMap(_:)))
+        touchGesture.numberOfTapsRequired = 2
         mapView.addGestureRecognizer(touchGesture)
     }
     @objc private func zoomToTapOnMap(gesture:UITapGestureRecognizer) {
         if mapView.camera.zoom < 15 {
             let pointOnMap = gesture.locationInView(mapView)
+            print("Gesture selector touch location: \(pointOnMap). coordinate: \(mapView.projection.coordinateForPoint(pointOnMap))")
             let camera = GMSCameraPosition.cameraWithTarget(mapView.projection.coordinateForPoint(pointOnMap), zoom: 15.0)
             mapView.animateToCameraPosition(camera)
             turnSwoopOn()
+        }
+    }
+    
+    override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        for touch in touches {
+            print("view delegate touch location: \(touch.locationInView(mapView))")
         }
     }
     
@@ -78,6 +92,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         mapView.settings.myLocationButton = true
         mapView.settings.rotateGestures = false
         mapView.delegate = self
+        mapView.settings.consumesGesturesInView = false
     }
     
     private func setObservers() {
@@ -107,7 +122,10 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         if currentMapPolylines.count > 0 {
             hide(mapOverlayViews: currentMapPolylines)
         }
+//        let date = NSDate()
         currentMapPolylines = SPPolylineManager().polylines(forCurrentLocations: dao!.currentMapViewLocations, zoom: Double(mapView.camera.zoom))
+//        print("Time lapse to initialize polylines: \(date.timeIntervalSinceNow)")
+
         if currentMapPolylines.count > 0 && mapView.camera.zoom >= 15 {
             hide(mapOverlayViews: currentGroundOverlays)
             show(mapOverlayViews: currentMapPolylines)
@@ -117,11 +135,11 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     }
     
     @objc private func currentLocationsByTimeAndDaySet(notification:NSNotification) {
-        getNewGroundOverlays()
+        getNewHeatMapOverlays()
         activityIndicator.stopAnimating()
     }
     
-    private func getNewGroundOverlays() {
+    private func getNewHeatMapOverlays() {
         hide(mapOverlayViews: currentGroundOverlays)
         currentGroundOverlays =  SPGroundOverlayManager().groundOverlays(forMap: mapView, forLocations: dao!.locationsForDayAndTime)
         show(mapOverlayViews: currentGroundOverlays)
@@ -178,7 +196,8 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         return true
     }
     
-    func moveCameraToUserLocation() {
+    private func moveCameraToUserLocation() {
+        guard dao != nil else { print("No ")) }
         if let currentCoordinate = dao!.currentLocation?.coordinate {
             let camera = GMSCameraPosition.cameraWithTarget(currentCoordinate, zoom: 15)
             mapView.animateToCameraPosition(camera)
@@ -192,7 +211,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
             show(mapOverlayViews: currentGroundOverlays)
             if mapView.camera.zoom < 13 {
                 zoomOutButton.hidden = true
-                getNewGroundOverlays()
+                getNewHeatMapOverlays()
             }
             if mapView.camera.zoom < 12 { animatingFromCityView = true }
         } else {
@@ -224,7 +243,11 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         for view in views { view.map = nil }
     }
     private func show<MapOverlayType: GMSOverlay>(mapOverlayViews views:[MapOverlayType]) {
-        for view in views {  view.map = mapView }
+        if views.count > 0 {
+//            let date = NSDate()
+            for view in views {  view.map = mapView }
+//            print("Time lapse for drawing overlays: \(date.timeIntervalSinceNow)")
+        }
     }
 
     //MARK: - Methods that interact with time and day controller

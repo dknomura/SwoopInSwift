@@ -17,6 +17,7 @@ struct SPSQLiteReader {
     }
     
     weak var delegate: SPSQLiteReaderDelegate?
+    weak var dao:SPDataAccessObject?
     
     var locationColumnsForJoin:[String] {
         return ["l." + kSPLocationNumberSQL, "l." + kSPIdSQL, kSPBoroughSQL, kSPSideOfStreetSQL, kSPStreetSQL, kSPToCrossStreetSQL, kSPFromCrossStreetSQL, kSPFromLatitudeSQL, kSPFromLongitudeSQL, kSPToLatitudeSQL, kSPToLongitudeSQL]
@@ -53,7 +54,6 @@ struct SPSQLiteReader {
     // This function is for finding all of the signs and locations within a given coordinate region. The call back passed to the callSQL() function parses all of the signs and location
     func querySignsAndLocations(swCoordinate swCoordinate:CLLocationCoordinate2D, neCoordinate: CLLocationCoordinate2D) {
         var query = beginningOfLocationJoinSignsQuery
-        //        query += "FROM locations l JOIN signs s ON l.id = s.location_id WHERE (from_latitude BETWEEN ? AND ? AND from_longitude BETWEEN ? AND ?) OR (to_latitude BETWEEN ? AND ? AND to_longitude BETWEEN ? AND ?) OR ((from_latitude + to_latitude) / 2 BETWEEN ? AND ? AND (from_longitude + to_longitude) / 2 BETWEEN ? AND ?);"
         query += "FROM locations l JOIN signs s ON l.id = s.location_id WHERE (from_latitude BETWEEN ? AND ? AND from_longitude BETWEEN ? AND ?) OR (to_latitude BETWEEN ? AND ? AND to_longitude BETWEEN ? AND ?);"
         let values = [NSNumber(double:swCoordinate.latitude), NSNumber(double:neCoordinate.latitude), NSNumber(double:swCoordinate.longitude), NSNumber(double:neCoordinate.longitude), NSNumber(double:swCoordinate.latitude), NSNumber(double:neCoordinate.latitude), NSNumber(double:swCoordinate.longitude), NSNumber(double:neCoordinate.longitude)]
         //        var values: [AnyObject] = columns
@@ -67,7 +67,7 @@ struct SPSQLiteReader {
     func queryUpcomingStreetCleaningSignsAndLocations(forDayAndTime:(day:Int, hour:Int, min:Int)) {
         //        var query = beginningOfLocationJoinSignsQuery
         //        query +=
-        let query = "SELECT l.id, sign_content, position_in_feet, from_latitude, from_longitude FROM locations l INNER JOIN signs s1 ON l.id = s1.location_id WHERE s1.position_in_feet || ' ' || s1.location_id IN ( SELECT s2.position_in_feet || ' ' || s2.location_id FROM signs s2 WHERE s2.sign_content MATCH 'broom tues* 11*')"
+        let query = "SELECT l.id, sign_content, position_in_feet, from_latitude, from_longitude FROM locations l INNER JOIN signs s1 ON l.id = s1.location_id WHERE s1.position_in_feet || ' ' || s1.location_id IN ( SELECT s2.position_in_feet || ' ' || s2.location_id FROM signs s2 WHERE s2.sign_content MATCH 'sanitation tues* 12*')"
         //        let query = "SELECT l.id, sign_content, position_in_feet, from_latitude, from_longitude FROM locations l INNER JOIN signs s1 ON l.id = s1.location_id WHERE l.id IN ( SELECT s2.location_id FROM signs s2 WHERE s2.sign_content MATCH 'broom tues* 11*')"
         //        let testQuery = "SELECT location_id from signs WHERE sign_content MATCH 'broom ?'"
         let callback = parseLocationsWithUniqueSignPositions
@@ -107,7 +107,9 @@ struct SPSQLiteReader {
     }
     
     private func parseLocationsWithUniqueSignPositions(fromResults results: FMResultSet, queryType:String) {
-        let locationResults = SPSignAndLocationParser().parseSQLLocationsWithOneStreetCleaningSignAtPosition(results)
+        var parser = SPSignAndLocationParser()
+        parser.dao = dao
+        let locationResults = parser.parseSQLSignsAndLocationsFromTime(results)
         
         dispatch_async(dispatch_get_main_queue(), {
             self.delegate?.sqlQueryDidFinish(withResults:(queryType, locationResults))
@@ -118,7 +120,9 @@ struct SPSQLiteReader {
     
     
     private func parseSignsAndLocations(fromResults results: FMResultSet, queryType:String) {
-        let locationResults = SPSignAndLocationParser().parseSQLSignsAndLocationsFromCoordinates(results, queryType: queryType)
+        var parser = SPSignAndLocationParser()
+        parser.dao = dao
+        let locationResults = parser.parseSQLSignsAndLocationsFromCoordinates(results, queryType: queryType)
         dispatch_async(dispatch_get_main_queue(), {
             self.delegate?.sqlQueryDidFinish(withResults:(queryType, locationResults))
         })

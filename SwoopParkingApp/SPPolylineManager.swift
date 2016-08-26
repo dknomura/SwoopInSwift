@@ -23,9 +23,6 @@ struct SPPolylineManager {
     
     
     func polylines(forCurrentLocations currentLocations: [SPLocation], zoom: Double) -> [GMSPolyline] {
-        
-        let date = NSDate()
-        
         var returnArray = [GMSPolyline]()
         
         //Meters to separate the two sides of the road
@@ -101,7 +98,7 @@ struct SPPolylineManager {
                 } catch {
                     print("Unknown polyline displacement error.. Sorry!")
                 }
-                polyline.strokeColor = self.polylineColor(sign)
+                polyline.strokeColor = polylineColor(forSign: sign)
                 polyline.strokeWidth = 2.5
                 
                 returnArray.append(polyline)
@@ -113,7 +110,6 @@ struct SPPolylineManager {
         //            total += percent
         //        }
         //        print("Avereage percent change: \(total / Double(percentChanges.count))")
-        print("Time to initialize polylines: \(date.timeIntervalSinceNow)")
         return returnArray
     }
     
@@ -350,8 +346,8 @@ struct SPPolylineManager {
     
     // MARK: - Polyline Color
     
-    private func polylineColor(fromSign:SPSign) -> UIColor {
-        if fromSign.signContent?.rangeOfString("SANITATION BROOM") != nil {
+    private func polylineColor(forSign sign:SPSign) -> UIColor {
+        if sign.isUniqueStreetCleaningSign == true {
             return UIColor.greenColor()
         }
         return UIColor.redColor()
