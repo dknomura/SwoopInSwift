@@ -16,10 +16,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-        
+        setupRootViewController()
         GMSServices.provideAPIKey(kSPGoogleMapsKey)
         setupAWS()
-        setupRootViewController()
         // Override point for customization after application launch.
         return true
     }
@@ -60,7 +59,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         guard let navController = window?.rootViewController as? UINavigationController else { return }
         guard let mapController = navController.topViewController as? SPMapViewController else { return }
         mapController.dao = dao
-
     }
 }
 

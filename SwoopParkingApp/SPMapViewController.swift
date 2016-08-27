@@ -13,7 +13,6 @@ import AWSLambda
 
 
 class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDelegate, UITextViewDelegate, SPTimeViewControllerDelegate, UIGestureRecognizerDelegate {
-    
     @IBOutlet weak var timeAndDayContainerView: UIView!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var swoopSwitch: UISwitch!
@@ -21,6 +20,9 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     @IBOutlet weak var heightConstraintOfTimeAndDayContainer: NSLayoutConstraint!
     @IBOutlet weak var heightConstraintOfToolbar: NSLayoutConstraint!
     var zoomOutButton = UIButton.init(type:.RoundedRect)
+    var initialMapViewCamera: GMSCameraPosition {
+        return GMSCameraPosition.cameraWithTarget(CLLocationCoordinate2DMake(40.7193748839769, -73.9289110153913), zoom: initialZoom)
+    }
     
     var currentMapPolylines = [GMSPolyline]()
     var currentGroundOverlays = [GMSGroundOverlay]()
@@ -32,19 +34,17 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     var animatingFromCityView = true
     var toolbarsHidden = false
     var isKeyboardPresent = false
+    var isPinchZooming = false
     
     var dao: SPDataAccessObject?
     var heightOfToolbar: CGFloat { return CGFloat(44.0) }
     var heightOfTimeContainerWhenInRangeMode: CGFloat { return CGFloat(70.0) }
 
-    var initialMapViewCamera: GMSCameraPosition {
-        return GMSCameraPosition.cameraWithTarget(CLLocationCoordinate2DMake(40.7193748839769, -73.9289110153913), zoom: initialZoom)
-    }
     var streetZoom: Float { return 15.0 }
     var initialZoom: Float {
         return SPPolylineManager().initialZoom(forViewHeight: Double(mapView.frame.height))
     }
-    var switchOverlayZoom: Float { return 14.0 }
+    var zoomLevelToSwitchOverlayType: Float { return 14.0 }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -121,7 +121,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     private func setupGestures() {
         hideKeyboardWhenTapAround()
         
-        let singleTapHideToolbarsGesture = UITapGestureRecognizer.init(target: self, action: #selector(toogleToolbarHideOrHideKeyboard(_:)))
+        let singleTapHideToolbarsGesture = UITapGestureRecognizer.init(target: self, action: #selector(tapToToogleToolbarHideOrHideKeyboard(_:)))
         singleTapHideToolbarsGesture.numberOfTapsRequired = 1
         singleTapHideToolbarsGesture.delegate = self
         mapView.addGestureRecognizer(singleTapHideToolbarsGesture)
@@ -138,6 +138,10 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         singleTapHideToolbarsGesture.requireGestureRecognizerToFail(tripleTapZoomGesture)
         singleTapHideToolbarsGesture.requireGestureRecognizerToFail(doubleTapZoomGesture)
         doubleTapZoomGesture.requireGestureRecognizerToFail(tripleTapZoomGesture)
+        
+        let pinchGesture = UIPinchGestureRecognizer.init(target: self, action: #selector(pinchZoom(_:)))
+        mapView.addGestureRecognizer(pinchGesture)
+        
     }
     
     @objc private func zoomToDoubleTapOnMap(gesture:UITapGestureRecognizer) {
@@ -150,14 +154,14 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         if mapView.camera.zoom < streetZoom {
             let pointOnMap = gesture.locationInView(mapView)
             let camera = GMSCameraPosition.cameraWithTarget(mapView.projection.coordinateForPoint(pointOnMap), zoom: streetZoom)
-            animateMap(toCameraPosition: camera, duration: abs(mapView.camera.zoom - streetZoom) / 2)
+            mapView.animateToCameraPosition(camera)
             turnSwoopOn()
         } else {
         
         }
     }
     
-    @objc private func toogleToolbarHideOrHideKeyboard(gesture: UITapGestureRecognizer) {
+    @objc private func tapToToogleToolbarHideOrHideKeyboard(gesture: UITapGestureRecognizer) {
         if isKeyboardPresent { view.endEditing(true) }
         else {
             if toolbarsHidden {
@@ -177,6 +181,26 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
                 toolbarsHidden = true
             }
         }
+    }
+    
+    var scale:CGFloat = 0
+    @objc private func pinchZoom(gesture:UIPinchGestureRecognizer) {
+        if gesture.state == .Began { scale = gesture.scale }
+        if gesture.state == .Changed {
+            let zoomScale = ((gesture.scale - scale) / scale)
+            let zoom: Float
+            if zoomScale > 0 {
+                zoom = Float( zoomScale / 20 + 1) * mapView.camera.zoom
+            } else { zoom = Float( zoomScale / 10 + 1) * mapView.camera.zoom }
+            mapView.animateToZoom(zoom)
+//            if zoomScale > 1 {
+//                let pointOfGesture = gesture.locationInView(mapView)
+//                let coordinateOfGesture = mapView.projection.coordinateForPoint(pointOfGesture)
+//                let camera = GMSCameraPosition.cameraWithTarget(coordinateOfGesture, zoom: zoom)
+//                mapView.animateToCameraPosition(camera)
+//            } else { mapView.animateToZoom(zoom) }
+        } else { return }
+        isPinchZooming = true
     }
     
     //MARK: --Views
@@ -235,7 +259,6 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     //MARK: --Other buttons
     @objc private func zoomOut(sender:UIButton) {
         mapView.animateToCameraPosition(initialMapViewCamera)
-        adjustViewsToZoom()
         show(mapOverlayViews: currentGroundOverlays, shouldHideOtherOverlay: true)
     }
     
@@ -255,18 +278,17 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
             print("DAO not passed to mapViewController, unable to get currentLocation to moveCameraToUserLocation")
             return
         }
-
         if let currentCoordinate = dao!.currentLocation?.coordinate {
             let camera = GMSCameraPosition.cameraWithTarget(currentCoordinate, zoom: streetZoom)
             mapView.animateToCameraPosition(camera)
-            adjustViewsToZoom()
         }
     }
     
     // MARK: - MapView delegate
     func mapView(mapView: GMSMapView, idleAtCameraPosition position: GMSCameraPosition) {
+        if isPinchZooming { isPinchZooming = false }
         adjustViewsToZoom()
-        if mapView.camera.zoom < switchOverlayZoom {
+        if mapView.camera.zoom < zoomLevelToSwitchOverlayType {
             getNewHeatMapOverlays()
             if mapView.camera.zoom < 12 { animatingFromCityView = true }
         }
@@ -274,15 +296,20 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     }
     
     func mapView(mapView: GMSMapView, didChangeCameraPosition position: GMSCameraPosition) {
-        if animatingFromCityView{
-            adjustViewsToZoom()
-            if mapView.camera.zoom < switchOverlayZoom {
-                show(mapOverlayViews: currentGroundOverlays, shouldHideOtherOverlay: true)
-            } else {
-                getSignsForCurrentMapView()
-                animatingFromCityView = false
-            }
+        if isPinchZooming {
+            getNewHeatMapOverlays()
         }
+//        if animatingFromCityView{
+//            if isPinchZooming {
+//                adjustViewsToZoom()
+//            }
+//            if mapView.camera.zoom < zoomLevelToSwitchOverlayType {
+//                show(mapOverlayViews: currentGroundOverlays, shouldHideOtherOverlay: true)
+//            } else {
+//                getSignsForCurrentMapView()
+//                animatingFromCityView = false
+//            }
+//        }
     }
     
     func mapView(mapView: GMSMapView, willMove gesture: Bool) {
@@ -303,11 +330,15 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     }
     
     private func adjustViewsToZoom() {
-        if mapView.camera.zoom < switchOverlayZoom {
-            show(mapOverlayViews: currentGroundOverlays, shouldHideOtherOverlay: true)
+        if mapView.camera.zoom < zoomLevelToSwitchOverlayType { getNewHeatMapOverlays()
         } else { show(mapOverlayViews: currentMapPolylines, shouldHideOtherOverlay: true) }
         if mapView.camera.zoom <= initialZoom + 1 { zoomOutButton.hidden = true }
         else { zoomOutButton.hidden = false }
+    }
+    
+    private func zoomMap(toCameraPosition camera:GMSCameraPosition) {
+        isPinchZooming = true
+        mapView.animateToCameraPosition(camera)
     }
     
     //MARK: - Draw on map methods

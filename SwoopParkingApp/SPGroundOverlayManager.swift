@@ -12,8 +12,6 @@ import UIKit
 
 
 class SPGroundOverlayManager {
-    
-    
     // https://developers.google.com/maps/documentation/ios-sdk/views#zoom
     // "at zoom level N, the width of the world is approximately 256 * 2^N, i.e., at zoom level 2, the whole world is approximately 1024 points wide"
     
