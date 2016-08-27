@@ -130,6 +130,12 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         doubleTapZoomGesture.numberOfTapsRequired = 2
         mapView.addGestureRecognizer(doubleTapZoomGesture)
         
+        let doubleTouchTapZoomGesture = UITapGestureRecognizer.init(target: self, action: #selector(zoomOutDoubleTouchTapOnMap(_:)))
+        doubleTouchTapZoomGesture.numberOfTapsRequired = 2
+        doubleTouchTapZoomGesture.numberOfTouchesRequired = 2
+        mapView.addGestureRecognizer(doubleTouchTapZoomGesture)
+
+        
         let tripleTapZoomGesture = UITapGestureRecognizer.init(target: self, action: #selector(zoomToTripleTapOnMap(_:)))
         tripleTapZoomGesture.numberOfTapsRequired = 3
         tripleTapZoomGesture.delegate = self
@@ -148,6 +154,10 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         let pointOnMap = gesture.locationInView(mapView)
         let camera = GMSCameraPosition.cameraWithTarget(mapView.projection.coordinateForPoint(pointOnMap), zoom: mapView.camera.zoom + 1)
         mapView.animateToCameraPosition(camera)
+    }
+    
+    @objc private func zoomOutDoubleTouchTapOnMap(gesture:UITapGestureRecognizer) {
+        mapView.animateToZoom(mapView.camera.zoom - 1.5)
     }
     
     @objc private func zoomToTripleTapOnMap(gesture: UITapGestureRecognizer) {
@@ -188,17 +198,8 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         if gesture.state == .Began { scale = gesture.scale }
         if gesture.state == .Changed {
             let zoomScale = ((gesture.scale - scale) / scale)
-            let zoom: Float
-            if zoomScale > 0 {
-                zoom = Float( zoomScale / 20 + 1) * mapView.camera.zoom
-            } else { zoom = Float( zoomScale / 10 + 1) * mapView.camera.zoom }
+            let zoom = Float( zoomScale / 10 + 1) * mapView.camera.zoom
             mapView.animateToZoom(zoom)
-//            if zoomScale > 1 {
-//                let pointOfGesture = gesture.locationInView(mapView)
-//                let coordinateOfGesture = mapView.projection.coordinateForPoint(pointOfGesture)
-//                let camera = GMSCameraPosition.cameraWithTarget(coordinateOfGesture, zoom: zoom)
-//                mapView.animateToCameraPosition(camera)
-//            } else { mapView.animateToZoom(zoom) }
         } else { return }
         isPinchZooming = true
     }
@@ -210,6 +211,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         mapView.settings.myLocationButton = true
         mapView.settings.rotateGestures = false
         mapView.settings.zoomGestures = false
+        mapView.settings.tiltGestures = false
         mapView.delegate = self
         mapView.settings.consumesGesturesInView = false
     }
