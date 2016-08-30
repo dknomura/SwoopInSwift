@@ -65,4 +65,7 @@ let kSPToLatitudeJSON = "toLatitude"
 let kSPToLongitudeJSON = "toLongitude"
 let kSPSnappedPointsJSON = "snappedPoints"
 
+//MARK: Max min coordinates
+var maxNYCCoordinate: CLLocationCoordinate2D { return CLLocationCoordinate2DMake(40.91295931663856, -73.70059684703173) }
+var minNYCCoordinate: CLLocationCoordinate2D { return CLLocationCoordinate2DMake(40.49785967315467, -74.25453161899142) }
 

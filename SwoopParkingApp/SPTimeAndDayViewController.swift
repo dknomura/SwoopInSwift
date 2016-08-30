@@ -77,7 +77,6 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate {
             print("DAO not passed to TimeAndDayViewController, unable to setCurrentDayAndTimeLabels")
             return
         }
-
         primaryDayTextView.text = dao!.dayString(fromInt: dao!.currentDayAndTimeInt.day)
         primaryTimeTextView.text = timeAndDayManager.timeString(fromTime: (dao!.currentDayAndTimeInt.time), format: timeFormat)
         dao!.primaryTimeAndDayString = SPTimeAndDayString(time: primaryTimeTextView.text, day: primaryDayTextView.text)
@@ -137,7 +136,7 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate {
     }
     //MARK: - TextView delegate
     func textViewDidBeginEditing(textView: UITextView) { dispatch_async(dispatch_get_main_queue()) { 
-        textView.selectAll(self) } }
+        textView.selectAll(nil) } }
     
     func textViewDidEndEditing(textView: UITextView) {
         guard dao != nil else {

@@ -20,7 +20,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="4Q6-5w-0gr">
-                                <rect key="frame" x="0.0" y="64" width="600" height="44"/>
+                                <rect key="frame" x="0.0" y="108" width="600" height="44"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="44" id="kRw-w5-y56"/>
                                 </constraints>
@@ -67,53 +67,118 @@
                                 </items>
                             </toolbar>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="azD-Bj-X44" customClass="GMSMapView">
-                                <rect key="frame" x="0.0" y="108" width="600" height="448"/>
+                                <rect key="frame" x="0.0" y="152" width="600" height="404"/>
                                 <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
                             <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="oaH-1b-Mge">
                                 <rect key="frame" x="282" y="555" width="37" height="37"/>
                                 <color key="color" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                             </activityIndicatorView>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="Lpd-yb-4zU">
+                                <rect key="frame" x="0.0" y="108" width="600" height="0.0"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" id="frY-e9-XW2"/>
+                                </constraints>
+                                <prototypes>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="cellReuseIdentifier" textLabel="cpP-X4-xxm" rowHeight="44" style="IBUITableViewCellStyleDefault" id="Htt-Bb-jei">
+                                        <rect key="frame" x="0.0" y="28" width="600" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Htt-Bb-jei" id="gnZ-cY-RlI">
+                                            <rect key="frame" x="0.0" y="0.0" width="600" height="43"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="cpP-X4-xxm">
+                                                    <rect key="frame" x="15" y="0.0" width="570" height="43"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </prototypes>
+                                <connections>
+                                    <outlet property="dataSource" destination="BYZ-38-t0r" id="LLs-dc-2zt"/>
+                                    <outlet property="delegate" destination="BYZ-38-t0r" id="Gvc-4I-G1G"/>
+                                </connections>
+                            </tableView>
+                            <searchBar contentMode="redraw" placeholder="Location" translatesAutoresizingMaskIntoConstraints="NO" id="1DZ-FS-KNq">
+                                <rect key="frame" x="0.0" y="64" width="600" height="44"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="44" id="FVT-4o-cxV"/>
+                                </constraints>
+                                <textInputTraits key="textInputTraits"/>
+                                <connections>
+                                    <outlet property="delegate" destination="BYZ-38-t0r" id="hkM-xg-cDZ"/>
+                                </connections>
+                            </searchBar>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="azD-Bj-X44" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="-20" id="2Ut-tN-lpN"/>
                             <constraint firstItem="4Q6-5w-0gr" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="-20" id="3nJ-gW-gpG"/>
                             <constraint firstItem="azD-Bj-X44" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="5NH-a4-Vlt"/>
+                            <constraint firstItem="Lpd-yb-4zU" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="8qw-vb-jY9"/>
                             <constraint firstItem="4Q6-5w-0gr" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="8xA-Fv-Fvk"/>
                             <constraint firstItem="pSV-hn-f5k" firstAttribute="top" secondItem="azD-Bj-X44" secondAttribute="bottom" id="Alv-3f-5gO"/>
                             <constraint firstItem="azD-Bj-X44" firstAttribute="top" secondItem="4Q6-5w-0gr" secondAttribute="bottom" id="HwP-Lk-Cjw"/>
                             <constraint firstItem="pSV-hn-f5k" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="Iep-H4-XtY"/>
+                            <constraint firstItem="1DZ-FS-KNq" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="Iji-jh-2TV"/>
                             <constraint firstItem="oaH-1b-Mge" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="JSr-zw-Uno"/>
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="oaH-1b-Mge" secondAttribute="bottom" constant="8" id="NVJ-f9-923"/>
+                            <constraint firstItem="1DZ-FS-KNq" firstAttribute="width" secondItem="8bC-Xf-vdC" secondAttribute="width" id="S2N-SA-Gah"/>
+                            <constraint firstItem="Lpd-yb-4zU" firstAttribute="width" secondItem="8bC-Xf-vdC" secondAttribute="width" id="TVd-qX-8mk"/>
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="pSV-hn-f5k" secondAttribute="bottom" id="VQl-oL-PtX"/>
                             <constraint firstItem="4Q6-5w-0gr" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="hdP-s7-cUu"/>
+                            <constraint firstItem="Lpd-yb-4zU" firstAttribute="top" secondItem="1DZ-FS-KNq" secondAttribute="bottom" id="juA-N9-cgF"/>
                             <constraint firstItem="4Q6-5w-0gr" firstAttribute="width" secondItem="8bC-Xf-vdC" secondAttribute="width" id="rRp-0C-ga9"/>
+                            <constraint firstItem="1DZ-FS-KNq" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="szo-wQ-t8E"/>
                             <constraint firstItem="pSV-hn-f5k" firstAttribute="width" secondItem="8bC-Xf-vdC" secondAttribute="width" id="tP7-8P-pmL"/>
+                            <constraint firstItem="4Q6-5w-0gr" firstAttribute="top" secondItem="1DZ-FS-KNq" secondAttribute="bottom" id="ub7-NY-ZD1"/>
                             <constraint firstItem="azD-Bj-X44" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="68" id="urf-T0-6E4"/>
                         </constraints>
                         <variation key="default">
                             <mask key="constraints">
                                 <exclude reference="3nJ-gW-gpG"/>
+                                <exclude reference="8xA-Fv-Fvk"/>
                                 <exclude reference="urf-T0-6E4"/>
                             </mask>
                         </variation>
                     </view>
                     <navigationItem key="navigationItem" title="Swoop Parking" id="ujr-Pz-LeK">
-                        <barButtonItem key="leftBarButtonItem" image="SearchIcon" id="kTj-VH-MfJ"/>
+                        <barButtonItem key="leftBarButtonItem" image="SearchIcon" id="kTj-VH-MfJ">
+                            <connections>
+                                <action selector="showSearchBarButtonPressed:" destination="BYZ-38-t0r" id="YNV-ge-q6m"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <connections>
                         <outlet property="activityIndicator" destination="oaH-1b-Mge" id="mDg-KL-O0C"/>
                         <outlet property="heightConstraintOfTimeAndDayContainer" destination="kRw-w5-y56" id="TLd-Fh-kLO"/>
                         <outlet property="heightConstraintOfToolbar" destination="ujL-Xb-6pP" id="59d-XY-c2N"/>
+                        <outlet property="heightConstraintsOfSearchTableView" destination="frY-e9-XW2" id="8kG-Oc-6eR"/>
                         <outlet property="mapView" destination="azD-Bj-X44" id="JBZ-aw-atx"/>
+                        <outlet property="searchBar" destination="1DZ-FS-KNq" id="HcY-Yk-2uM"/>
+                        <outlet property="searchBarHeight" destination="FVT-4o-cxV" id="PRM-oQ-loQ"/>
+                        <outlet property="searchDisplayController" destination="BMI-ff-lP2" id="WhR-Bb-g1e"/>
+                        <outlet property="searchResultsTableView" destination="Lpd-yb-4zU" id="zrr-64-uuk"/>
                         <outlet property="swoopSwitch" destination="Zek-LR-fRA" id="Em8-uL-M1N"/>
                         <outlet property="timeAndDayContainerView" destination="4Q6-5w-0gr" id="D8K-UP-8si"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+                <searchDisplayController id="BMI-ff-lP2">
+                    <connections>
+                        <outlet property="delegate" destination="BYZ-38-t0r" id="lmd-OF-4wd"/>
+                        <outlet property="searchContentsController" destination="BYZ-38-t0r" id="qt2-ps-EOr"/>
+                        <outlet property="searchResultsDataSource" destination="BYZ-38-t0r" id="utG-gz-aqc"/>
+                        <outlet property="searchResultsDelegate" destination="BYZ-38-t0r" id="Y2W-Dn-8tA"/>
+                    </connections>
+                </searchDisplayController>
             </objects>
-            <point key="canvasLocation" x="1508" y="210"/>
+            <point key="canvasLocation" x="1371" y="253"/>
         </scene>
         <!--Title-->
         <scene sceneID="1Mp-CJ-hCv">

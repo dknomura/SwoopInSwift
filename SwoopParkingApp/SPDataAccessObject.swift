@@ -15,6 +15,7 @@ enum DAOError:ErrorType {
 
 class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDelegate, SPLambdaManagerDelegate {
     
+    var delegate: SPDataAccessObjectDelegate?
     var locationsForDayAndTime = [SPLocation]()
     var currentMapViewLocations = [SPLocation]()
     var currentLocation: CLLocation?
@@ -23,7 +24,8 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
     let locationManager = CLLocationManager()
     var primaryTimeAndDayString: SPTimeAndDayString?
     var secondaryTimeAndDayString: SPTimeAndDayString?
-    
+    var addressResults = [SPGoogleAddressResult]()
+    var searchCoordinate: CLLocationCoordinate2D?
     
     //MARK: - Time and Day data access methods
     func dayString(fromInt dayInt:Int) -> String {
@@ -47,8 +49,6 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
     }
     
     //MARK: - Determine if current mapView is within NYC
-    var maxNYCCoordinate: CLLocationCoordinate2D { return CLLocationCoordinate2DMake(40.91295931663856, -73.70059684703173) }
-    var minNYCCoordinate: CLLocationCoordinate2D { return CLLocationCoordinate2DMake(40.49785967315467, -74.25453161899142) }
     
     func isInNYC(mapView:GMSMapView) -> Bool {
         let region = GMSCoordinateBounds.init(region: mapView.projection.visibleRegion())
@@ -100,7 +100,7 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
         }
         if responseDict["lambdaFunction"] as? String ==  kSPLambdaGetSignsAndLocationsForCoordinates,
             let data = responseDict["response"] as? NSArray {
-            currentMapViewLocations = SPSignAndLocationParser().parseLambdaSignsAndLocationsFromCoordinates(data)
+            currentMapViewLocations = SPParser().parseLambdaSignsAndLocationsFromCoordinates(data)
             NSNotificationCenter.defaultCenter().postNotificationName(kSPSQLiteCoordinateQuery, object: nil)
         }
     }
@@ -123,4 +123,8 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
         if (locations.count == 0) { return }
     }
     
+}
+
+protocol SPDataAccessObjectDelegate: class {
+    func dataAccessObject(dao: SPDataAccessObject, didFinishWithResponse response:[String])
 }

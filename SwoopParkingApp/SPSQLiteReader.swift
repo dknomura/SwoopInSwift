@@ -95,7 +95,7 @@ struct SPSQLiteReader {
     }
     
     private func parseLocationsWithUniqueSignPositions(fromResults results: FMResultSet, queryType:String) {
-        var parser = SPSignAndLocationParser()
+        var parser = SPParser()
         parser.dao = dao
         let locationResults = parser.parseSQLSignsAndLocationsFromTime(results)
         
@@ -106,7 +106,7 @@ struct SPSQLiteReader {
     }
     
     private func parseSignsAndLocations(fromResults results: FMResultSet, queryType:String) {
-        var parser = SPSignAndLocationParser()
+        var parser = SPParser()
         parser.dao = dao
         let locationResults = parser.parseSQLSignsAndLocationsFromCoordinates(results, queryType: queryType)
         dispatch_async(dispatch_get_main_queue(), {

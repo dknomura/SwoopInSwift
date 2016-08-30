@@ -11,8 +11,9 @@ import CoreLocation
 import GoogleMaps
 import AWSLambda
 
-struct SPSignAndLocationParser {
-    //MARK: - Parse lambda response to create sign and location objects
+struct SPParser {
+    //MARK: - Parse sign and location objects
+    //MARK: ---Lambda
     var dao: SPDataAccessObject?
     func parseLambdaSignsAndLocationsFromCoordinates(response:NSArray) -> [SPLocation] {
         var returnArray = [SPLocation]()
@@ -55,6 +56,8 @@ struct SPSignAndLocationParser {
         }
         return returnArray
     }
+    
+    //MARK: ---SQL
     
     func parseSQLSignsAndLocationsFromCoordinates(results:FMResultSet, queryType:String) -> [SPLocation] {
         var locationResults = [SPLocation]()
@@ -135,7 +138,7 @@ struct SPSignAndLocationParser {
         return locationResults
     }
     
-    
+    //MARK: ---Marking unique street cleaning signs
     private func isThereUniqueSignPosition(forLocation location: SPLocation) -> Bool {
         guard let signs = location.signs else { return false }
         let numberOfSignsAtPosition = dictionaryOfNumberOfSignsAtPosition(signs)
@@ -202,7 +205,113 @@ struct SPSignAndLocationParser {
         }
         return numberOfSignsAtPosition
     }
+    
+    
+    //MARK: - Parse Google API calls
+    func parseGoogleAPIResponse(responseDict:NSDictionary, delegateAction:SPNetworkingDelegateAction, inout returnResponse: SPGoogleResponse) {
+        returnResponse.googleAPIResponse = SPGoogleAPIResponse()
+        guard let dictKey = key(forDelegateAction:delegateAction) else {
+            print("No key for delegateAction: \(delegateAction)")
+            return
+        }
+        if let responseNextLevel = responseDict[dictKey] as? [NSDictionary] {
+            if delegateAction == .presentAutocompleteResults { parseGoogleAutocomplete(responseNextLevel , returnResponse: &returnResponse) }
+            else if delegateAction == .presentAddress { parseGoogleAddress(responseNextLevel, returnResponse: &returnResponse) }
+        } else if let responseNextLevel = responseDict[dictKey] as? NSDictionary {
+            if delegateAction == .presentCoordinate { parseGooglePlaceID(responseNextLevel, returnResponse: &returnResponse) }
+        } else { print("No key: \(dictKey) in response dictionary: \(responseDict)") }
+        return
+    }
+    
+    //MARK: --Individual API parsers
+    private func parseGoogleAutocomplete(responseArray:[NSDictionary], inout returnResponse:SPGoogleResponse) {
+        var addressResults = [SPGoogleAddressResult]()
+        for response in responseArray {
+            if let prediction = response["description"] as? String,
+                let placeID = response["place_id"] as? String {
+                guard isAddressInNYC(prediction) else { continue }
+                let result = SPGoogleAddressResult(address: prediction, placeID: placeID, coordinate: nil)
+                addressResults.append(result)
+            }
+        }
+        returnResponse.googleAPIResponse?.addressResults = addressResults
+    }
+    
+    private func parseGoogleAddress(responseDict:[NSDictionary], inout returnResponse:SPGoogleResponse) {
+        var addressResults = [SPGoogleAddressResult]()
+        for response in responseDict {
+            let addressKey = "formatted_address", placeIDKey = "place_id"
+            if let address = response[addressKey] as? String,
+                let coordinate = coordinate(fromDictionary: response),
+                let placeID = response[placeIDKey] as? String {
+                if isAddressInNYC(address) {
+                    let result = SPGoogleAddressResult(address: address, placeID: placeID, coordinate: coordinate)
+                    addressResults.append(result)
+                }
+            } else {
+                print("Unable to get coordinate or values for keys: \(addressKey), \(placeIDKey), in dictionary: \(response)")
+            }
+        }
+        returnResponse.googleAPIResponse?.addressResults = addressResults
+    }
+
+    private func parseGooglePlaceID(responseDict:NSDictionary, inout returnResponse:SPGoogleResponse) {
+        if let coordinate = coordinate(fromDictionary: responseDict) {
+            returnResponse.googleAPIResponse?.placeIDCoordinate = coordinate
+        } else {
+            print("Unable to get coordinate from \(responseDict)")
+        }
+    }
+    
+    private func coordinate(fromDictionary responseDict:NSDictionary) -> CLLocationCoordinate2D? {
+        var key = "geometry"
+        guard let geometryDict = (responseDict[key] as? NSDictionary) else {
+            print("No key: \(key) in dict: \(responseDict)")
+            return nil
+        }
+        key = "location"
+        guard let coordinateDict = geometryDict[key] as? NSDictionary else {
+            print("No key: \(key) in dict: \(geometryDict)")
+            return nil
+        }
+        key = "lat"
+        let key2 = "lng"
+        if let lat = coordinateDict[key] as? Double ,
+            let lng = coordinateDict[key2] as? Double {
+            return CLLocationCoordinate2D.init(latitude: lat, longitude: lng)
+        } else {
+            print("No key \(key) or \(key2) in dict: \(coordinateDict)")
+            return nil
+        }
+    }
+    
+    //MARK: ---Get JSON key from delegate action
+    private func key(forDelegateAction delegateAction: SPNetworkingDelegateAction) -> String? {
+        switch delegateAction {
+        case .presentAddress:
+            return "results"
+        case .presentAutocompleteResults:
+            return "predictions"
+        case .presentCoordinate:
+            return "result"
+        default:
+            return nil
+        }
+        
+    }
+    private func isAddressInNYC(address:String) -> Bool {
+        //This method checks whether the response contains New York, or one of the 5 boroughs to filter out other results
+        //The terms values in the JSON response has an offset and value property, which shows the string position and the string value of the autocomplete prediction.
+        let searchTerms = ["manhattan", "brooklyn", "queens", "bronx", "staten island", "new york"]
+        for term in searchTerms {
+            if address.lowercaseString.rangeOfString(term) != nil{
+                return true
+            }
+        }
+        return false
+    }
 }
+
 
 
 

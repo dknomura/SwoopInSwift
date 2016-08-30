@@ -14,6 +14,8 @@
 		9C4DCF531D6E01F30060EEBF /* SPSignAndLocationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C4DCF521D6E01F30060EEBF /* SPSignAndLocationModel.swift */; };
 		9C5279C81CEB62B900AF88FF /* SPQuickGCD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C5279C71CEB62B900AF88FF /* SPQuickGCD.swift */; };
 		9C617EF51D51BF5100FFA51A /* SPTileLayerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C617EF41D51BF5100FFA51A /* SPTileLayerManager.swift */; };
+		9C61F0B11D7496DC00BA524C /* SPGoogleNetworking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C61F0B01D7496DB00BA524C /* SPGoogleNetworking.swift */; };
+		9C61F0B31D751F4A00BA524C /* SPSearchBarExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C61F0B21D751F4A00BA524C /* SPSearchBarExtension.swift */; };
 		9C8C0BA41D6F823900A4E040 /* swoop-sqlite2.db in Resources */ = {isa = PBXBuildFile; fileRef = 9C8C0BA31D6F823900A4E040 /* swoop-sqlite2.db */; };
 		9C96EE901D625EC4007C4EC8 /* SPViewControllerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C96EE8F1D625EC4007C4EC8 /* SPViewControllerExtension.swift */; };
 		9CA7DDC11D57EAB50050B75D /* LFHeatMap-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CA7DDBC1D57EAB50050B75D /* LFHeatMap-dummy.m */; };
@@ -70,6 +72,8 @@
 		9C4DCF521D6E01F30060EEBF /* SPSignAndLocationModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPSignAndLocationModel.swift; sourceTree = "<group>"; };
 		9C5279C71CEB62B900AF88FF /* SPQuickGCD.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPQuickGCD.swift; sourceTree = "<group>"; };
 		9C617EF41D51BF5100FFA51A /* SPTileLayerManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPTileLayerManager.swift; sourceTree = "<group>"; };
+		9C61F0B01D7496DB00BA524C /* SPGoogleNetworking.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPGoogleNetworking.swift; sourceTree = "<group>"; };
+		9C61F0B21D751F4A00BA524C /* SPSearchBarExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPSearchBarExtension.swift; sourceTree = "<group>"; };
 		9C8C0BA31D6F823900A4E040 /* swoop-sqlite2.db */ = {isa = PBXFileReference; lastKnownFileType = file; path = "swoop-sqlite2.db"; sourceTree = "<group>"; };
 		9C96EE8F1D625EC4007C4EC8 /* SPViewControllerExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPViewControllerExtension.swift; sourceTree = "<group>"; };
 		9CA7DDBC1D57EAB50050B75D /* LFHeatMap-dummy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "LFHeatMap-dummy.m"; sourceTree = "<group>"; };
@@ -186,6 +190,7 @@
 				9CFF46E61D501FBE00504407 /* SPPolylineManager.swift */,
 				9C617EF41D51BF5100FFA51A /* SPTileLayerManager.swift */,
 				9CA7DDC41D590BEF0050B75D /* SPGroundOverlayManager.swift */,
+				9C61F0B21D751F4A00BA524C /* SPSearchBarExtension.swift */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -199,8 +204,17 @@
 				9CBE25BA1D552BD500B5384B /* SPSQLiteReader.swift */,
 				9C42DAB21D5A589E004ECA97 /* SPDataAccessObject.swift */,
 				9CBBB4671D5CD19D00AE1511 /* SPTimeAndDayManager.swift */,
+				9C61F0AF1D7496C100BA524C /* Networking */,
 			);
 			name = Model;
+			sourceTree = "<group>";
+		};
+		9C61F0AF1D7496C100BA524C /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				9C61F0B01D7496DB00BA524C /* SPGoogleNetworking.swift */,
+			);
+			name = Networking;
 			sourceTree = "<group>";
 		};
 		9CA7DDBB1D57EAB50050B75D /* LFHeatMap */ = {
@@ -505,10 +519,12 @@
 				9CBE25DF1D555CEE00B5384B /* FMDatabaseAdditions.m in Sources */,
 				9CA7DDC11D57EAB50050B75D /* LFHeatMap-dummy.m in Sources */,
 				9CFEE37A1CDA6D7900CE5D53 /* AppDelegate.swift in Sources */,
+				9C61F0B11D7496DC00BA524C /* SPGoogleNetworking.swift in Sources */,
 				9CA7DDC21D57EAB50050B75D /* LFHeatMap.m in Sources */,
 				9C5279C81CEB62B900AF88FF /* SPQuickGCD.swift in Sources */,
 				9CFF46E71D501FBE00504407 /* SPPolylineManager.swift in Sources */,
 				9CC46A131D2EAFE500AC0717 /* SPLambdaManager.swift in Sources */,
+				9C61F0B31D751F4A00BA524C /* SPSearchBarExtension.swift in Sources */,
 				9CFEE3A81CDA6E6600CE5D53 /* SPConstants.swift in Sources */,
 				9C617EF51D51BF5100FFA51A /* SPTileLayerManager.swift in Sources */,
 				9CBE25E01D555CEE00B5384B /* FMDatabasePool.m in Sources */,
