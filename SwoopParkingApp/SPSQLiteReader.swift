@@ -54,21 +54,17 @@ struct SPSQLiteReader {
         //        for value in whereValues {
         //            values.append(value)
         //        }
-        callSQL(query: query, withValues: values, queryType: kSPSQLiteCoordinateQuery, callback: parseSignsAndLocations)
+        callSQL(query: query, withValues: values, queryType: .getLocationsForCurrentMapView, callback: parseSignsAndLocations)
     }
     
     //This function is for finding all of the locations with at least one street cleaning sign that is the only sign in their position (meaning that it is okay to park there any time after street cleaning). The call back passed to the callSQL() function will find locations that have at least one street cleaning sign that is the only sign at that position
     func queryUpcomingStreetCleaningSignsAndLocations(forDayAndTime:SPTimeAndDayInt) {
-        //        var query = beginningOfLocationJoinSignsQuery
-        //        query +=
         let query = "SELECT l.id, sign_content, position_in_feet, from_latitude, from_longitude FROM locations l INNER JOIN signs s1 ON l.id = s1.location_id WHERE s1.position_in_feet || ' ' || s1.location_id IN ( SELECT s2.position_in_feet || ' ' || s2.location_id FROM signs s2 WHERE s2.sign_content MATCH 'sanitation tues* 12*')"
-        //        let query = "SELECT l.id, sign_content, position_in_feet, from_latitude, from_longitude FROM locations l INNER JOIN signs s1 ON l.id = s1.location_id WHERE l.id IN ( SELECT s2.location_id FROM signs s2 WHERE s2.sign_content MATCH 'broom tues* 11*')"
-        //        let testQuery = "SELECT location_id from signs WHERE sign_content MATCH 'broom ?'"
         let callback = parseLocationsWithUniqueSignPositions
-        callSQL(query: query, withValues: [], queryType: kSPSQLiteTimeAndDayQuery, callback:callback)
+        callSQL(query: query, withValues: [], queryType: .getLocationsForTimeAndDay, callback:callback)
     }
     
-    private func callSQL(query query:String, withValues values:[AnyObject], queryType:String, callback:(FMResultSet, String) -> Void) {
+    private func callSQL(query query:String, withValues values:[AnyObject], queryType:SPSQLLocationQueryTypes, callback:(FMResultSet, SPSQLLocationQueryTypes) -> Void) {
         dispatch_async(dispatch_get_global_queue(QOS_CLASS_UTILITY, 0)) {
             let database = FMDatabase(path: self.dbPath)
             
@@ -94,7 +90,7 @@ struct SPSQLiteReader {
         }
     }
     
-    private func parseLocationsWithUniqueSignPositions(fromResults results: FMResultSet, queryType:String) {
+    private func parseLocationsWithUniqueSignPositions(fromResults results: FMResultSet, queryType:SPSQLLocationQueryTypes) {
         var parser = SPParser()
         parser.dao = dao
         let locationResults = parser.parseSQLSignsAndLocationsFromTime(results)
@@ -105,7 +101,7 @@ struct SPSQLiteReader {
         
     }
     
-    private func parseSignsAndLocations(fromResults results: FMResultSet, queryType:String) {
+    private func parseSignsAndLocations(fromResults results: FMResultSet, queryType:SPSQLLocationQueryTypes) {
         var parser = SPParser()
         parser.dao = dao
         let locationResults = parser.parseSQLSignsAndLocationsFromCoordinates(results, queryType: queryType)
@@ -117,5 +113,5 @@ struct SPSQLiteReader {
 }
 
 protocol SPSQLiteReaderDelegate: class {
-    func sqlQueryDidFinish(withResults results:(queryType: String, locationResults: [SPLocation]))
+    func sqlQueryDidFinish(withResults results:(queryType: SPSQLLocationQueryTypes, locationResults: [SPLocation]))
 }

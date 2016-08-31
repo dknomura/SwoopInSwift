@@ -8,17 +8,15 @@
 
 import Foundation
 let kSPGoogleMapsKey = "AIzaSyCGKTmya_bbd5_S9hJOzO9eKf4pDckrffQ"
-//MARK: Lambda function name constants
 
-let kSPLambdaGetSignsAndLocationsForTimeAndDay = "GetSignsAndLocationsForTimeAndDay"
-let kSPLambdaGetSignsAndLocationsForCoordinates = "GetSignsAndLocationsForCoordinates"
+//MARK: NotificationCenter names
+let kSPSearchTableViewDataSourceDidChange = "SearchTableViewDataSourceDidChange"
 
-
-//MARK: SQL query types and column names
-// query type - used for delegate method control flow and for NSNotificationCenter names
-let kSPSQLiteCoordinateQuery = "SQLiteCoordinateQuery"
-let kSPSQLiteTimeAndDayQuery = "SQLiteTimeAndDayQuery"
-let kSPSQLiteTimeAndDayLocationsOnlyQuery = "SQLiteTimeAndDayLocationsOnlyQuery"
+//MARK: SQL query types
+enum SPSQLLocationQueryTypes: String {
+    case getLocationsForTimeAndDay
+    case getLocationsForCurrentMapView
+}
 
 // location SQL columns
 let kSPIdSQL = "id"

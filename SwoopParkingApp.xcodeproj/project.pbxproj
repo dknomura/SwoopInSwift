@@ -16,6 +16,7 @@
 		9C617EF51D51BF5100FFA51A /* SPTileLayerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C617EF41D51BF5100FFA51A /* SPTileLayerManager.swift */; };
 		9C61F0B11D7496DC00BA524C /* SPGoogleNetworking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C61F0B01D7496DB00BA524C /* SPGoogleNetworking.swift */; };
 		9C61F0B31D751F4A00BA524C /* SPSearchBarExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C61F0B21D751F4A00BA524C /* SPSearchBarExtension.swift */; };
+		9C61F0B51D7608CC00BA524C /* SPSearchResultsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C61F0B41D7608CC00BA524C /* SPSearchResultsViewController.swift */; };
 		9C8C0BA41D6F823900A4E040 /* swoop-sqlite2.db in Resources */ = {isa = PBXBuildFile; fileRef = 9C8C0BA31D6F823900A4E040 /* swoop-sqlite2.db */; };
 		9C96EE901D625EC4007C4EC8 /* SPViewControllerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C96EE8F1D625EC4007C4EC8 /* SPViewControllerExtension.swift */; };
 		9CA7DDC11D57EAB50050B75D /* LFHeatMap-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CA7DDBC1D57EAB50050B75D /* LFHeatMap-dummy.m */; };
@@ -74,6 +75,7 @@
 		9C617EF41D51BF5100FFA51A /* SPTileLayerManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPTileLayerManager.swift; sourceTree = "<group>"; };
 		9C61F0B01D7496DB00BA524C /* SPGoogleNetworking.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPGoogleNetworking.swift; sourceTree = "<group>"; };
 		9C61F0B21D751F4A00BA524C /* SPSearchBarExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPSearchBarExtension.swift; sourceTree = "<group>"; };
+		9C61F0B41D7608CC00BA524C /* SPSearchResultsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPSearchResultsViewController.swift; sourceTree = "<group>"; };
 		9C8C0BA31D6F823900A4E040 /* swoop-sqlite2.db */ = {isa = PBXFileReference; lastKnownFileType = file; path = "swoop-sqlite2.db"; sourceTree = "<group>"; };
 		9C96EE8F1D625EC4007C4EC8 /* SPViewControllerExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPViewControllerExtension.swift; sourceTree = "<group>"; };
 		9CA7DDBC1D57EAB50050B75D /* LFHeatMap-dummy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "LFHeatMap-dummy.m"; sourceTree = "<group>"; };
@@ -180,6 +182,7 @@
 				9CFEE37B1CDA6D7900CE5D53 /* SPMapViewController.swift */,
 				9C215D9B1D6652D9006C1E3E /* SPTimeAndDayViewController.swift */,
 				9C96EE8F1D625EC4007C4EC8 /* SPViewControllerExtension.swift */,
+				9C61F0B41D7608CC00BA524C /* SPSearchResultsViewController.swift */,
 			);
 			name = Controller;
 			sourceTree = "<group>";
@@ -532,6 +535,7 @@
 				9CBE25E11D555CEE00B5384B /* FMDatabaseQueue.m in Sources */,
 				9C4DCF531D6E01F30060EEBF /* SPSignAndLocationModel.swift in Sources */,
 				9C42DAB31D5A589E004ECA97 /* SPDataAccessObject.swift in Sources */,
+				9C61F0B51D7608CC00BA524C /* SPSearchResultsViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

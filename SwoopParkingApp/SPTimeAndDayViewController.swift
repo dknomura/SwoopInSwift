@@ -35,6 +35,7 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate {
     @IBOutlet weak var centerYConstraintForPrimaryTimeDayView: NSLayoutConstraint!
 
     override func viewDidLoad() {
+        super.viewDidLoad()
         setCurrentDayAndTimeLabels()
     }
     

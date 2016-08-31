@@ -18,7 +18,7 @@ struct SPGoogleAPIResponse{
     var addressResults: [SPGoogleAddressResult]?
     var placeIDCoordinate: CLLocationCoordinate2D?
 }
-struct SPGoogleAddressResult{
+struct SPGoogleAddressResult {
     var address:String
     var placeID:String
     var coordinate:CLLocationCoordinate2D?

@@ -59,7 +59,7 @@ struct SPParser {
     
     //MARK: ---SQL
     
-    func parseSQLSignsAndLocationsFromCoordinates(results:FMResultSet, queryType:String) -> [SPLocation] {
+    func parseSQLSignsAndLocationsFromCoordinates(results:FMResultSet, queryType:SPSQLLocationQueryTypes) -> [SPLocation] {
         var locationResults = [SPLocation]()
         var location = SPLocation()
         location.signs = [SPSign]()

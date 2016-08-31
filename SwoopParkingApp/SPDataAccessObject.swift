@@ -13,7 +13,7 @@ enum DAOError:ErrorType {
     case noDao(forFunction: String)
 }
 
-class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDelegate, SPLambdaManagerDelegate {
+class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDelegate, SPLambdaManagerDelegate, SPGoogleNetworkingDelegate {
     
     var delegate: SPDataAccessObjectDelegate?
     var locationsForDayAndTime = [SPLocation]()
@@ -68,7 +68,6 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
     func getUpcomingStreetCleaningSigns() {
         var sqliteReader = SPSQLiteReader()
         sqliteReader.delegate = self
-        //        sqliteReader.getAllSignsAndLocations()
         sqliteReader.queryUpcomingStreetCleaningSignsAndLocations(currentDayAndTimeInt)
     }
     
@@ -84,13 +83,13 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
     }
     
     // MARK: - SQLite and Lambda delegate methods
-    func sqlQueryDidFinish(withResults results: (queryType: String, locationResults: [SPLocation])) {
-        if results.queryType == kSPSQLiteCoordinateQuery {
+    func sqlQueryDidFinish(withResults results: (queryType: SPSQLLocationQueryTypes, locationResults: [SPLocation])) {
+        if results.queryType == .getLocationsForCurrentMapView {
             currentMapViewLocations = results.locationResults
-        } else if results.queryType == kSPSQLiteTimeAndDayQuery {
+        } else if results.queryType == .getLocationsForTimeAndDay {
             locationsForDayAndTime = results.locationResults
         }
-        NSNotificationCenter.defaultCenter().postNotificationName(results.queryType, object: nil)
+        delegate?.dataAccessObject(self, didSetLocations: results.locationResults, forQueryType: results.queryType)
     }
     
     func lambdaFunctionDidFinish(withResponse responseDict: NSDictionary) {
@@ -98,10 +97,12 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
             print("error with lambda function, \(responseDict["lambdaFunction"]), call: \(responseDict["response"])")
             return
         }
-        if responseDict["lambdaFunction"] as? String ==  kSPLambdaGetSignsAndLocationsForCoordinates,
+        
+        //NEED TO CHANGE SERVER RESPONSE TO HAVE "lambdaFunction" MATCH "getLocationsForCurrentMapView"
+        if responseDict["lambdaFunction"] as? String == SPSQLLocationQueryTypes.getLocationsForCurrentMapView.rawValue,
             let data = responseDict["response"] as? NSArray {
             currentMapViewLocations = SPParser().parseLambdaSignsAndLocationsFromCoordinates(data)
-            NSNotificationCenter.defaultCenter().postNotificationName(kSPSQLiteCoordinateQuery, object: nil)
+            delegate?.dataAccessObject(self, didSetLocations: currentMapViewLocations, forQueryType: .getLocationsForCurrentMapView)
         }
     }
     
@@ -123,8 +124,38 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
         if (locations.count == 0) { return }
     }
     
+    //MARK: - Networking Delegate methods
+    //MARK: ---Google networking delegate
+    func googleNetworking(googleNetwork: SPGoogleNetworking, didFinishWithResponse response: SPGoogleResponse, delegateAction: SPNetworkingDelegateAction) {
+        if delegateAction == .presentAutocompleteResults {
+            presentSearchResultsOnTableView(fromResponse: response)
+        } else if delegateAction == .presentCoordinate {
+            searchCoordinate = response.googleAPIResponse?.placeIDCoordinate
+            delegate?.dataAccessObject(self, didSetSearchCoordinate: searchCoordinate!)
+        } else if delegateAction == .presentAddress {
+            if response.googleAPIResponse?.addressResults?.count == 1 {
+                searchCoordinate = response.googleAPIResponse?.addressResults?[0].coordinate
+                delegate?.dataAccessObject(self, didSetSearchCoordinate: searchCoordinate!)
+            } else {
+                presentSearchResultsOnTableView(fromResponse: response)
+            }
+        }
+    }
+    
+    private func presentSearchResultsOnTableView(fromResponse response:SPGoogleResponse) {
+        if response.googleAPIResponse?.addressResults != nil {
+            addressResults = (response.googleAPIResponse?.addressResults)!
+            delegate?.dataAccessObject(self, didUpdateAddressResults: addressResults)
+        }
+    }
 }
 
 protocol SPDataAccessObjectDelegate: class {
-    func dataAccessObject(dao: SPDataAccessObject, didFinishWithResponse response:[String])
+    //For SQL calls
+    func dataAccessObject(dao: SPDataAccessObject, didSetLocations locations:[SPLocation], forQueryType:SPSQLLocationQueryTypes)
+    
+    //For google API calls
+    func dataAccessObject(dao: SPDataAccessObject, didSetSearchCoordinate coordinate:CLLocationCoordinate2D)
+    func dataAccessObject(dao: SPDataAccessObject, didUpdateAddressResults:[SPGoogleAddressResult])
+    
 }

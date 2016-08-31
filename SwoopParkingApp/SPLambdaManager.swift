@@ -12,22 +12,23 @@ import CoreLocation
 
 struct SPLambdaManager {
     weak var delegate: SPLambdaManagerDelegate?
-    
+    //MARK: TO DO 
+    // Change lambda function names to match SPSQLLocationQueryType.rawValues
     func upcomingStreetCleaningQuery(forDayAndTime dayAndTime:(day:Int, hour:Int, minute:Int)) {
         let parameters = ["hour": dayAndTime.hour, "day": dayAndTime.day]
-        invoke(kSPLambdaGetSignsAndLocationsForTimeAndDay, parameters: parameters)
+        invoke(.getLocationsForTimeAndDay, parameters: parameters)
     }
     
     func signsAndLocationsQuery(fromCoordinateNE: CLLocationCoordinate2D, coordinateSW: CLLocationCoordinate2D) {
         
         let parameters = ["northEastLatitude": fromCoordinateNE.latitude, "northEastLongitude": fromCoordinateNE.longitude, "southWestLatitude": coordinateSW.latitude, "southWestLongitude": coordinateSW.longitude]
-        invoke(kSPLambdaGetSignsAndLocationsForCoordinates, parameters: parameters)
+        invoke(.getLocationsForCurrentMapView, parameters: parameters)
     }
     
-    private func invoke(lambdaFunction: String, parameters:NSDictionary) {
+    private func invoke(lambdaFunction: SPSQLLocationQueryTypes, parameters:NSDictionary) {
         let lambdaInvoker = AWSLambdaInvoker.defaultLambdaInvoker()
         let date = NSDate()
-        lambdaInvoker.invokeFunction(lambdaFunction, JSONObject: parameters) { (response, error) in
+        lambdaInvoker.invokeFunction(lambdaFunction.rawValue, JSONObject: parameters) { (response, error) in
             let timeLapse = date.timeIntervalSinceNow
             print("Time lapse for \(lambdaFunction): \(timeLapse)")
             
