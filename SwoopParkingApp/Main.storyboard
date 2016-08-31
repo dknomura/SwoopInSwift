@@ -68,34 +68,24 @@
                             </toolbar>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="azD-Bj-X44" customClass="GMSMapView">
                                 <rect key="frame" x="0.0" y="152" width="600" height="404"/>
+                                <subviews>
+                                    <view opaque="NO" userInteractionEnabled="NO" alpha="0.5" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XJZ-gd-JZ7">
+                                        <rect key="frame" x="0.0" y="0.0" width="600" height="404"/>
+                                        <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                                    </view>
+                                </subviews>
                                 <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
-                            <visualEffectView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="V1Y-O9-veB">
-                                <rect key="frame" x="0.0" y="152" width="600" height="404"/>
-                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="ZCf-29-4c5">
-                                    <rect key="frame" x="0.0" y="0.0" width="600" height="404"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <subviews>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Finding locations for time and date..." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EMK-Cb-Oig">
-                                            <rect key="frame" x="161" y="8" width="278" height="21"/>
-                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                                            <nil key="highlightedColor"/>
-                                        </label>
-                                        <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="oaH-1b-Mge">
-                                            <rect key="frame" x="282" y="37" width="37" height="37"/>
-                                            <color key="color" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
-                                        </activityIndicatorView>
-                                    </subviews>
-                                    <constraints>
-                                        <constraint firstItem="EMK-Cb-Oig" firstAttribute="centerX" secondItem="ZCf-29-4c5" secondAttribute="centerX" id="EW0-uI-SEQ"/>
-                                        <constraint firstItem="oaH-1b-Mge" firstAttribute="centerX" secondItem="ZCf-29-4c5" secondAttribute="centerX" id="nus-YE-pTh"/>
-                                        <constraint firstItem="oaH-1b-Mge" firstAttribute="top" secondItem="EMK-Cb-Oig" secondAttribute="bottom" constant="8" id="plT-5k-cV0"/>
-                                        <constraint firstItem="EMK-Cb-Oig" firstAttribute="top" secondItem="ZCf-29-4c5" secondAttribute="top" constant="8" id="ylr-0F-sfv"/>
-                                    </constraints>
-                                </view>
-                                <blurEffect style="extraLight"/>
-                            </visualEffectView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Finding locations for time and date..." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="7" adjustsLetterSpacingToFitWidth="YES" translatesAutoresizingMaskIntoConstraints="NO" id="EMK-Cb-Oig">
+                                <rect key="frame" x="161" y="211" width="278" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="oaH-1b-Mge">
+                                <rect key="frame" x="281" y="239" width="37" height="37"/>
+                                <color key="color" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                            </activityIndicatorView>
                             <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vz8-2e-oco">
                                 <rect key="frame" x="0.0" y="64" width="600" height="44"/>
                                 <constraints>
@@ -108,25 +98,27 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="EMK-Cb-Oig" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="1et-sP-uya"/>
                             <constraint firstItem="azD-Bj-X44" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="-20" id="2Ut-tN-lpN"/>
                             <constraint firstItem="4Q6-5w-0gr" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="-20" id="3nJ-gW-gpG"/>
                             <constraint firstItem="azD-Bj-X44" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="5NH-a4-Vlt"/>
+                            <constraint firstItem="oaH-1b-Mge" firstAttribute="top" secondItem="4Q6-5w-0gr" secondAttribute="bottom" id="8Bc-k4-wWg"/>
                             <constraint firstItem="vz8-2e-oco" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="8pV-Du-MeN"/>
                             <constraint firstItem="4Q6-5w-0gr" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="8xA-Fv-Fvk"/>
                             <constraint firstItem="vz8-2e-oco" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="9Ks-Bk-Ora"/>
                             <constraint firstItem="pSV-hn-f5k" firstAttribute="top" secondItem="azD-Bj-X44" secondAttribute="bottom" id="Alv-3f-5gO"/>
+                            <constraint firstItem="EMK-Cb-Oig" firstAttribute="top" secondItem="4Q6-5w-0gr" secondAttribute="bottom" constant="59" id="DyI-Dq-xUS"/>
                             <constraint firstItem="azD-Bj-X44" firstAttribute="top" secondItem="4Q6-5w-0gr" secondAttribute="bottom" id="HwP-Lk-Cjw"/>
                             <constraint firstItem="pSV-hn-f5k" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="Iep-H4-XtY"/>
-                            <constraint firstItem="V1Y-O9-veB" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="QN9-Id-wbi"/>
-                            <constraint firstItem="V1Y-O9-veB" firstAttribute="top" secondItem="4Q6-5w-0gr" secondAttribute="bottom" id="U0y-9u-qvW"/>
+                            <constraint firstItem="EMK-Cb-Oig" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="96" id="MNz-2f-Jga"/>
                             <constraint firstItem="vz8-2e-oco" firstAttribute="width" secondItem="8bC-Xf-vdC" secondAttribute="width" id="UPl-Tz-4rg"/>
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="pSV-hn-f5k" secondAttribute="bottom" id="VQl-oL-PtX"/>
                             <constraint firstItem="4Q6-5w-0gr" firstAttribute="top" secondItem="vz8-2e-oco" secondAttribute="bottom" id="XUT-7l-oqz"/>
+                            <constraint firstItem="oaH-1b-Mge" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="Z0D-kf-z7T"/>
+                            <constraint firstItem="oaH-1b-Mge" firstAttribute="top" secondItem="EMK-Cb-Oig" secondAttribute="bottom" constant="7" id="bkN-rI-7lu"/>
                             <constraint firstItem="4Q6-5w-0gr" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="hdP-s7-cUu"/>
                             <constraint firstItem="4Q6-5w-0gr" firstAttribute="width" secondItem="8bC-Xf-vdC" secondAttribute="width" id="rRp-0C-ga9"/>
-                            <constraint firstItem="V1Y-O9-veB" firstAttribute="height" secondItem="azD-Bj-X44" secondAttribute="height" id="sbl-Gg-870"/>
                             <constraint firstItem="pSV-hn-f5k" firstAttribute="width" secondItem="8bC-Xf-vdC" secondAttribute="width" id="tP7-8P-pmL"/>
-                            <constraint firstItem="V1Y-O9-veB" firstAttribute="width" secondItem="azD-Bj-X44" secondAttribute="width" id="tbQ-CE-Jk2"/>
                             <constraint firstItem="azD-Bj-X44" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="68" id="urf-T0-6E4"/>
                         </constraints>
                         <variation key="default">
@@ -134,6 +126,8 @@
                                 <exclude reference="3nJ-gW-gpG"/>
                                 <exclude reference="8xA-Fv-Fvk"/>
                                 <exclude reference="urf-T0-6E4"/>
+                                <exclude reference="MNz-2f-Jga"/>
+                                <exclude reference="8Bc-k4-wWg"/>
                             </mask>
                         </variation>
                     </view>
@@ -146,11 +140,12 @@
                     </navigationItem>
                     <connections>
                         <outlet property="activityIndicator" destination="oaH-1b-Mge" id="mDg-KL-O0C"/>
-                        <outlet property="blurView" destination="V1Y-O9-veB" id="v5C-Md-gxc"/>
+                        <outlet property="greyOutMapView" destination="XJZ-gd-JZ7" id="V64-Os-LyB"/>
                         <outlet property="heightConstraintOfSearchContainer" destination="YMk-Vd-xCz" id="mTF-AI-7HN"/>
                         <outlet property="heightConstraintOfTimeAndDayContainer" destination="kRw-w5-y56" id="TLd-Fh-kLO"/>
                         <outlet property="heightConstraintOfToolbar" destination="ujL-Xb-6pP" id="59d-XY-c2N"/>
                         <outlet property="mapView" destination="azD-Bj-X44" id="JBZ-aw-atx"/>
+                        <outlet property="searchContainerView" destination="vz8-2e-oco" id="0EY-4L-Oh9"/>
                         <outlet property="searchDisplayController" destination="BMI-ff-lP2" id="WhR-Bb-g1e"/>
                         <outlet property="swoopSwitch" destination="Zek-LR-fRA" id="Em8-uL-M1N"/>
                         <outlet property="timeAndDayContainerView" destination="4Q6-5w-0gr" id="D8K-UP-8si"/>

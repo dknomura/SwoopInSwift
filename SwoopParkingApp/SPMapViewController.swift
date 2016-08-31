@@ -17,9 +17,10 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var swoopSwitch: UISwitch!
     @IBOutlet weak var mapView: GMSMapView!
-    @IBOutlet weak var blurView: UIVisualEffectView!
     @IBOutlet weak var waitingLabel: UILabel!
+    @IBOutlet weak var searchContainerView: UIView!
     
+    @IBOutlet weak var greyOutMapView: UIView!
     @IBOutlet weak var heightConstraintOfSearchContainer: NSLayoutConstraint!
     @IBOutlet weak var heightConstraintOfTimeAndDayContainer: NSLayoutConstraint!
     @IBOutlet weak var heightConstraintOfToolbar: NSLayoutConstraint!
@@ -53,17 +54,8 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     var standardHeightOfToolOrSearchBar: CGFloat { return CGFloat(44.0) }
     var heightOfTimeContainerWhenInRangeMode: CGFloat { return CGFloat(70.0) }
     
-    var waitingTextForCurrentMapViewLocations:String { return "Finding parking locations for current map view" }
-    var waitingTextForTimeAndDateLocations:String {
-        if isInTimeRangeMode {
-            return "Finding parking locations between \(dao!.primaryTimeAndDayString!.time), \(dao!.primaryTimeAndDayString!.day) and \(dao!.secondaryTimeAndDayString!.time), \(dao!.secondaryTimeAndDayString!.day)"
-
-        } else {
-            return "Finding parking locations for \(dao?.primaryTimeAndDayString!.time), \(dao?.primaryTimeAndDayString?.day)"
-
-        }
-    }
-
+    var waitingText:String { return "Finding upcoming street cleaning areas" }
+    
     var zoomToSwitchOverlays: Float { return 14.5 }
     var streetZoom: Float { return 15.0 }
     var initialZoom: Float {
@@ -83,7 +75,6 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         }
         dao!.setUpLocationManager()
         dao?.delegate = self
-        setupInitialPrompt()
     }
     
     override func didReceiveMemoryWarning() {
@@ -115,12 +106,10 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     //MARK: --Gesture
 
     private func setupGestures() {
-//        hideKeyboardWhenTapAround()
-        
         let singleTapGesture = UITapGestureRecognizer.init(target: self, action: #selector(singleTapHandler(_:)))
         singleTapGesture.numberOfTapsRequired = 1
         singleTapGesture.delegate = self
-        singleTapGesture.cancelsTouchesInView = true
+        singleTapGesture.cancelsTouchesInView = false
         view.addGestureRecognizer(singleTapGesture)
         
         let doubleTapZoomGesture = UITapGestureRecognizer.init(target: self, action: #selector(zoomToDoubleTapOnMap(_:)))
@@ -225,35 +214,19 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     func setupOtherViews() {
         heightConstraintOfSearchContainer.constant = 0
         view.layoutIfNeeded()
-//        activityIndicator.startAnimating()
+        searchContainerView.userInteractionEnabled = true
         activityIndicator.hidesWhenStopped = true
+        showGreyView(withLabel: waitingText, isStreetView: false)
     }
     
     private func setUpButtons() {
         zoomOutButton.setTitle("Zoom Out", forState: .Normal)
-        let buttonSize = zoomOutButton.intrinsicContentSize()
-        zoomOutButton.frame = CGRectMake(mapView.bounds.origin.x + 8.0, mapView.bounds.origin.y + 8, buttonSize.width, buttonSize.height)
+//        let buttonSize = zoomOutButton.intrinsicContentSize()
+        zoomOutButton.frame = CGRectMake(mapView.bounds.origin.x + 8.0, mapView.bounds.origin.y + 8, 0, 0)
         zoomOutButton.backgroundColor = UIColor.whiteColor()
         zoomOutButton.hidden = true
         zoomOutButton.addTarget(self, action: #selector(zoomOut), forControlEvents: .TouchUpInside)
         mapView.addSubview(zoomOutButton)
-    }
-    
-    //MARK: ---Initial prompt
-    private func setupInitialPrompt() {
-        blurView.hidden = true
-        showBlurView(withLabel: waitingTextForTimeAndDateLocations)
-        let alertController = UIAlertController.init(title: nil, message: "Where would you like to start looking for parking?", preferredStyle: .ActionSheet)
-        let goToUserLocationAction = UIAlertAction.init(title: "My location", style: .Default, handler: nil)
-        let goToSearchLocationAction = UIAlertAction.init(title: "Find a location", style: .Default) { (alertAction) in
-            self.toggleSearchBar()
-            self.searchContainerViewController?.searchBar.becomeFirstResponder()
-        }
-        let waitAction = UIAlertAction.init(title: "It's okay", style: .Default, handler: nil)
-        alertController.addAction(goToUserLocationAction)
-        alertController.addAction(goToSearchLocationAction)
-        alertController.addAction(waitAction)
-//        presentViewController(alertController, animated: true, completion: nil)
     }
     
     //    MARK: - Button Methods
@@ -345,17 +318,18 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         searchBarPresent = !searchBarPresent
     }
     //MARK: ---Blur View animation
-    private func showBlurView(withLabel labelText:String) {
-        UIView.animateWithDuration(0.2) { 
-            self.waitingLabel.hidden = false
+    private func showGreyView(withLabel labelText:String, isStreetView:Bool) {
+        if !isStreetView {
+            greyOutMapView.hidden = false
+            greyOutMapView.alpha = 0.3
         }
         activityIndicator.startAnimating()
+        waitingLabel.hidden = false
         waitingLabel.text = labelText
     }
-    private func hideBlurView() {
-        UIView.animateWithDuration(0.2) { 
-            self.waitingLabel.hidden = true
-        }
+    private func hideGreyView() {
+        greyOutMapView.hidden = true
+        waitingLabel.hidden = true
         activityIndicator.stopAnimating()
     }
     
@@ -399,7 +373,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
             return
         }
         if mapView.camera.zoom >= zoomToSwitchOverlays && dao!.isInNYC(mapView) {
-            showBlurView(withLabel: waitingTextForCurrentMapViewLocations)
+            showGreyView(withLabel: waitingText, isStreetView: true)
             dao!.getSigns(forCurrentMapView: mapView)
         }
     }
@@ -477,7 +451,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         } else if forQueryType == .getLocationsForTimeAndDay {
             getNewHeatMapOverlays()
         }
-        hideBlurView()
+        hideGreyView()
     }
     
     //MARK: --Prepare for segue
