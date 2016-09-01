@@ -128,7 +128,7 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
     //MARK: ---Google networking delegate
     func googleNetworking(googleNetwork: SPGoogleNetworking, didFinishWithResponse response: SPGoogleResponse, delegateAction: SPNetworkingDelegateAction) {
         if delegateAction == .presentAutocompleteResults {
-            presentSearchResultsOnTableView(fromResponse: response)
+            setAddressResultsForTableView(fromResponse: response)
         } else if delegateAction == .presentCoordinate {
             searchCoordinate = response.googleAPIResponse?.placeIDCoordinate
             delegate?.dataAccessObject(self, didSetSearchCoordinate: searchCoordinate!)
@@ -137,12 +137,12 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
                 searchCoordinate = response.googleAPIResponse?.addressResults?[0].coordinate
                 delegate?.dataAccessObject(self, didSetSearchCoordinate: searchCoordinate!)
             } else {
-                presentSearchResultsOnTableView(fromResponse: response)
+                setAddressResultsForTableView(fromResponse: response)
             }
         }
     }
     
-    private func presentSearchResultsOnTableView(fromResponse response:SPGoogleResponse) {
+    private func setAddressResultsForTableView(fromResponse response:SPGoogleResponse) {
         if response.googleAPIResponse?.addressResults != nil {
             addressResults = (response.googleAPIResponse?.addressResults)!
             delegate?.dataAccessObject(self, didUpdateAddressResults: addressResults)

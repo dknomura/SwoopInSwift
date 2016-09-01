@@ -17,11 +17,42 @@ enum SPTimeAndDayError : ErrorType {
     case invalidInput
     case invalidHourInt(hour:Int)
     case invalidMinuteInt(minute:Int)
+    case noStreetParkingForDay(day:String, nextValidTime:SPTimeAndDayString)
+    case noStreetParkingForTimeAndDay(time:SPTimeAndDayString, nextValidTime:SPTimeAndDayString)
 }
 
 enum SPTimeFormat : Int {
     case format24Hour = 0
     case format12Hour
+}
+
+enum SPDay: Int{
+    case Sun = 1, Mon, Tues, Wed, Thurs, Fri, Sat
+    var stringValue: String {
+        switch self {
+        case .Sun: return "Sun"
+        case .Mon: return "Mon"
+        case .Tues: return "Tues"
+        case .Wed: return "Wed"
+        case .Thurs: return "Thurs"
+        case .Fri: return "Fri"
+        case .Sat: return "Sat"
+        }
+    }
+}
+
+enum SPHour: Int {
+    case hour0 = 0, hour1, hour2, hour3, hour4, hour5, hour6, hour7, hour8, hour9, hour10, hour11, hour12, hour13, hour14, hour15,hour16, hour17, hour18, hour19, hour20, hour21, hour22, hour23
+    var allValues: [SPHour] { return [hour0, hour1, hour2, hour3, hour4, hour5, hour6, hour7, hour8, hour9, hour10, hour11, hour12, hour13, hour14, hour15,hour16, hour17, hour18, hour19, hour20, hour21, hour22, hour23] }
+}
+enum SPMin: Int {
+    case min0 = 0, min30 = 30
+}
+
+struct SPTimeAndDay {
+    var stringValue: SPTimeAndDayString?
+    var intValue: SPTimeAndDayInt?
+    var format: SPTimeFormat?
 }
 
 struct SPTimeAndDayString {
@@ -57,14 +88,21 @@ class SPTimeAndDayManager {
     func increaseDay(dayString:String) -> String {
         if dayString == "" { return dayString }
         do {
-            var dayInt = try getDayNumber(fromDayString: dayString)
-            if dayInt == 7 { dayInt = 1 }
-            else { dayInt += 1 }
+            var dayInt = try getDayInt(fromDayString: dayString)
+            increaseDayInt(&dayInt)
+            if !isValid(dayInt) {
+                increaseDayInt(&dayInt)
+            }
             return try getDayString(fromInt: dayInt)
         } catch {
             print("Error while converting day between Int and String")
         }
         return dayString
+    }
+    private func increaseDayInt(inout dayInt:Int) {
+        if dayInt == 7 {
+            dayInt = 1
+        } else { dayInt += 1 }
     }
     
     func decreaseDay(dayString:String) -> String {
@@ -72,11 +110,10 @@ class SPTimeAndDayManager {
             return dayString
         }
         do {
-            var dayInt = try getDayNumber(fromDayString: dayString)
-            if dayInt == 1 {
-                dayInt = 7
-            } else {
-                dayInt -= 1
+            var dayInt = try getDayInt(fromDayString: dayString)
+            decreaseDayInt(&dayInt)
+            if !isValid(dayInt) {
+                decreaseDayInt(&dayInt)
             }
             return try getDayString(fromInt: dayInt)
         } catch {
@@ -84,89 +121,184 @@ class SPTimeAndDayManager {
         }
         return dayString
     }
+    private func decreaseDayInt(inout dayInt:Int) {
+        if dayInt == 1 {
+            dayInt = 7
+        } else { dayInt -= 1 }
+    }
     
     
-    
-    func increaseTime(timeAndDay:SPTimeAndDayString, format:SPTimeFormat) -> SPTimeAndDayString {
-        if timeAndDay.time == "" {
-            return timeAndDay
+    func increaseTime(timeAndDayString:SPTimeAndDayString, format:SPTimeFormat) -> SPTimeAndDayString {
+        if timeAndDayString.time == "" {
+            return timeAndDayString
         }
-        do {
-            var hourAndMin = try timeInt(fromTimeString: timeAndDay.time, format: format)
-            var dayString = timeAndDay.day
-            if hourAndMin.min < 30 {
-                hourAndMin.min = 30
-            } else if hourAndMin.min >= 30 {
-                hourAndMin.hour += 1
-                hourAndMin.min = 0
-            }
-            if hourAndMin.hour > 23 {
-                hourAndMin.hour = 0
-                dayString = increaseDay(dayString)
-            }
-            return SPTimeAndDayString.init(time:timeString(fromTime: hourAndMin, format: format), day: dayString)
-        } catch {
-            print("Error while getting time tuple from timeString: \(timeAndDay)")
-            return timeAndDay
+        var timeAndDayInt = getTimeAndDayInt(fromString: timeAndDayString, format: format)
+        increaseTimeAndDayInt(&timeAndDayInt)
+        return nextValidTimeAndDay(fromTimeAndDayInt: timeAndDayInt, format: format)
+    }
+    
+    private func increaseTimeAndDayInt(inout timeAndDayInt:SPTimeAndDayInt) {
+        if timeAndDayInt.time.min < 30 {
+            timeAndDayInt.time.min = 30
+        } else if timeAndDayInt.time.min >= 30 {
+            timeAndDayInt.time.hour += 1
+            timeAndDayInt.time.min = 0
+        }
+        if timeAndDayInt.time.hour > 23 {
+            timeAndDayInt.time.hour = 0
+            increaseDayInt(&timeAndDayInt.day)
         }
     }
+    
     
     func decreaseTime(timeAndDay:SPTimeAndDayString, format:SPTimeFormat) -> SPTimeAndDayString {
         if timeAndDay.time == "" {
             return timeAndDay
         }
-        do {
-            var hourAndMin = try timeInt(fromTimeString: timeAndDay.time, format: format)
-            var dayString = timeAndDay.day
-            if hourAndMin.min > 30 {
-                hourAndMin.min = 30
-            } else if hourAndMin.min <= 30 && hourAndMin.min > 0 {
-                hourAndMin.min = 0
-            } else if hourAndMin.min == 0 {
-                hourAndMin.min = 30
-                hourAndMin.hour -= 1
+        var timeAndDayInt = getTimeAndDayInt(fromString: timeAndDay, format: format)
+        decreaseTimeAndDayInt(&timeAndDayInt)
+        return previousValidTimeAndDay(fromTimeAndDayInt: timeAndDayInt, format: format)
+    }
+    
+    private func decreaseTimeAndDayInt(inout timeAndDayInt:SPTimeAndDayInt) {
+        if timeAndDayInt.time.min > 30 {
+            timeAndDayInt.time.min = 30
+        } else if timeAndDayInt.time.min <= 30 && timeAndDayInt.time.min > 0 {
+            timeAndDayInt.time.min = 0
+        } else if timeAndDayInt.time.min == 0 {
+            timeAndDayInt.time.min = 30
+            timeAndDayInt.time.hour -= 1
+        }
+        if timeAndDayInt.time.hour < 0 {
+            timeAndDayInt.time.hour = 23
+            decreaseDayInt(&timeAndDayInt.day)
+        }
+    }
+    
+    //MARK: - Next valid time string
+    
+    func nextValidTimeAndDay(timeAndDayString:SPTimeAndDayString, format:SPTimeFormat) -> SPTimeAndDayString {
+        let timeAndDayInt = getTimeAndDayInt(fromString: timeAndDayString, format: format)
+        return nextValidTimeAndDay(fromTimeAndDayInt: timeAndDayInt, format: format)
+    }
+    
+    func nextValidTimeAndDay(fromTimeAndDayInt timeAndDayInt:SPTimeAndDayInt, format:SPTimeFormat) -> SPTimeAndDayString {
+        var returnTimeAndDayInt = timeAndDayInt
+        if returnTimeAndDayInt.time.hour < 15 && returnTimeAndDayInt.time.hour > 2 {
+            if returnTimeAndDayInt.time.hour == 14 && returnTimeAndDayInt.time.min == 30 {
+                returnTimeAndDayInt.time.hour = 19
+                returnTimeAndDayInt.time.min = 0
             }
-            if hourAndMin.hour < 0 {
-                hourAndMin.hour = 23
-                dayString = decreaseDay(dayString)
+        } else if returnTimeAndDayInt.time.hour < 19 {
+            returnTimeAndDayInt.time.hour = 19
+            returnTimeAndDayInt.time.min = 0
+        } else if returnTimeAndDayInt.time.hour == 19 && returnTimeAndDayInt.time.min == 0 {
+        } else {
+            returnTimeAndDayInt.time.hour = 3
+            returnTimeAndDayInt.time.min = 0
+            increaseDayInt(&returnTimeAndDayInt.day)
+        }
+        if returnTimeAndDayInt.day == 1 {
+            returnTimeAndDayInt.day += 1
+        }
+        return getTimeAndDayString(fromTimeAndDay: returnTimeAndDayInt, format: format)
+    }
+    
+    
+    func previousValidTimeAndDay(timeAndDayString:SPTimeAndDayString, format:SPTimeFormat) -> SPTimeAndDayString {
+        let timeAndDayInt = getTimeAndDayInt(fromString: timeAndDayString, format: format)
+        return previousValidTimeAndDay(fromTimeAndDayInt: timeAndDayInt, format: format)
+    }
+    
+    func previousValidTimeAndDay(fromTimeAndDayInt timeAndDayInt:SPTimeAndDayInt, format:SPTimeFormat) -> SPTimeAndDayString {
+        var returnTimeAndDayInt = timeAndDayInt
+        if returnTimeAndDayInt.time.hour > 19 && (returnTimeAndDayInt.day != 1 || returnTimeAndDayInt.day != 7) {
+            returnTimeAndDayInt.time.hour = 19
+            returnTimeAndDayInt.time.min = 0
+        } else if returnTimeAndDayInt.time.hour > 14 || (returnTimeAndDayInt.time.hour == 14 && returnTimeAndDayInt.time.min == 30) {
+            returnTimeAndDayInt.time.hour = 14
+            returnTimeAndDayInt.time.min = 0
+        } else if returnTimeAndDayInt.time.hour < 3 {
+            decreaseDayInt(&returnTimeAndDayInt.day)
+            if returnTimeAndDayInt.day == 7 {
+                returnTimeAndDayInt.time.hour = 13
+                returnTimeAndDayInt.time.min = 0
+            } else {
+                returnTimeAndDayInt.time.hour = 19
+                returnTimeAndDayInt.time.min = 0
             }
-            return SPTimeAndDayString.init(time: timeString(fromTime: hourAndMin, format: format), day: dayString)
+        }
+        if returnTimeAndDayInt.day == 1 {
+            returnTimeAndDayInt.day = 7
+            returnTimeAndDayInt.time.hour = 13
+            returnTimeAndDayInt.time.min = 0
+        }
+        return getTimeAndDayString(fromTimeAndDay: returnTimeAndDayInt, format: format)
+    }
+    
+    //MARK: - Determine if valid swoop string
+    
+    func isValid(dayString dayString:String) -> Bool {
+        if dayString == "Sun" {
+            return false
+        } else { return true }
+    }
+    
+    func isValid(dayInt:Int) -> Bool {
+        if dayInt == 1 {
+            return false
+        } else { return true }
+    }
+    
+    func isValid(timeString timeString:String, format:SPTimeFormat) -> Bool {
+        do{
+            let timeInt = try getTimeInt(fromTimeString: timeString, format: format)
+            switch timeInt.hour {
+            case 3..<15:
+                if timeInt.hour == 15 && timeInt.min == 30 {
+                    return false
+                } else { return true }
+            case 19:
+                if timeInt.min == 30 {
+                    return false
+                } else { return true }
+            default:
+                return false
+            }
         } catch {
-            print("Error while getting time tuple from timeString: \(timeAndDay)")
+            return false
         }
-        return timeAndDay
     }
     
-    func setNextValidTime(timeAndDay:SPTimeAndDayInt, format:SPTimeFormat) -> SPTimeAndDayString {
-        var min: Int
-        var hour: Int
-        var dayString = try! getDayString(fromInt:timeAndDay.day)
-        
-        if timeAndDay.time.min > 30 {
-            hour = timeAndDay.time.hour + 1
-            min = 0
+    //MARK: - Methods to convert time/day to string/int
+    func getTimeAndDayString(fromTimeAndDay timeAndDayInt: SPTimeAndDayInt, format:SPTimeFormat) -> SPTimeAndDayString {
+        var timeAndDayString: SPTimeAndDayString
+        if format == .format12Hour {
+            timeAndDayString = SPTimeAndDayString.init(time: "12:00AM", day: "Mon")
         } else {
-            hour = timeAndDay.time.hour
-            min = 30
+            timeAndDayString = SPTimeAndDayString.init(time: "00:00", day: "Mon")
         }
-        if hour < 14 {
-            if hour > 0 && hour < 3 {
-                hour = 3
-                min = 0
-            }
-        } else if hour < 19 {
-            hour = 7
-            min = 0
-        } else {
-            hour = 3
-            min = 0
-            dayString = increaseDay(dayString)
+        do{
+            timeAndDayString.time = getTimeString(fromTime: timeAndDayInt.time, format: format)
+            timeAndDayString.day = try getDayString(fromInt: timeAndDayInt.day)
+        } catch {
+            print("Unable to get string from \(timeAndDayInt), will return '00:00' '")
         }
-        return SPTimeAndDayString.init(time: timeString(fromTime: SPTimeInt.init(hour: hour, min: min), format: format), day: dayString)
+        return timeAndDayString
+    }
+    func getTimeAndDayInt(fromString timeAndDayString:SPTimeAndDayString, format:SPTimeFormat) -> SPTimeAndDayInt {
+        var timeAndDayInt = SPTimeAndDayInt.init(time: SPTimeInt.init(hour: 0, min: 0), day: 1)
+        do {
+            timeAndDayInt.time = try getTimeInt(fromTimeString: timeAndDayString.time, format: format)
+            timeAndDayInt.day = try getDayInt(fromDayString: timeAndDayString.day)
+        } catch {
+            print("Unable to get int from \(timeAndDayString), will return 0, 0, 1 for hour, min, and day")
+        }
+        return timeAndDayInt
     }
     
-    //MARK: Methods to convert time/day to string/int
-    func timeString(fromTime time: SPTimeInt, format:SPTimeFormat) -> String {
+    
+    func getTimeString(fromTime time: SPTimeInt, format:SPTimeFormat) -> String {
         let minString: String
         let hourString: String
         var hour = time.hour
@@ -203,15 +335,15 @@ class SPTimeAndDayManager {
     
     func convertTimeString(time:String, toFormat format:SPTimeFormat) -> String {
         do{
-            let time = try timeInt(fromTimeString: time, format: format)
-            return timeString(fromTime: time, format: format)
+            let time = try getTimeInt(fromTimeString: time, format: format)
+            return getTimeString(fromTime: time, format: format)
         } catch{
             print("Unable to convert string '\(time)' to int")
         }
         return time
     }
     
-    func timeInt(fromTimeString timeString:String, format:SPTimeFormat) throws -> SPTimeInt {
+    func getTimeInt(fromTimeString timeString:String, format:SPTimeFormat) throws -> SPTimeInt {
         if let colonRange = timeString.rangeOfString(":") {
             let hourString = timeString.substringWithRange(timeString.startIndex..<colonRange.startIndex)
             let minuteString = timeString.substringWithRange(colonRange.endIndex..<colonRange.endIndex.advancedBy(2))
@@ -233,24 +365,6 @@ class SPTimeAndDayManager {
             print("There is no colon in timeString: \(timeString)")
             throw SPTimeAndDayError.noColon(inTimeString: timeString)
         }
-    }
-    
-    private func hourAndMinTuple(fromTimeString timeString: String) throws -> SPTimeInt {
-        if let colonRange = timeString.rangeOfString(":") {
-            let hourString = timeString.substringWithRange(timeString.startIndex..<colonRange.startIndex)
-            let minuteString = timeString.substringWithRange(colonRange.endIndex..<colonRange.endIndex.advancedBy(2))
-            guard let hour = Int(hourString) else {
-                throw SPTimeAndDayError.unableToCastInt(fromString: hourString)
-            }
-            guard let minute = Int(minuteString) else {
-                throw SPTimeAndDayError.unableToCastInt(fromString: minuteString)
-            }
-            return SPTimeInt.init(hour: hour, min: minute)
-        } else {
-            print("There is no colon in timeString: \(timeString)")
-            throw SPTimeAndDayError.noColon(inTimeString: timeString)
-        }
-        
     }
     
     func getDayString(fromInt fromInt:Int) throws -> String {
@@ -275,7 +389,7 @@ class SPTimeAndDayManager {
         }
     }
     
-    func getDayNumber(fromDayString dayString:String) throws -> Int {
+    func getDayInt(fromDayString dayString:String) throws -> Int {
         switch dayString {
         case "Sun":
             return 1
@@ -299,7 +413,7 @@ class SPTimeAndDayManager {
     
     // MARK: - Convert text input to valid text
     
-    func dayString(fromTextInput input:String) throws -> String {
+    func validateDayString(fromTextInput input:String) throws -> String {
         let lowerCase = input.lowercaseString
         switch lowerCase {
         case "su", "sun", "sund", "sunda", "sunday", "7":
@@ -322,80 +436,133 @@ class SPTimeAndDayManager {
         }
     }
     
-    func timeString(fromTextInput input:String, format:SPTimeFormat) throws -> String {
-        return input
-        //        let lowerCaseInput = input.lowercaseString
-        //        let pTuple = rangeAndDistance(ofString: "p", toEndOfString: lowerCaseInput)
-        //        let aTuple = rangeAndDistance(ofString: "a", toEndOfString: lowerCaseInput)
-        //        let periodTuple = rangeAndDistance(ofString: ".", toEndOfString: lowerCaseInput)
-        //        let colonTuple = rangeAndDistance(ofString: ":", toEndOfString: lowerCaseInput)
-        //
-        //        let isAMPM: Bool
-        //
-        //        // First check if there is 'a' or 'p', then check if the a/p is 1 or 2 characters away from the end.
-        //        if pTuple.range == nil && aTuple.range == nil { isAMPM = false }
-        //        else if pTuple.range != nil && (pTuple.distanceToEnd == 1 || pTuple.distanceToEnd == 0) { isAMPM = true }
-        //        else if aTuple.range != nil && (aTuple.distanceToEnd == 1 || aTuple.distanceToEnd == 0) { isAMPM = true }
-        //        else {
-        //                print("AM/PM range \(pTuple.range) \(aTuple.range) is not at the end of the input string \(lowerCaseInput)")
-        //                throw TimeAndDayError.invalidInput
-        //        }
-        //
-        //        var hour = Int(lowerCaseInput.substringToIndex(lowerCaseInput.startIndex.advancedBy(2)))
-        //        if hour == nil {
-        //            hour = Int(lowerCaseInput.substringToIndex(lowerCaseInput.startIndex.advancedBy(1)))
-        //            if hour == nil { throw TimeAndDayError.invalidInput }
-        //        }
-        //
-        //        if isAMPM {
-        //            if colonTuple.range == nil && periodTuple.range == nil {
-        //                if pTuple.distanceToStart > 2 || aTuple.distanceToStart > 2 { throw TimeAndDayError.invalidInput }
-        //                if pTuple.range != nil && hour < 12 { hour! += 12 }
-        //                if aTuple.range != nil && hour == 12 { hour! = 0 }
-        //                try checkHour(hour!)
-        //                return timeString(fromTime: (hour!, 0), format: format)
-        //            } else {
-        //
-        //            }
-        //        }
-        //        if lowerCaseInput.characters.count < 3 && !isAMPM {
-        //            guard let hour = Int(lowerCaseInput) else {
-        //                print("Unable to convert \(lowerCaseInput) to time string")
-        //                throw TimeAndDayError.invalidInput
-        //            }
-        //            try checkHour(hour)
-        //            return timeString(fromTime: (hour, 0), format: format)
-        //        } else if periodTuple.range != nil {
-        //            guard let hourInt = Int(lowerCaseInput.substringToIndex(periodTuple.range!.startIndex)) else { throw TimeAndDayError.invalidInput }
-        //            let decimalMinute = Int(lowerCaseInput.substringFromIndex(periodTuple.range!.endIndex))
-        //            var minInt = 0
-        ////            if decimalMinute != nil  {
-        ////                minInt =
-        ////            }
-        //            let periodDistance = periodTuple.range!.endIndex.distanceTo(lowerCaseInput.endIndex)
-        //        }
-        //
-        //
-        //        return lowerCaseInput
+    enum AMOrPM {
+        case am, pm
     }
     
-//    private func rangeAndDistance(ofString subString:String, toEndOfString testString:String) -> (range:Range<String.CharacterView.Index>?, distanceToStart:Int, distanceToEnd:Int) {
-//        guard let range = testString.rangeOfString(subString) else { return (nil, 0, 0) }
-//        let startDistance = testString.startIndex.distanceTo(range.startIndex)
-//        let endDistance = range.endIndex.distanceTo(testString.endIndex)
-//        return (range, startDistance, endDistance)
-//    }
-//    
-//    private func checkHour(hour:Int) throws {
-//        if hour < 0 || hour > 24 {
-//            print("Hour \(hour), is not valid, not in between 0 and 24")
-//            throw TimeAndDayError.invalidHourInt(hour: hour)
+//    enum TimeInputRange: String {
+//        case period, colon, a, p
+//        var allValues: [TimeInputRange] { return [period, colon, a, p] }
+//        func rangeValue(forString:String) -> Range<String.CharacterView.Index>? {
+//            switch self {
+//            case .a:
+//                return forString.rangeOfString("a")
+//            case .p:
+//                return forString.rangeOfString("p")
+//            case .period:
+//                return forString.rangeOfString(".")
+//            case .colon:
+//                return forString.rangeOfString(":")
+//            }
+//        }
+//        func allRangeValues(forString:String) -> [TimeInputRange: Range<String.CharacterView.Index>?] {
+//            var rangeValues = [TimeInputRange: Range<String.CharacterView.Index>?]()
+//            for value in allValues {
+//                rangeValues[value] = value.rangeValue(forString)
+//            }
+//            return rangeValues
 //        }
 //    }
-//    private func checkMin(min:Int) throws {
-//        if min < 0 || min > 60 {
-//            print("Minute \(min), is not valid, not in between 0 and 60")
-//            throw TimeAndDayError.invalidMinuteInt(minute: min)
-//        }
-//    }
+    
+    func validateTimeString(fromTextInput input:String, format:SPTimeFormat) throws -> String {
+        let lowerCaseInput = input.lowercaseString
+        let periodRange = range(ofSubstring: ".", inString: lowerCaseInput)
+        let colonRange = range(ofSubstring: ":", inString: lowerCaseInput)
+        let pRange = range(ofSubstring: "p", inString: lowerCaseInput)
+        let aRange = range(ofSubstring: "a", inString: lowerCaseInput)
+        var amOrPM: AMOrPM?
+        
+        let timeInt:SPTimeInt
+        var hour: Int?, min:Int?
+        var minuteScale = 100.0
+        var delimiterIndex = lowerCaseInput.endIndex
+        var apIndex = lowerCaseInput.endIndex
+        if aRange != nil {
+            apIndex = aRange!.startIndex
+            amOrPM = .am
+        } else if pRange != nil {
+            apIndex = pRange!.startIndex
+            amOrPM = .pm
+        }
+
+        if periodRange != nil {
+            if colonRange != nil {
+                print("Colon and period both present in \(lowerCaseInput)")
+                throw SPTimeAndDayError.invalidInput
+            }
+            minuteScale = 60
+            delimiterIndex = periodRange!.startIndex
+        } else if colonRange != nil {
+             delimiterIndex = colonRange!.startIndex
+        } else {
+            if amOrPM != nil {
+                delimiterIndex = apIndex
+            }
+        }
+        hour = Int(lowerCaseInput.substringWithRange(lowerCaseInput.startIndex..<delimiterIndex))
+        var tempMin: Double? = nil
+        if delimiterIndex < apIndex {
+            tempMin = Double(lowerCaseInput.substringWithRange(delimiterIndex..<apIndex))
+        }
+        if tempMin != nil {
+            if colonRange != nil {
+                min = Int(tempMin!)
+            } else if periodRange != nil {
+                min = Int(tempMin! * minuteScale)
+            } 
+        } else {
+            min = 0
+        }
+
+        guard min != nil && hour != nil else {
+            print("No hour and/or min in \(lowerCaseInput). hour: \(hour) min: \(min)")
+            throw SPTimeAndDayError.invalidInput
+        }
+        try adjustMinuteInput(&min!)
+        try adjustHourInput(&hour!, amOrPM: amOrPM)
+        timeInt = SPTimeInt.init(hour: hour!, min: min!)
+        return getTimeString(fromTime: timeInt, format: format)
+    }
+    
+    private func range(ofSubstring subString:String, inString testString:String) -> Range<String.CharacterView.Index>? {
+        guard let range = testString.rangeOfString(subString) else { return nil }
+        return range
+    }
+    
+    private func adjustHourInput(inout hour:Int, amOrPM:AMOrPM?) throws {
+        var upperBound, lowerBound:Int
+        if amOrPM != nil {
+            upperBound = 12
+            lowerBound = 1
+        } else {
+            upperBound = 23
+            lowerBound = 0
+        }
+        if hour < lowerBound || hour > upperBound {
+            print("Hour \(hour), is not valid, not in between \(lowerBound) and \(upperBound). AM/PM: \(amOrPM)")
+            throw SPTimeAndDayError.invalidHourInt(hour: hour)
+        }
+        if amOrPM != nil {
+            if amOrPM == .am {
+                if hour == 12 {
+                    hour = 0
+                }
+            } else if amOrPM == .pm {
+                if hour < 12 {
+                    hour += 12
+                }
+            }
+        }
+    }
+    private func adjustMinuteInput(inout min:Int) throws {
+        if min < 0 || min > 59 {
+            print("Minute \(min), is not valid, not in between 0 and 59")
+            throw SPTimeAndDayError.invalidMinuteInt(minute: min)
+        }
+        if min < 30 {
+            min = 0
+        } else if min >= 30 {
+            min = 30
+        }
+    }
 }

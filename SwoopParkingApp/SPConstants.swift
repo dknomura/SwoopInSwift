@@ -7,6 +7,9 @@
 //
 
 import Foundation
+
+var standardAnimationDuration:Double { return 0.2 }
+
 let kSPGoogleMapsKey = "AIzaSyCGKTmya_bbd5_S9hJOzO9eKf4pDckrffQ"
 
 //MARK: NotificationCenter names

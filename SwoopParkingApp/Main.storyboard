@@ -35,24 +35,25 @@
                                 </constraints>
                                 <items>
                                     <barButtonItem style="plain" id="Goq-d2-crx">
-                                        <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="DJv-Ap-5OW">
+                                        <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="DJv-Ap-5OW">
                                             <rect key="frame" x="20" y="7" width="56" height="30"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                            <state key="normal" title="Swoop!">
-                                                <color key="titleColor" red="0.066666666669999999" green="0.066666666669999999" blue="0.066666666669999999" alpha="1" colorSpace="calibratedRGB"/>
+                                            <accessibility key="accessibilityConfiguration">
+                                                <accessibilityTraits key="traits" notEnabled="YES"/>
+                                            </accessibility>
+                                            <state key="normal" title="City">
+                                                <color key="titleColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                             </state>
-                                            <connections>
-                                                <action selector="toggleSwoopButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="dJ7-F3-Z4c"/>
-                                            </connections>
                                         </button>
                                     </barButtonItem>
                                     <barButtonItem style="plain" id="fQp-ix-yYg">
                                         <switch key="customView" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" id="Zek-LR-fRA">
                                             <rect key="frame" x="86" y="7" width="51" height="31"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <color key="onTintColor" red="0.1498290823" green="0.66666666669999997" blue="0.26254776260000001" alpha="1" colorSpace="calibratedRGB"/>
                                             <color key="thumbTintColor" red="0.16339006506206896" green="0.17756032368275854" blue="0.30353015126896549" alpha="1" colorSpace="calibratedRGB"/>
                                             <connections>
-                                                <action selector="toggleSwoopSwitch:" destination="BYZ-38-t0r" eventType="valueChanged" id="SEC-dQ-dYw"/>
+                                                <action selector="toggleOverlaySwitch:" destination="BYZ-38-t0r" eventType="valueChanged" id="95W-nN-jPE"/>
                                             </connections>
                                         </switch>
                                     </barButtonItem>
@@ -68,22 +69,21 @@
                             </toolbar>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="azD-Bj-X44" customClass="GMSMapView">
                                 <rect key="frame" x="0.0" y="152" width="600" height="404"/>
-                                <subviews>
-                                    <view opaque="NO" userInteractionEnabled="NO" alpha="0.5" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XJZ-gd-JZ7">
-                                        <rect key="frame" x="0.0" y="0.0" width="600" height="404"/>
-                                        <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
-                                    </view>
-                                </subviews>
                                 <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
+                            <view opaque="NO" userInteractionEnabled="NO" alpha="0.5" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="XJZ-gd-JZ7">
+                                <rect key="frame" x="0.0" y="152" width="600" height="404"/>
+                                <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                            </view>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Finding locations for time and date..." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="7" adjustsLetterSpacingToFitWidth="YES" translatesAutoresizingMaskIntoConstraints="NO" id="EMK-Cb-Oig">
-                                <rect key="frame" x="161" y="211" width="278" height="21"/>
+                                <rect key="frame" x="60" y="190" width="480" height="21"/>
+                                <color key="backgroundColor" red="0.43529411759999997" green="0.4431372549" blue="0.47450980390000003" alpha="1" colorSpace="calibratedRGB"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <color key="textColor" red="1" green="1" blue="1" alpha="0.59999999999999998" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="oaH-1b-Mge">
-                                <rect key="frame" x="281" y="239" width="37" height="37"/>
+                                <rect key="frame" x="281" y="218" width="37" height="37"/>
                                 <color key="color" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                             </activityIndicatorView>
                             <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vz8-2e-oco">
@@ -103,20 +103,25 @@
                             <constraint firstItem="4Q6-5w-0gr" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="-20" id="3nJ-gW-gpG"/>
                             <constraint firstItem="azD-Bj-X44" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="5NH-a4-Vlt"/>
                             <constraint firstItem="oaH-1b-Mge" firstAttribute="top" secondItem="4Q6-5w-0gr" secondAttribute="bottom" id="8Bc-k4-wWg"/>
+                            <constraint firstItem="XJZ-gd-JZ7" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="8YE-Sg-gKS"/>
                             <constraint firstItem="vz8-2e-oco" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="8pV-Du-MeN"/>
                             <constraint firstItem="4Q6-5w-0gr" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="8xA-Fv-Fvk"/>
                             <constraint firstItem="vz8-2e-oco" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="9Ks-Bk-Ora"/>
+                            <constraint firstItem="XJZ-gd-JZ7" firstAttribute="width" secondItem="azD-Bj-X44" secondAttribute="width" id="9MY-eq-oja"/>
                             <constraint firstItem="pSV-hn-f5k" firstAttribute="top" secondItem="azD-Bj-X44" secondAttribute="bottom" id="Alv-3f-5gO"/>
-                            <constraint firstItem="EMK-Cb-Oig" firstAttribute="top" secondItem="4Q6-5w-0gr" secondAttribute="bottom" constant="59" id="DyI-Dq-xUS"/>
+                            <constraint firstItem="EMK-Cb-Oig" firstAttribute="top" secondItem="4Q6-5w-0gr" secondAttribute="bottom" constant="38" id="DyI-Dq-xUS"/>
                             <constraint firstItem="azD-Bj-X44" firstAttribute="top" secondItem="4Q6-5w-0gr" secondAttribute="bottom" id="HwP-Lk-Cjw"/>
                             <constraint firstItem="pSV-hn-f5k" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="Iep-H4-XtY"/>
+                            <constraint firstItem="EMK-Cb-Oig" firstAttribute="width" secondItem="8bC-Xf-vdC" secondAttribute="width" multiplier="4:5" id="MHd-Of-gI7"/>
                             <constraint firstItem="EMK-Cb-Oig" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="96" id="MNz-2f-Jga"/>
                             <constraint firstItem="vz8-2e-oco" firstAttribute="width" secondItem="8bC-Xf-vdC" secondAttribute="width" id="UPl-Tz-4rg"/>
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="pSV-hn-f5k" secondAttribute="bottom" id="VQl-oL-PtX"/>
                             <constraint firstItem="4Q6-5w-0gr" firstAttribute="top" secondItem="vz8-2e-oco" secondAttribute="bottom" id="XUT-7l-oqz"/>
                             <constraint firstItem="oaH-1b-Mge" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="Z0D-kf-z7T"/>
                             <constraint firstItem="oaH-1b-Mge" firstAttribute="top" secondItem="EMK-Cb-Oig" secondAttribute="bottom" constant="7" id="bkN-rI-7lu"/>
+                            <constraint firstItem="XJZ-gd-JZ7" firstAttribute="height" secondItem="azD-Bj-X44" secondAttribute="height" id="hOP-o2-Z5i"/>
                             <constraint firstItem="4Q6-5w-0gr" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="hdP-s7-cUu"/>
+                            <constraint firstItem="XJZ-gd-JZ7" firstAttribute="top" secondItem="4Q6-5w-0gr" secondAttribute="bottom" id="o2V-vr-bsd"/>
                             <constraint firstItem="4Q6-5w-0gr" firstAttribute="width" secondItem="8bC-Xf-vdC" secondAttribute="width" id="rRp-0C-ga9"/>
                             <constraint firstItem="pSV-hn-f5k" firstAttribute="width" secondItem="8bC-Xf-vdC" secondAttribute="width" id="tP7-8P-pmL"/>
                             <constraint firstItem="azD-Bj-X44" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="68" id="urf-T0-6E4"/>
@@ -140,6 +145,7 @@
                     </navigationItem>
                     <connections>
                         <outlet property="activityIndicator" destination="oaH-1b-Mge" id="mDg-KL-O0C"/>
+                        <outlet property="bottomToolbar" destination="pSV-hn-f5k" id="r59-jW-YkR"/>
                         <outlet property="greyOutMapView" destination="XJZ-gd-JZ7" id="V64-Os-LyB"/>
                         <outlet property="heightConstraintOfSearchContainer" destination="YMk-Vd-xCz" id="mTF-AI-7HN"/>
                         <outlet property="heightConstraintOfTimeAndDayContainer" destination="kRw-w5-y56" id="TLd-Fh-kLO"/>
@@ -147,7 +153,8 @@
                         <outlet property="mapView" destination="azD-Bj-X44" id="JBZ-aw-atx"/>
                         <outlet property="searchContainerView" destination="vz8-2e-oco" id="0EY-4L-Oh9"/>
                         <outlet property="searchDisplayController" destination="BMI-ff-lP2" id="WhR-Bb-g1e"/>
-                        <outlet property="swoopSwitch" destination="Zek-LR-fRA" id="Em8-uL-M1N"/>
+                        <outlet property="streetViewSwitch" destination="Zek-LR-fRA" id="yu1-Gz-fbe"/>
+                        <outlet property="switchLabel" destination="DJv-Ap-5OW" id="oDg-hf-DAT"/>
                         <outlet property="timeAndDayContainerView" destination="4Q6-5w-0gr" id="D8K-UP-8si"/>
                         <outlet property="waitingLabel" destination="EMK-Cb-Oig" id="7Xd-9F-Qcu"/>
                     </connections>
@@ -688,6 +695,10 @@
         <scene sceneID="M46-4k-2wP">
             <objects>
                 <viewController id="9cI-Ye-8Fz" customClass="SPSearchResultsViewController" customModule="SwoopParkingApp" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="cFq-Qa-Y0I"/>
+                        <viewControllerLayoutGuide type="bottom" id="yCp-II-xAy"/>
+                    </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="BKK-ed-ove">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="44"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>

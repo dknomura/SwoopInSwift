@@ -14,7 +14,7 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate {
     
     weak var delegate: SPTimeViewControllerDelegate?
     
-    var timeFormat = SPTimeFormat.format24Hour
+    var timeFormat = SPTimeFormat.format12Hour
     var isInTimeRangeMode = false
     var dao: SPDataAccessObject?
     let timeAndDayManager = SPTimeAndDayManager()
@@ -36,6 +36,10 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        guard dao != nil else {
+            print("DAO not passed to TimeAndDayViewController")
+            return
+        }
         setCurrentDayAndTimeLabels()
     }
     
@@ -56,10 +60,15 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate {
     }
     
     @IBAction func decreasePrimaryTime(sender: UIButton) { changeTime(forTimeView: primaryTimeTextView, dayView: primaryDayTextView, function: timeAndDayManager.decreaseTime) }
-    @IBAction func increasePrimaryTime(sender: UIButton) { changeTime(forTimeView: primaryTimeTextView, dayView: primaryDayTextView, function: timeAndDayManager.increaseTime) }
-    @IBAction func decreaseSecondaryTime(sender: UIButton) { changeTime(forTimeView: secondaryTimeTextView, dayView: secondaryDayTextView, function: timeAndDayManager.decreaseTime) }
+    @IBAction func increasePrimaryTime(sender: UIButton) {
+        changeTime(forTimeView: primaryTimeTextView, dayView: primaryDayTextView, function: timeAndDayManager.increaseTime)
+        if primaryDayTextView.text == secondaryDayTextView.text && primaryTimeTextView.text == secondaryTimeTextView.text { increaseSecondaryTime(UIButton()) }
+    }
+    @IBAction func decreaseSecondaryTime(sender: UIButton) {
+        changeTime(forTimeView: secondaryTimeTextView, dayView: secondaryDayTextView, function: timeAndDayManager.decreaseTime)
+        if primaryDayTextView.text == secondaryDayTextView.text && primaryTimeTextView.text == secondaryTimeTextView.text { decreasePrimaryTime(UIButton()) }
+    }
     @IBAction func increaseSecondaryTime(sender: UIButton) { changeTime(forTimeView: secondaryTimeTextView, dayView: secondaryDayTextView, function: timeAndDayManager.increaseTime) }
-    
     private func changeTime(forTimeView timeView:UITextView, dayView:UITextView, function: (SPTimeAndDayString, SPTimeFormat) -> SPTimeAndDayString) {
         let timeAndDay = function(SPTimeAndDayString(time:timeView.text, day:dayView.text), timeFormat)
         timeView.text = timeAndDay.time
@@ -79,7 +88,8 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate {
             return
         }
         primaryDayTextView.text = dao!.dayString(fromInt: dao!.currentDayAndTimeInt.day)
-        primaryTimeTextView.text = timeAndDayManager.timeString(fromTime: (dao!.currentDayAndTimeInt.time), format: timeFormat)
+        primaryTimeTextView.text = timeAndDayManager.getTimeString(fromTime: (dao!.currentDayAndTimeInt.time), format: timeFormat)
+        increasePrimaryTime(UIButton())
         dao!.primaryTimeAndDayString = SPTimeAndDayString(time: primaryTimeTextView.text, day: primaryDayTextView.text)
     }
 
@@ -109,13 +119,14 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate {
             timeRangeButton.setTitle(singleTimeString, forState: .Normal)
             secondaryDayTextView.text = primaryDayTextView.text
             secondaryTimeTextView.text = primaryTimeTextView.text
+            increaseSecondaryTime(UIButton())
             guard dao != nil else {
                 print("DAO not passed to TimeAndDayViewController, unable to set secondaryTimeAndDayString in toggleTimeRange")
                 return
             }
             dao!.secondaryTimeAndDayString = SPTimeAndDayString(time: secondaryTimeTextView.text, day:secondaryDayTextView.text)
             
-            UIView.animateWithDuration(0.3, animations: {
+            UIView.animateWithDuration(standardAnimationDuration, animations: {
                 self.secondaryDayAndTimeView.hidden = false
                 self.centerYConstraintForPrimaryTimeDayView.constant = -15
                 self.centerYConstraintForSecondaryTimeDayView.constant = 15
@@ -126,7 +137,7 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate {
         } else if isInTimeRangeMode {
             isInTimeRangeMode = !isInTimeRangeMode
             timeRangeButton.setTitle(timeRangeString, forState: .Normal)
-            UIView.animateWithDuration(0.3, animations: {
+            UIView.animateWithDuration(standardAnimationDuration, animations: {
                 self.centerYConstraintForPrimaryTimeDayView.constant = 0
                 self.centerYConstraintForSecondaryTimeDayView.constant = 0
                 self.view.layoutIfNeeded()
@@ -146,11 +157,11 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate {
         }
         do {
             if textView === primaryDayTextView || textView === secondaryDayTextView {
-                textView.text = try SPTimeAndDayManager().dayString(fromTextInput: textView.text)
+                textView.text = try SPTimeAndDayManager().validateDayString(fromTextInput: textView.text)
                 if textView == primaryDayTextView { dao!.primaryTimeAndDayString!.day = textView.text }
                 else { dao!.secondaryTimeAndDayString!.day = textView.text }
             } else if textView === primaryTimeTextView || textView === secondaryTimeTextView {
-                textView.text = try SPTimeAndDayManager().timeString(fromTextInput: textView.text, format:timeFormat)
+                textView.text = try SPTimeAndDayManager().validateTimeString(fromTextInput: textView.text, format:timeFormat)
                 if textView == primaryTimeTextView { dao!.primaryTimeAndDayString!.time = textView.text }
                 else { dao!.secondaryTimeAndDayString!.time = textView.text }
             }
@@ -159,6 +170,11 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate {
             else if textView === primaryDayTextView { textView.text = dao!.primaryTimeAndDayString!.day }
             else if textView === secondaryTimeTextView { textView.text = dao!.secondaryTimeAndDayString!.time }
             else if textView === secondaryDayTextView { textView.text = dao!.secondaryTimeAndDayString!.day }
+            UIView.animateWithDuration(standardAnimationDuration, animations: {
+                textView.backgroundColor = UIColor.redColor()
+                }, completion: { (complete) in
+                    textView.backgroundColor = UIColor.whiteColor()
+            })
         }
     }
 }
