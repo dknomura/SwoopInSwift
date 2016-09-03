@@ -233,7 +233,6 @@
 			children = (
 				9CD51DC81CE24662006B741D /* SPSignAndLocationParser.swift */,
 				9C4DCF521D6E01F30060EEBF /* SPSignAndLocationModel.swift */,
-				9CC46A121D2EAFE500AC0717 /* SPLambdaManager.swift */,
 				9CBE25BA1D552BD500B5384B /* SPSQLiteReader.swift */,
 				9C42DAB21D5A589E004ECA97 /* SPDataAccessObject.swift */,
 				9CBBB4671D5CD19D00AE1511 /* SPTimeAndDayManager.swift */,
@@ -246,6 +245,7 @@
 			isa = PBXGroup;
 			children = (
 				9C61F0B01D7496DB00BA524C /* SPGoogleNetworking.swift */,
+				9CC46A121D2EAFE500AC0717 /* SPLambdaManager.swift */,
 			);
 			name = Networking;
 			sourceTree = "<group>";

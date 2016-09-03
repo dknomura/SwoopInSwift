@@ -40,6 +40,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     var timeContainerSegue:String { return "timeContainer" }
     var switchLabelCity:String { return "City" }
     var switchLabelStreet: String { return "Street" }
+    var waitingText:String { return "Finding street cleaning locations..." }
     
     var isSearchTableViewPresent = false
     var isInTimeRangeMode = false
@@ -58,14 +59,12 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     var standardHeightOfToolOrSearchBar: CGFloat { return CGFloat(44.0) }
     var heightOfTimeContainerWhenInRangeMode: CGFloat { return CGFloat(70.0) }
     
-    var waitingText:String { return "Finding street cleaning locations..." }
-    
-    var zoomToSwitchOverlays: Float { return 14.5 }
-    var streetZoom: Float { return 15.0 }
+    var zoomToSwitchOverlays: Float { return streetZoom - 0.5 }
+    var streetZoom: Float { return 16.0 }
     var initialZoom: Float {
         return SPPolylineManager().initialZoom(forViewHeight: Double(mapView.frame.height))
     }
-    
+    //MARK: - Override methods
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpMap()
@@ -80,20 +79,36 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         dao?.setUpLocationManager()
         dao?.delegate = self
     }
-    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
-    
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
         deregisterObservers()
     }
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if segue.identifier == timeContainerSegue {
+            timeAndDayViewController = segue.destinationViewController as? SPTimeAndDayViewController
+            guard timeAndDayViewController != nil else {
+                print("Destination ViewController for segue \(segue.identifier) is not time and day container controller. It is \(segue.destinationViewController)")
+                return
+            }
+            timeAndDayViewController!.dao = dao
+            timeAndDayViewController!.delegate = self
+        } else if segue.identifier == searchContainerSegue {
+            searchContainerViewController = segue.destinationViewController as? SPSearchResultsViewController
+            guard searchContainerViewController != nil else {
+                print("Destination ViewController for segue \(segue.identifier) is not time and day container controller. It is \(segue.destinationViewController)")
+                return
+            }
+            dao?.delegate = self
+            searchContainerViewController!.dao = dao
+            searchContainerViewController!.delegate = self
+        }
+    }
     
     //MARK: - Setup/breakdown methods
-    
     //MARK: --NotificationCenter
-    
     private func setObservers() {
         let notificationCenter = NSNotificationCenter.defaultCenter()
         notificationCenter.addObserver(self, selector: #selector(keyboardDidHide), name: UIKeyboardDidHideNotification, object: nil)
@@ -107,8 +122,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     @objc private func keyboardDidHide() { isKeyboardPresent = false }
     @objc private func keyboardDidShow() { isKeyboardPresent = true }
     
-    //MARK: --Gesture
-
+    //MARK: --Gestures
     private func setupGestures() {
         let singleTapGesture = UITapGestureRecognizer.init(target: self, action: #selector(singleTapHandler(_:)))
         singleTapGesture.numberOfTapsRequired = 1
@@ -128,7 +142,6 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         
         let tripleTapZoomGesture = UITapGestureRecognizer.init(target: self, action: #selector(zoomToTripleTapOnMap(_:)))
         tripleTapZoomGesture.numberOfTapsRequired = 3
-        tripleTapZoomGesture.delegate = self
         mapView.addGestureRecognizer(tripleTapZoomGesture)
         
         singleTapGesture.requireGestureRecognizerToFail(tripleTapZoomGesture)
@@ -138,52 +151,29 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         let pinchGesture = UIPinchGestureRecognizer.init(target: self, action: #selector(pinchZoom(_:)))
         pinchGesture.cancelsTouchesInView = false
         mapView.addGestureRecognizer(pinchGesture)
-        
     }
-    
-    @objc private func zoomToDoubleTapOnMap(gesture:UITapGestureRecognizer) {
-        let pointOnMap = gesture.locationInView(mapView)
-        let camera = GMSCameraPosition.cameraWithTarget(mapView.projection.coordinateForPoint(pointOnMap), zoom: mapView.camera.zoom + 1)
-        isZoomingIn = true
-        zoomMap(toCamera: camera)
-    }
-    
-    @objc private func zoomOutDoubleTouchTapOnMap(gesture:UITapGestureRecognizer) {
-        zoomMap(toZoom: mapView.camera.zoom - 1.5)
-    }
-    
-    @objc private func zoomToTripleTapOnMap(gesture: UITapGestureRecognizer) {
-        if mapView.camera.zoom < streetZoom {
-            let pointOnMap = gesture.locationInView(mapView)
-            let camera = GMSCameraPosition.cameraWithTarget(mapView.projection.coordinateForPoint(pointOnMap), zoom: streetZoom)
-            isZoomingIn = true
-            animateMap(toCameraPosition: camera, duration: 0.8)
-//            turnStreetOverlayOn()
-        } else {
-            // Maybe add zoomout feature
-        }
-    }
-    
     @objc private func singleTapHandler(gesture: UITapGestureRecognizer) {
         if isSearchTableViewPresent {
-            if CGRectContainsPoint(searchContainerView.frame, gesture.locationInView(view)) {
-                return
-            }
             searchContainerViewController!.hideSearchResultsTableView()
         }
         if isKeyboardPresent { view.endEditing(true) }
         else {
-            if CGRectContainsPoint(timeAndDayContainerView.frame, gesture.locationInView(view)) || CGRectContainsPoint(bottomToolbar.frame, gesture.locationInView(view)) || CGRectContainsPoint(zoomOutButton.frame, gesture.locationInView(mapView)) { return }
-
+            if CGRectContainsPoint(timeAndDayContainerView.frame, gesture.locationInView(view)) || CGRectContainsPoint(bottomToolbar.frame, gesture.locationInView(view)) { return }
+            
             if toolbarsPresent {
-                if isSearchBarPresent { searchContainerViewController!.hideSearchBar() }
+                if isSearchBarPresent {
+                    searchContainerViewController!.hideSearchBar()
+                    isSearchBarPresent = true
+                }
                 UIView.animateWithDuration(standardAnimationDuration, animations: {
                     self.heightConstraintOfTimeAndDayContainer.constant = 0
                     self.heightConstraintOfToolbar.constant = 0
                     self.view.layoutIfNeeded()
                 })
             } else {
-                if isSearchBarPresent { searchContainerViewController!.showSearchBar() }
+                if isSearchBarPresent {
+                    searchContainerViewController!.showSearchBar()
+                }
                 UIView.animateWithDuration(standardAnimationDuration, animations: {
                     if self.isInTimeRangeMode { self.heightConstraintOfTimeAndDayContainer.constant = self.heightOfTimeContainerWhenInRangeMode }
                     else { self.heightConstraintOfTimeAndDayContainer.constant = self.standardHeightOfToolOrSearchBar }
@@ -194,7 +184,25 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
             toolbarsPresent = !toolbarsPresent
         }
     }
-    
+    @objc private func zoomToDoubleTapOnMap(gesture:UITapGestureRecognizer) {
+        let pointOnMap = gesture.locationInView(mapView)
+        let camera = GMSCameraPosition.cameraWithTarget(mapView.projection.coordinateForPoint(pointOnMap), zoom: mapView.camera.zoom + 1)
+        isZoomingIn = true
+        zoomMap(toCamera: camera)
+    }
+    @objc private func zoomOutDoubleTouchTapOnMap(gesture:UITapGestureRecognizer) {
+        zoomMap(toZoom: mapView.camera.zoom - 1.5)
+    }
+    @objc private func zoomToTripleTapOnMap(gesture: UITapGestureRecognizer) {
+        if mapView.camera.zoom < streetZoom {
+            let pointOnMap = gesture.locationInView(mapView)
+            let camera = GMSCameraPosition.cameraWithTarget(mapView.projection.coordinateForPoint(pointOnMap), zoom: streetZoom)
+            isZoomingIn = true
+            animateMap(toCameraPosition: camera, duration: 0.8)
+        } else {
+            // Maybe add zoomout feature
+        }
+    }
     var scale:CGFloat = 0
     @objc private func pinchZoom(gesture:UIPinchGestureRecognizer) {
         if gesture.state == .Began { scale = gesture.scale }
@@ -204,6 +212,12 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
             zoomMap(toZoom: zoom)
         } else { return }
         isPinchZooming = true
+    }
+    func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldReceiveTouch touch: UITouch) -> Bool {
+        if touch.view != nil {
+            if touch.view === zoomOutButton || touch.view!.isDescendantOfView(searchContainerView) { return false }
+        }
+        return true
     }
     
     //MARK: --Views
@@ -217,8 +231,6 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         mapView.delegate = self
         mapView.settings.consumesGesturesInView = false
     }
-    
-    
     func setupOtherViews() {
         heightConstraintOfSearchContainer.constant = 0
         view.layoutIfNeeded()
@@ -226,7 +238,6 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         activityIndicator.hidesWhenStopped = true
         showWaitingView(withLabel: waitingText, isStreetView: false)
     }
-    
     private func setUpButtons() {
         zoomOutButton.setTitle("Zoom Out", forState: .Normal)
         let buttonSize = zoomOutButton.intrinsicContentSize()
@@ -237,8 +248,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         mapView.addSubview(zoomOutButton)
     }
     
-    //    MARK: - Button Methods
-    
+    //MARK: - Button Methods
     //MARK: --Swoop toggle
     @IBAction func toggleOverlaySwitch(sender: UISwitch) {
         setOverlayAndLabel()
@@ -264,54 +274,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
             switchLabel.setTitle(switchLabelCity, forState: .Normal)
         }
     }
-    //MARK: --Other buttons
-    @objc private func zoomOut(sender:UIButton) {
-        zoomMap(toCamera: initialMapViewCamera)
-    }
-    
-    @IBAction func centerOnUserLocation(sender: UIButton) {
-        userControl = false
-        moveCameraToUserLocation()
-    }
-    
-    func didTapMyLocationButtonForMapView(mapView: GMSMapView) -> Bool {
-        userControl = false
-        return true
-    }
-    
-    private func moveCameraToUserLocation() {
-        guard dao != nil else {
-            print("DAO not passed to mapViewController, unable to get currentLocation to moveCameraToUserLocation")
-            return
-        }
-        if let currentCoordinate = dao!.currentLocation?.coordinate {
-            let camera = GMSCameraPosition.cameraWithTarget(currentCoordinate, zoom: streetZoom)
-            zoomMap(toCamera: camera)
-        }
-    }
-
-    
-    // MARK: - MapView delegate
-    func mapView(mapView: GMSMapView, idleAtCameraPosition position: GMSCameraPosition) {
-        adjustViewsToZoom()
-        if isZoomingIn { isZoomingIn = false }
-        if isPinchZooming && currentMapPolylines.count > 0 { isPinchZooming = false }
-    }
-    
-    func mapView(mapView: GMSMapView, didChangeCameraPosition position: GMSCameraPosition) {
-        if (isPinchZooming || isZoomingIn){
-            adjustViewsToZoom()
-        }
-    }
-    
-    func mapView(mapView: GMSMapView, willMove gesture: Bool) {
-        if (gesture) { userControl = true }
-        else { userControl = false }
-    }
-    
-    
-    //MARK: - View animation methods
-    //MARK: ---Searchbar animation
+    //MARK: --Searchbar toggle
     @IBAction func showSearchBarButtonPressed(sender: UIBarButtonItem) {
         toggleSearchBar()
     }
@@ -324,9 +287,34 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         } else if isSearchBarPresent {
             searchContainerViewController?.hideSearchBar()
         }
-//        isSearchBarPresent = !isSearchBarPresent
     }
-    //MARK: ---Blur View animation
+    //MARK: --Other buttons
+    @objc private func zoomOut(sender:UIButton) {
+        zoomMap(toCamera: initialMapViewCamera)
+    }
+    @IBAction func centerOnUserLocation(sender: UIButton) {
+        userControl = false
+        moveCameraToUserLocation()
+    }
+    func didTapMyLocationButtonForMapView(mapView: GMSMapView) -> Bool {
+        userControl = false
+        return true
+    }
+    private func moveCameraToUserLocation() {
+        guard dao != nil else {
+            print("DAO not passed to mapViewController, unable to get currentLocation to moveCameraToUserLocation")
+            return
+        }
+        if let currentCoordinate = dao!.currentLocation?.coordinate {
+            let camera = GMSCameraPosition.cameraWithTarget(currentCoordinate, zoom: streetZoom)
+            zoomMap(toCamera: camera)
+        }
+    }
+
+    //MARK: - Animation methods
+
+    
+    //MARK: --Blur View animation
     private func showWaitingView(withLabel labelText:String, isStreetView:Bool) {
         if !isStreetView {
             greyOutMapView.hidden = false
@@ -342,8 +330,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         activityIndicator.stopAnimating()
     }
     
-    // MARK: - Map animation methods
-    
+    // MARK: --Map animation methods
     private func animateMap(toCameraPosition cameraPosition:GMSCameraPosition, duration:Float) {
         CATransaction.begin()
         CATransaction.setCompletionBlock { 
@@ -353,7 +340,6 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         zoomMap(toCamera: cameraPosition)
         CATransaction.commit()
     }
-    
     private func adjustViewsToZoom() {
         if mapView.camera.zoom < zoomToSwitchOverlays {
             turnCityOverlayOn()
@@ -366,7 +352,6 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
             zoomOutButton.hidden = false
         }
     }
-    
     private func zoomMap(toCoordinate coordinate:CLLocationCoordinate2D?, zoom:Float) {
         if coordinate != nil {
             let camera = GMSCameraPosition.cameraWithTarget(coordinate!, zoom: zoom)
@@ -389,8 +374,8 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         }
         if isKeyboardPresent { view.endEditing(true) }
     }
-    //MARK: - Draw on map methods
     
+    //MARK: -----Draw on map methods
     private func getSignsForCurrentMapView() {
         guard dao != nil else {
             print("DAO not passed to mapViewController, unable to check if isInNYC to getSignsForCurrentMapView")
@@ -401,7 +386,6 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
             dao!.getSigns(forCurrentMapView: mapView)
         }
     }
-    
     private func getNewHeatMapOverlays() {
         hide(mapOverlayViews: currentGroundOverlays)
         guard dao != nil else {
@@ -411,60 +395,44 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         currentGroundOverlays =  SPGroundOverlayManager().groundOverlays(forMap: mapView, forLocations: dao!.locationsForDayAndTime)
         show(mapOverlayViews: currentGroundOverlays, shouldHideOtherOverlay: true)
     }
-    
-
-    //MARK: --Hide/Show GMSPolyline/GroundOverLays
-    private func hide<MapOverlayType: GMSOverlay>(mapOverlayViews views:[MapOverlayType]) {
+    private func hide(mapOverlayViews views:[GMSOverlay]) {
         for view in views { view.map = nil }
     }
     private func show<MapOverlayType: GMSOverlay>(mapOverlayViews views:[MapOverlayType], shouldHideOtherOverlay:Bool) {
         if views.count > 0 {
+            let date = NSDate()
             for view in views {  view.map = mapView }
             if shouldHideOtherOverlay {
                 if MapOverlayType() is GMSPolyline { hide(mapOverlayViews: currentGroundOverlays) }
                 else if MapOverlayType() is GMSGroundOverlay { hide(mapOverlayViews: currentMapPolylines) }
             }
+            print("Time to draw/hide overlays on map: \(date.timeIntervalSinceNow)")
         }
-    }
-    //MARK: - Methods that interact with view controllers
-    //MARK: --Time and Day Container Controller delegate
-    func timeViewControllerDidTapTimeRangeButton(isInRangeMode: Bool) {
-        if isInRangeMode {
-            UIView.animateWithDuration(standardAnimationDuration, animations: {
-                self.heightConstraintOfTimeAndDayContainer.constant = self.standardHeightOfToolOrSearchBar
-                self.view.layoutIfNeeded()
-            })
-        } else {
-            UIView.animateWithDuration(standardAnimationDuration, animations: {
-                self.heightConstraintOfTimeAndDayContainer.constant = self.heightOfTimeContainerWhenInRangeMode
-                self.view.layoutIfNeeded()
-            })
-        }
-        isInTimeRangeMode = !isInRangeMode
-    }
-    //MARK: --Search container controller delegate
-    func searchContainer(toPerformDelegateAction delegateAction: SPNetworkingDelegateAction) {
-        if delegateAction == .presentCoordinate {
-            zoomMap(toCoordinate: dao?.searchCoordinate, zoom: 15)
-        }
-    }
-    func searchContainerHeightWillAdjust(height: CGFloat, isTableViewPresent: Bool, isSearchBarPresent: Bool) -> Bool {
-        UIView.animateWithDuration(standardAnimationDuration) {
-            self.heightConstraintOfSearchContainer.constant = height
-            self.view.layoutIfNeeded()
-        }
-        self.isSearchTableViewPresent = isTableViewPresent
-        self.isSearchBarPresent = isSearchBarPresent
-        return true
     }
     
-    //MARK: --DAO delegate
+    // MARK: - Delegate Methods
+    //MARK: --MapView delegate
+    func mapView(mapView: GMSMapView, idleAtCameraPosition position: GMSCameraPosition) {
+        adjustViewsToZoom()
+        if isZoomingIn { isZoomingIn = false }
+        if isPinchZooming && currentMapPolylines.count > 0 { isPinchZooming = false }
+    }
+    func mapView(mapView: GMSMapView, didChangeCameraPosition position: GMSCameraPosition) {
+        if (isPinchZooming || isZoomingIn){
+            adjustViewsToZoom()
+        }
+    }
+    func mapView(mapView: GMSMapView, willMove gesture: Bool) {
+        if (gesture) { userControl = true }
+        else { userControl = false }
+    }
+    
+    //MARK: -----DAO delegate
     func dataAccessObject(dao: SPDataAccessObject, didUpdateAddressResults: [SPGoogleAddressResult]) {
         searchContainerViewController?.showSearchResultsTableView()
     }
-    
     func dataAccessObject(dao: SPDataAccessObject, didSetSearchCoordinate coordinate: CLLocationCoordinate2D) {
-        zoomMap(toCoordinate: coordinate, zoom: 15)
+        zoomMap(toCoordinate: coordinate, zoom: streetZoom)
     }
     func dataAccessObject(dao: SPDataAccessObject, didSetLocations locations: [SPLocation], forQueryType: SPSQLLocationQueryTypes) {
         if forQueryType == .getLocationsForCurrentMapView {
@@ -481,26 +449,36 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         }
         hideWaitingView()
     }
-    
-    //MARK: --Prepare for segue
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if segue.identifier == timeContainerSegue {
-            timeAndDayViewController = segue.destinationViewController as? SPTimeAndDayViewController
-            guard timeAndDayViewController != nil else {
-                print("Destination ViewController for segue \(segue.identifier) is not time and day container controller. It is \(segue.destinationViewController)")
-                return
-            }
-            timeAndDayViewController!.dao = dao
-            timeAndDayViewController!.delegate = self
-        } else if segue.identifier == searchContainerSegue {
-            searchContainerViewController = segue.destinationViewController as? SPSearchResultsViewController
-            guard searchContainerViewController != nil else {
-                print("Destination ViewController for segue \(segue.identifier) is not time and day container controller. It is \(segue.destinationViewController)")
-                return
-            }
-            dao?.delegate = self
-            searchContainerViewController!.dao = dao
-            searchContainerViewController!.delegate = self
+
+    //MARK: -- Methods that interact with child view controllers
+    //MARK: -----Time and Day Container Controller delegate
+    func timeViewControllerDidTapTimeRangeButton(isInRangeMode: Bool) {
+        if isInRangeMode {
+            UIView.animateWithDuration(standardAnimationDuration, animations: {
+                self.heightConstraintOfTimeAndDayContainer.constant = self.standardHeightOfToolOrSearchBar
+                self.view.layoutIfNeeded()
+            })
+        } else {
+            UIView.animateWithDuration(standardAnimationDuration, animations: {
+                self.heightConstraintOfTimeAndDayContainer.constant = self.heightOfTimeContainerWhenInRangeMode
+                self.view.layoutIfNeeded()
+            })
         }
+        isInTimeRangeMode = !isInRangeMode
+    }
+    //MARK: -----Search container controller delegate
+    func searchContainer(toPerformDelegateAction delegateAction: SPNetworkingDelegateAction) {
+        if delegateAction == .presentCoordinate {
+            zoomMap(toCoordinate: dao?.searchCoordinate, zoom: streetZoom)
+        }
+    }
+    func searchContainerHeightShouldAdjust(height: CGFloat, isTableViewPresent: Bool, isSearchBarPresent: Bool) -> Bool {
+        UIView.animateWithDuration(standardAnimationDuration) {
+            self.heightConstraintOfSearchContainer.constant = height
+            self.view.layoutIfNeeded()
+        }
+        self.isSearchTableViewPresent = isTableViewPresent
+        self.isSearchBarPresent = isSearchBarPresent
+        return true
     }
 }
