@@ -58,7 +58,7 @@ struct SPSQLiteReader {
     }
     
     //This function is for finding all of the locations with at least one street cleaning sign that is the only sign in their position (meaning that it is okay to park there any time after street cleaning). The call back passed to the callSQL() function will find locations that have at least one street cleaning sign that is the only sign at that position
-    func queryUpcomingStreetCleaningSignsAndLocations(forDayAndTime:SPTimeAndDayInt) {
+    func queryUpcomingStreetCleaningSignsAndLocations(forDayAndTime:SPTimeAndDay) {
         let query = "SELECT l.id, sign_content, position_in_feet, from_latitude, from_longitude FROM locations l INNER JOIN signs s1 ON l.id = s1.location_id WHERE s1.position_in_feet || ' ' || s1.location_id IN ( SELECT s2.position_in_feet || ' ' || s2.location_id FROM signs s2 WHERE s2.sign_content MATCH 'sanitation tues* 12*')"
         let callback = parseLocationsWithUniqueSignPositions
         callSQL(query: query, withValues: [], queryType: .getLocationsForTimeAndDay, callback:callback)

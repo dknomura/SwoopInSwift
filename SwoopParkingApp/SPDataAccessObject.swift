@@ -78,8 +78,6 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
         sqlReader.delegate = self
         sqlReader.dao = self
         sqlReader.querySignsAndLocations(swCoordinate: visibleRegionBounds.southWest, neCoordinate: visibleRegionBounds.northEast)
-        
-        //         hit the swoop button to find the current map center and zoom
     }
     
     // MARK: - SQLite and Lambda delegate methods

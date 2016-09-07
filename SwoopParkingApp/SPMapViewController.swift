@@ -34,7 +34,6 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     
     var currentMapPolylines = [GMSPolyline]()
     var currentGroundOverlays = [GMSGroundOverlay]()
-    let timeAndDayManager = SPTimeAndDayManager()
     
     var searchContainerSegue: String { return "searchContainer" }
     var timeContainerSegue:String { return "timeContainer" }
@@ -64,6 +63,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     var initialZoom: Float {
         return SPPolylineManager().initialZoom(forViewHeight: Double(mapView.frame.height))
     }
+
     //MARK: - Override methods
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -84,7 +84,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     }
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
-        deregisterObservers()
+        NSNotificationCenter.defaultCenter().removeObserver(self)
     }
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == timeContainerSegue {
@@ -113,11 +113,6 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         let notificationCenter = NSNotificationCenter.defaultCenter()
         notificationCenter.addObserver(self, selector: #selector(keyboardDidHide), name: UIKeyboardDidHideNotification, object: nil)
         notificationCenter.addObserver(self, selector: #selector(keyboardDidShow), name: UIKeyboardDidShowNotification, object: nil)
-    }
-    private func deregisterObservers() {
-        let notificationCenter = NSNotificationCenter.defaultCenter()
-        notificationCenter.removeObserver(self, name: UIKeyboardDidShowNotification, object: nil)
-        notificationCenter.removeObserver(self, name: UIKeyboardDidHideNotification, object: nil)
     }
     @objc private func keyboardDidHide() { isKeyboardPresent = false }
     @objc private func keyboardDidShow() { isKeyboardPresent = true }
@@ -387,7 +382,6 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         }
     }
     private func getNewHeatMapOverlays() {
-        hide(mapOverlayViews: currentGroundOverlays)
         guard dao != nil else {
             print("DAO not passed to mapViewController, unable to get locationsForDayAndTime to set currentGroundOverlays")
             return
@@ -402,11 +396,11 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         if views.count > 0 {
             let date = NSDate()
             for view in views {  view.map = mapView }
+            print("Time to draw/hide overlays on map: \(date.timeIntervalSinceNow)")
             if shouldHideOtherOverlay {
                 if MapOverlayType() is GMSPolyline { hide(mapOverlayViews: currentGroundOverlays) }
                 else if MapOverlayType() is GMSGroundOverlay { hide(mapOverlayViews: currentMapPolylines) }
             }
-            print("Time to draw/hide overlays on map: \(date.timeIntervalSinceNow)")
         }
     }
     
