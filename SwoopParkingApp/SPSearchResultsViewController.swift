@@ -15,26 +15,23 @@ class SPSearchResultsViewController: UIViewController, UITableViewDelegate, UITa
     @IBOutlet weak var heightConstraintOfTableView: NSLayoutConstraint!
     @IBOutlet weak var heightConstraintOfSearchBar: NSLayoutConstraint!
     
-    var dao: SPDataAccessObject?
+    var dao: SPDataAccessObject!
     weak var delegate: SPSearchResultsViewControllerDelegate?
     
-    var cellReuseIdentifier:String { return "cellReuseIdentifier" }
+    var cellReuseIdentifier:String { return "searchResultsCellIdentifier" }
     var standardHeightOfToolOrSearchBar: CGFloat { return CGFloat(44.0) }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         searchResultsTableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: cellReuseIdentifier)
         searchResultsTableView.userInteractionEnabled = true
-        if dao == nil {
-            print("DAO not passed to search view controller from map view controller")
-        }
     }
     
     //MARK: - Search bar
     func searchBarTextDidBeginEditing(searchBar: UISearchBar) {
         if searchBar.text?.characters.count == 0 {
             hideSearchResultsTableView()
-        } else if dao?.addressResults.count > 0 {
+        } else if dao.addressResults.count > 0 {
             showSearchResultsTableView()
         }
     }
@@ -59,30 +56,22 @@ class SPSearchResultsViewController: UIViewController, UITableViewDelegate, UITa
     
     //MARK: - TableView Delegate/Datasource
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        guard dao != nil else {
-            print("DAO not passed to mapViewController, unable to get numberOfRowsInSection")
-            return 0
-        }
-        return dao!.addressResults.count
+        return dao.addressResults.count
     }
     func numberOfSectionsInTableView(tableView: UITableView) -> Int { return 1 }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         var cell = tableView.dequeueReusableCellWithIdentifier(cellReuseIdentifier)
         if cell != nil { cell = UITableViewCell.init(style: .Default, reuseIdentifier: cellReuseIdentifier) }
-        cell?.textLabel!.text = dao?.addressResults[indexPath.row].address
+        cell?.textLabel!.text = dao.addressResults[indexPath.row].address
         cell?.userInteractionEnabled = true
         return cell!
     }
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        guard dao != nil else {
-            print("DAO not passed to mapViewController, unable to get search results for results tableview")
-            return
-        }
-        let addressResult = dao!.addressResults[indexPath.row]
+        let addressResult = dao.addressResults[indexPath.row]
         searchBar.text = addressResult.address
         if addressResult.coordinate != nil {
-            dao?.searchCoordinate = addressResult.coordinate
+            dao.searchCoordinate = addressResult.coordinate
             delegate?.searchContainer(toPerformDelegateAction: .presentCoordinate)
         } else {
             let googleNetworking = SPGoogleNetworking()
@@ -94,7 +83,7 @@ class SPSearchResultsViewController: UIViewController, UITableViewDelegate, UITa
     //MARK: - TableView animation
     func showSearchResultsTableView() {
         searchResultsTableView.reloadData()
-        let multipler = self.dao?.addressResults.count < 4 ? self.dao!.addressResults.count : 3
+        let multipler = self.dao.addressResults.count < 4 ? self.dao.addressResults.count : 3
         let heightOfTableView = standardHeightOfToolOrSearchBar * CGFloat(multipler)
         if delegate!.searchContainerHeightShouldAdjust(standardHeightOfToolOrSearchBar + heightOfTableView, isTableViewPresent: true, isSearchBarPresent: true) {
             UIView.animateWithDuration(standardAnimationDuration) {

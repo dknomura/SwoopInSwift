@@ -21,7 +21,7 @@
 		9CA7DDC11D57EAB50050B75D /* LFHeatMap-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CA7DDBC1D57EAB50050B75D /* LFHeatMap-dummy.m */; };
 		9CA7DDC21D57EAB50050B75D /* LFHeatMap.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CA7DDBF1D57EAB50050B75D /* LFHeatMap.m */; };
 		9CA7DDC51D590BEF0050B75D /* SPGroundOverlayManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CA7DDC41D590BEF0050B75D /* SPGroundOverlayManager.swift */; };
-		9CBBB4681D5CD19D00AE1511 /* SPTimeAndDayManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CBBB4671D5CD19D00AE1511 /* SPTimeAndDayManager.swift */; };
+		9CBBB4681D5CD19D00AE1511 /* SPTimeAndDay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CBBB4671D5CD19D00AE1511 /* SPTimeAndDay.swift */; };
 		9CBE25BB1D552BD500B5384B /* SPSQLiteReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CBE25BA1D552BD500B5384B /* SPSQLiteReader.swift */; };
 		9CBE25CF1D552C2800B5384B /* libsqlite3.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 9CBE25CE1D552C2800B5384B /* libsqlite3.0.tbd */; };
 		9CBE25D21D554F3300B5384B /* libsqlite3.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 9CBE25CE1D552C2800B5384B /* libsqlite3.0.tbd */; };
@@ -105,7 +105,7 @@
 		9CA7DDBF1D57EAB50050B75D /* LFHeatMap.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LFHeatMap.m; sourceTree = "<group>"; };
 		9CA7DDC01D57EAB50050B75D /* LFHeatMap.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; path = LFHeatMap.modulemap; sourceTree = "<group>"; };
 		9CA7DDC41D590BEF0050B75D /* SPGroundOverlayManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPGroundOverlayManager.swift; sourceTree = "<group>"; };
-		9CBBB4671D5CD19D00AE1511 /* SPTimeAndDayManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPTimeAndDayManager.swift; sourceTree = "<group>"; };
+		9CBBB4671D5CD19D00AE1511 /* SPTimeAndDay.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPTimeAndDay.swift; sourceTree = "<group>"; };
 		9CBE25BA1D552BD500B5384B /* SPSQLiteReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPSQLiteReader.swift; sourceTree = "<group>"; };
 		9CBE25BC1D552BFA00B5384B /* SwoopParkingApp-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SwoopParkingApp-Bridging-Header.h"; sourceTree = "<group>"; };
 		9CBE25CE1D552C2800B5384B /* libsqlite3.0.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.0.tbd; path = usr/lib/libsqlite3.0.tbd; sourceTree = SDKROOT; };
@@ -207,6 +207,24 @@
 			name = Pods;
 			sourceTree = "<group>";
 		};
+		9C04E2711D9028540012EAE0 /* DataAccess */ = {
+			isa = PBXGroup;
+			children = (
+				9C42DAB21D5A589E004ECA97 /* SPDataAccessObject.swift */,
+				9C04E2721D9028680012EAE0 /* Local Data */,
+				9C61F0AF1D7496C100BA524C /* Networking */,
+			);
+			name = DataAccess;
+			sourceTree = "<group>";
+		};
+		9C04E2721D9028680012EAE0 /* Local Data */ = {
+			isa = PBXGroup;
+			children = (
+				9CBE25BA1D552BD500B5384B /* SPSQLiteReader.swift */,
+			);
+			name = "Local Data";
+			sourceTree = "<group>";
+		};
 		9C42DAB41D5A6A37004ECA97 /* Controller */ = {
 			isa = PBXGroup;
 			children = (
@@ -233,10 +251,8 @@
 			children = (
 				9CD51DC81CE24662006B741D /* SPSignAndLocationParser.swift */,
 				9C4DCF521D6E01F30060EEBF /* SPSignAndLocationModel.swift */,
-				9CBE25BA1D552BD500B5384B /* SPSQLiteReader.swift */,
-				9C42DAB21D5A589E004ECA97 /* SPDataAccessObject.swift */,
-				9CBBB4671D5CD19D00AE1511 /* SPTimeAndDayManager.swift */,
-				9C61F0AF1D7496C100BA524C /* Networking */,
+				9CBBB4671D5CD19D00AE1511 /* SPTimeAndDay.swift */,
+				9C04E2711D9028540012EAE0 /* DataAccess */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -610,7 +626,7 @@
 				9CFEE3A81CDA6E6600CE5D53 /* SPConstants.swift in Sources */,
 				9C617EF51D51BF5100FFA51A /* SPTileLayerManager.swift in Sources */,
 				9CBE25E01D555CEE00B5384B /* FMDatabasePool.m in Sources */,
-				9CBBB4681D5CD19D00AE1511 /* SPTimeAndDayManager.swift in Sources */,
+				9CBBB4681D5CD19D00AE1511 /* SPTimeAndDay.swift in Sources */,
 				9CBE25E11D555CEE00B5384B /* FMDatabaseQueue.m in Sources */,
 				9C4DCF531D6E01F30060EEBF /* SPSignAndLocationModel.swift in Sources */,
 				9C42DAB31D5A589E004ECA97 /* SPDataAccessObject.swift in Sources */,
@@ -714,6 +730,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
@@ -761,6 +778,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
@@ -790,7 +808,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
+				EMBEDDED_CONTENT_CONTAINS_SWIFT = "$(inherited)";
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				"FRAMEWORK_SEARCH_PATHS[arch=*]" = "$(inherited)";
 				INFOPLIST_FILE = SwoopParkingApp/Info.plist;
@@ -814,7 +832,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
+				EMBEDDED_CONTENT_CONTAINS_SWIFT = "$(inherited)";
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				"FRAMEWORK_SEARCH_PATHS[arch=*]" = "$(inherited)";
 				INFOPLIST_FILE = SwoopParkingApp/Info.plist;
@@ -836,6 +854,7 @@
 				"FRAMEWORK_SEARCH_PATHS[arch=*]" = "$(inherited)";
 				INFOPLIST_FILE = SwoopParkingAppTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = dnom.SwoopParkingAppTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SwoopParkingApp.app/SwoopParkingApp";
@@ -850,6 +869,7 @@
 				"FRAMEWORK_SEARCH_PATHS[arch=*]" = "$(inherited)";
 				INFOPLIST_FILE = SwoopParkingAppTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = dnom.SwoopParkingAppTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SwoopParkingApp.app/SwoopParkingApp";
@@ -894,6 +914,7 @@
 				9CEC19751D77EA38006AEAB0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		9CFEE3711CDA6D7900CE5D53 /* Build configuration list for PBXProject "SwoopParkingApp" */ = {
 			isa = XCConfigurationList;

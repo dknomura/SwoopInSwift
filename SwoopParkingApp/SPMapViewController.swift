@@ -10,8 +10,6 @@ import UIKit
 import GoogleMaps
 import AWSLambda
 
-
-
 class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDelegate, UITextViewDelegate, SPTimeViewControllerDelegate, UIGestureRecognizerDelegate, SPDataAccessObjectDelegate, SPSearchResultsViewControllerDelegate {
     @IBOutlet weak var timeAndDayContainerView: UIView!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
@@ -51,7 +49,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     var isSearchBarPresent = false
     var isZoomingIn = false
     
-    var dao: SPDataAccessObject?
+    var dao: SPDataAccessObject!
     var timeAndDayViewController: SPTimeAndDayViewController?
     var searchContainerViewController: SPSearchResultsViewController?
     
@@ -73,11 +71,11 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         setupGestures()
         setupOtherViews()
         guard dao != nil else {
-            print("DAO not passed to mapViewController, unable to setupLocationManager")
+            print("DAO not passed to mapViewController")
             return
         }
-        dao?.setUpLocationManager()
-        dao?.delegate = self
+        dao.setUpLocationManager()
+        dao.delegate = self
     }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -101,7 +99,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
                 print("Destination ViewController for segue \(segue.identifier) is not time and day container controller. It is \(segue.destinationViewController)")
                 return
             }
-            dao?.delegate = self
+            dao.delegate = self
             searchContainerViewController!.dao = dao
             searchContainerViewController!.delegate = self
         }
@@ -296,11 +294,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         return true
     }
     private func moveCameraToUserLocation() {
-        guard dao != nil else {
-            print("DAO not passed to mapViewController, unable to get currentLocation to moveCameraToUserLocation")
-            return
-        }
-        if let currentCoordinate = dao!.currentLocation?.coordinate {
+        if let currentCoordinate = dao.currentLocation?.coordinate {
             let camera = GMSCameraPosition.cameraWithTarget(currentCoordinate, zoom: streetZoom)
             zoomMap(toCamera: camera)
         }
@@ -372,21 +366,13 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     
     //MARK: -----Draw on map methods
     private func getSignsForCurrentMapView() {
-        guard dao != nil else {
-            print("DAO not passed to mapViewController, unable to check if isInNYC to getSignsForCurrentMapView")
-            return
-        }
         if mapView.camera.zoom >= zoomToSwitchOverlays && dao!.isInNYC(mapView) && streetViewSwitch.on {
             showWaitingView(withLabel: waitingText, isStreetView: true)
             dao!.getSigns(forCurrentMapView: mapView)
         }
     }
     private func getNewHeatMapOverlays() {
-        guard dao != nil else {
-            print("DAO not passed to mapViewController, unable to get locationsForDayAndTime to set currentGroundOverlays")
-            return
-        }
-        currentGroundOverlays =  SPGroundOverlayManager().groundOverlays(forMap: mapView, forLocations: dao!.locationsForDayAndTime)
+        currentGroundOverlays =  SPGroundOverlayManager().groundOverlays(forMap: mapView, forLocations: dao.locationsForDayAndTime)
         show(mapOverlayViews: currentGroundOverlays, shouldHideOtherOverlay: true)
     }
     private func hide(mapOverlayViews views:[GMSOverlay]) {
@@ -463,7 +449,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     //MARK: -----Search container controller delegate
     func searchContainer(toPerformDelegateAction delegateAction: SPNetworkingDelegateAction) {
         if delegateAction == .presentCoordinate {
-            zoomMap(toCoordinate: dao?.searchCoordinate, zoom: streetZoom)
+            zoomMap(toCoordinate: dao.searchCoordinate, zoom: streetZoom)
         }
     }
     func searchContainerHeightShouldAdjust(height: CGFloat, isTableViewPresent: Bool, isSearchBarPresent: Bool) -> Bool {

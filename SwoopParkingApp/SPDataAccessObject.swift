@@ -8,6 +8,7 @@
 
 import Foundation
 import GoogleMaps
+import DNTimeAndDay
 
 enum DAOError:ErrorType {
     case noDao(forFunction: String)
@@ -20,34 +21,13 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
     var currentMapViewLocations = [SPLocation]()
     var currentLocation: CLLocation?
     var streetCleaningLocations = [SPLocation]()
-    var currentDayAndTimeInt: SPTimeAndDayInt { return SPTimeAndDayManager().getCurrentDayHourMinutes() }
+    var currentDayAndTimeInt: DNTimeAndDay { return DNTimeAndDay.currentTimeAndDay() }
     let locationManager = CLLocationManager()
-    var primaryTimeAndDayString: SPTimeAndDayString?
-    var secondaryTimeAndDayString: SPTimeAndDayString?
+    var primaryTimeAndDay: DNTimeAndDay?
+    var secondaryTimeAndDay: DNTimeAndDay?
     var addressResults = [SPGoogleAddressResult]()
     var searchCoordinate: CLLocationCoordinate2D?
-    
-    //MARK: - Time and Day data access methods
-    func dayString(fromInt dayInt:Int) -> String {
-        do{
-            return try SPTimeAndDayManager().getDayString(fromInt: dayInt)
-        } catch {
-            print("Day Int \(dayInt) is not between 1 and 7")
-            return "Mon"
-        }
-    }
-    
-    func dayAndTimeForSQLCall(dayAndTime:SPTimeAndDayString) -> SPTimeAndDayString {
-        var time = SPTimeAndDayManager().convertTimeString(dayAndTime.time, toFormat: .format12Hour)
         
-        if let removeRange = dayAndTime.time.rangeOfString(":00") {
-            time.removeRange(removeRange)
-            return SPTimeAndDayString(time: time, day: dayAndTime.day)
-        } else {
-            return SPTimeAndDayString(time: time, day:dayAndTime.day)
-        }
-    }
-    
     //MARK: - Determine if current mapView is within NYC
     
     func isInNYC(mapView:GMSMapView) -> Bool {
