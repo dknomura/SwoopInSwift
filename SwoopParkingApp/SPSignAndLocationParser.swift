@@ -14,7 +14,7 @@ import AWSLambda
 struct SPParser {
     //MARK: - Parse sign and location objects
     //MARK: ---Lambda
-    var dao: SPDataAccessObject?
+    var dao: SPDataAccessObject!
     func parseLambdaSignsAndLocationsFromCoordinates(response:NSArray) -> [SPLocation] {
         var returnArray = [SPLocation]()
         for i in 0 ..< response.count {
@@ -154,12 +154,6 @@ struct SPParser {
         guard let signs = location.signs else { return [SPSign]() }
         var returnSigns = [SPSign]()
         let numberOfSignsAtPosition = dictionaryOfNumberOfSignsAtPosition(signs)
-        
-        guard dao != nil,
-        let dayAndTime = dao?.primaryTimeAndDayString else {
-            print("DAO was not passed to SPSignAndLocationParser, unable to get timeAndDayString for markStreetCleaningSignsWithUniquePosition")
-            return [SPSign]()
-        }
         var signsWithUniquePositions = [SPSign]()
         for var sign in signs {
             if sign.positionInFeet != nil {
@@ -179,7 +173,7 @@ struct SPParser {
                 print("No sign content for sign \(sign.signIndex) at location: \(location.locationNumber)")
                 continue
             }
-            let searchedDayAndTime = dao!.dayAndTimeForSQLCall(dayAndTime)
+            let searchedDayAndTime = dao!.formattedTimeAndDayTupleForSQLQuery(forTimeAndDay: dao.primaryTimeAndDay)
             guard signContent.rangeOfString(searchedDayAndTime.day.lowercaseString) != nil  &&
                 signContent.rangeOfString(searchedDayAndTime.time.lowercaseString) != nil else {
                     sign.isUniqueStreetCleaningSign = false

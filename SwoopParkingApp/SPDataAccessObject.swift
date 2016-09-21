@@ -21,13 +21,13 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
     var currentMapViewLocations = [SPLocation]()
     var currentLocation: CLLocation?
     var streetCleaningLocations = [SPLocation]()
-    var currentDayAndTimeInt: DNTimeAndDay { return DNTimeAndDay.currentTimeAndDay() }
     let locationManager = CLLocationManager()
-    var primaryTimeAndDay: DNTimeAndDay?
-    var secondaryTimeAndDay: DNTimeAndDay?
+    var primaryTimeAndDay: DNTimeAndDay = DNTimeAndDay.currentTimeAndDay()
+    var secondaryTimeAndDay: DNTimeAndDay = DNTimeAndDay.currentTimeAndDay()
     var addressResults = [SPGoogleAddressResult]()
     var searchCoordinate: CLLocationCoordinate2D?
-        
+    
+    
     //MARK: - Determine if current mapView is within NYC
     
     func isInNYC(mapView:GMSMapView) -> Bool {
@@ -48,7 +48,7 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
     func getUpcomingStreetCleaningSigns() {
         var sqliteReader = SPSQLiteReader()
         sqliteReader.delegate = self
-        sqliteReader.queryUpcomingStreetCleaningSignsAndLocations(currentDayAndTimeInt)
+        sqliteReader.queryUpcomingStreetCleaningSignsAndLocations(DNTimeAndDay.currentTimeAndDay())
     }
     
     func getSigns(forCurrentMapView mapView:GMSMapView) {
@@ -60,6 +60,16 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
         sqlReader.querySignsAndLocations(swCoordinate: visibleRegionBounds.southWest, neCoordinate: visibleRegionBounds.northEast)
     }
     
+    func formattedTimeAndDayTupleForSQLQuery(forTimeAndDay timeAndDay: DNTimeAndDay) -> (time: String, day: String) {
+        var returnTuple: (time: String, day:String)
+        let timeAndDayFormat = DNTimeAndDayFormat(time: .format12Hour, day: .abbr)
+        returnTuple.day = timeAndDay.day.stringValue(forFormat: timeAndDayFormat)
+        returnTuple.time = timeAndDay.time.stringValue(forFormat: timeAndDayFormat)
+        if let removeRange = returnTuple.time.rangeOfString(":00") {
+            returnTuple.time.removeRange(removeRange)
+        }
+        return returnTuple
+    }
     // MARK: - SQLite and Lambda delegate methods
     func sqlQueryDidFinish(withResults results: (queryType: SPSQLLocationQueryTypes, locationResults: [SPLocation])) {
         if results.queryType == .getLocationsForCurrentMapView {

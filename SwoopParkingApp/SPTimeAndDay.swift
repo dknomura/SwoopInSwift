@@ -24,10 +24,10 @@ extension DNTimeAndDay {
         } else {
             returnTimeAndDay.time.hour = 3
             returnTimeAndDay.time.min = 0
-            returnTimeAndDay.day.increase(days: 1)
+            returnTimeAndDay.day.increase(by: 1)
         }
         if returnTimeAndDay.day.rawValue == 1 {
-            returnTimeAndDay.day.increase(days: 1)
+            returnTimeAndDay.day.increase(by: 1)
         }
         return DNTimeAndDay.init(day: returnTimeAndDay.day, time: returnTimeAndDay.time)
     }
@@ -41,7 +41,7 @@ extension DNTimeAndDay {
             returnTimeAndDay.time.hour = 14
             returnTimeAndDay.time.min = 0
         } else if returnTimeAndDay.time.hour < 3 {
-            returnTimeAndDay.day.decrease(days:1)
+            returnTimeAndDay.day.decrease(by:1)
             if returnTimeAndDay.day.rawValue == 7 {
                 returnTimeAndDay.time.hour = 13
                 returnTimeAndDay.time.min = 0
@@ -51,7 +51,7 @@ extension DNTimeAndDay {
             }
         }
         if returnTimeAndDay.day.rawValue == 1 {
-            returnTimeAndDay.day.decrease(days: 1)
+            returnTimeAndDay.day.decrease(by: 1)
             returnTimeAndDay.time.hour = 13
             returnTimeAndDay.time.min = 0
         }

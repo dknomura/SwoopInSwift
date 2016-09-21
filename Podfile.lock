@@ -1,10 +1,10 @@
 PODS:
-  - AWSCognito (2.4.8):
-    - AWSCore (= 2.4.8)
-  - AWSCore (2.4.8)
-  - AWSLambda (2.4.8):
-    - AWSCore (= 2.4.8)
-  - DNTimeAndDay (0.1.1)
+  - AWSCognito (2.4.9):
+    - AWSCore (= 2.4.9)
+  - AWSCore (2.4.9)
+  - AWSLambda (2.4.9):
+    - AWSCore (= 2.4.9)
+  - DNTimeAndDay (0.1.5)
   - FMDB/FTS (2.6.2):
     - FMDB/standard
   - FMDB/standard (2.6.2)
@@ -22,10 +22,10 @@ DEPENDENCIES:
   - GoogleMaps
 
 SPEC CHECKSUMS:
-  AWSCognito: 63ae70c4ff94656f7a36892c45680bbb311b7381
-  AWSCore: 7bc7e845f532dedc65b133cdf518bb44a2e28dfe
-  AWSLambda: ee460128289d04e9ae7ad1b2dab0ccb1ce40d888
-  DNTimeAndDay: e8d32ab0f7f33e8d471e9fd69635a822347faa0e
+  AWSCognito: 4fa9fefcadae1d8425b01cbde27d564c21e3fd35
+  AWSCore: 175208358b95492e0ebe0337df2ab415300bddac
+  AWSLambda: 5cfb825a83acbfd6b62a6cf109f9c73896f5cc7a
+  DNTimeAndDay: ce9adb6186b06411554d99e688a7c82665f6b1ef
   FMDB: 854a0341b4726e53276f2a8996f06f1b80f9259a
   GoogleMaps: f09da64fc987c1aa29394567c3cab5a3df83c402
 

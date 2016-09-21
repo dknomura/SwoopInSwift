@@ -211,18 +211,18 @@
 			isa = PBXGroup;
 			children = (
 				9C42DAB21D5A589E004ECA97 /* SPDataAccessObject.swift */,
-				9C04E2721D9028680012EAE0 /* Local Data */,
+				9C04E2721D9028680012EAE0 /* Local */,
 				9C61F0AF1D7496C100BA524C /* Networking */,
 			);
 			name = DataAccess;
 			sourceTree = "<group>";
 		};
-		9C04E2721D9028680012EAE0 /* Local Data */ = {
+		9C04E2721D9028680012EAE0 /* Local */ = {
 			isa = PBXGroup;
 			children = (
 				9CBE25BA1D552BD500B5384B /* SPSQLiteReader.swift */,
 			);
-			name = "Local Data";
+			name = Local;
 			sourceTree = "<group>";
 		};
 		9C42DAB41D5A6A37004ECA97 /* Controller */ = {
