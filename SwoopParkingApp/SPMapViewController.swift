@@ -48,6 +48,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     var isPinchZooming = false
     var isSearchBarPresent = false
     var isZoomingIn = false
+    var shouldTapShowSearchBar = false
     
     var timeAndDayViewController: SPTimeAndDayViewController?
     var searchContainerViewController: SPSearchResultsViewController?
@@ -167,31 +168,12 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
             }
             hideToolbars()
         } else {
-            if !isSearchBarPresent {
+            if !isSearchBarPresent && shouldTapShowSearchBar {
                 searchContainerViewController!.showSearchBar(makeFirstResponder: false)
             }
             showToolbars()
         }
     }
-    
-    private func hideToolbars() {
-        UIView.animateWithDuration(standardAnimationDuration, animations: {
-            self.heightConstraintOfTimeAndDayContainer.constant = 0
-            self.heightConstraintOfToolbar.constant = 0
-            self.view.layoutIfNeeded()
-        })
-        toolbarsPresent = false
-    }
-    
-    private func showToolbars() {
-        UIView.animateWithDuration(standardAnimationDuration, animations: {
-            self.heightConstraintOfTimeAndDayContainer.constant = self.heightOfTimeContainer
-            self.heightConstraintOfToolbar.constant = self.standardHeightOfToolOrSearchBar
-            self.view.layoutIfNeeded()
-        })
-        toolbarsPresent = true
-    }
-    
     @objc private func zoomToDoubleTapOnMap(gesture:UITapGestureRecognizer) {
         let pointOnMap = gesture.locationInView(mapView)
         let camera = GMSCameraPosition.cameraWithTarget(mapView.projection.coordinateForPoint(pointOnMap), zoom: mapView.camera.zoom + 1)
@@ -286,8 +268,10 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     @IBAction func showSearchBarButtonPressed(sender: UIBarButtonItem) {
         if !isSearchBarPresent {
             searchContainerViewController?.showSearchBar(makeFirstResponder: true)
+            shouldTapShowSearchBar = true
         } else if isSearchBarPresent {
             searchContainerViewController?.hideSearchBar()
+            shouldTapShowSearchBar = false
         }
     }
     //MARK: --Other buttons
@@ -310,6 +294,24 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     }
 
     //MARK: - Animation methods
+    private func hideToolbars() {
+        UIView.animateWithDuration(standardAnimationDuration, animations: {
+            self.heightConstraintOfTimeAndDayContainer.constant = 0
+            self.heightConstraintOfToolbar.constant = 0
+            self.view.layoutIfNeeded()
+        })
+        toolbarsPresent = false
+    }
+    
+    private func showToolbars() {
+        UIView.animateWithDuration(standardAnimationDuration, animations: {
+            self.heightConstraintOfTimeAndDayContainer.constant = self.heightOfTimeContainer
+            self.heightConstraintOfToolbar.constant = self.standardHeightOfToolOrSearchBar
+            self.view.layoutIfNeeded()
+        })
+        toolbarsPresent = true
+    }
+    
 
     
     //MARK: --Blur View animation
