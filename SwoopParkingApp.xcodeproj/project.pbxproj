@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		63D1C4EB52AFB020182655BB /* Pods_SwoopParkingApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56327B640CD4999BE162E2BD /* Pods_SwoopParkingApp.framework */; };
+		9C04E2741D93FC6A0012EAE0 /* SPProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C04E2731D93FC6A0012EAE0 /* SPProtocols.swift */; };
 		9C215D9C1D6652D9006C1E3E /* SPTimeAndDayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C215D9B1D6652D9006C1E3E /* SPTimeAndDayViewController.swift */; };
 		9C42DAB31D5A589E004ECA97 /* SPDataAccessObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C42DAB21D5A589E004ECA97 /* SPDataAccessObject.swift */; };
 		9C4DCF4F1D6D39280060EEBF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9C4DCF4E1D6D39280060EEBF /* Main.storyboard */; };
@@ -89,6 +90,7 @@
 		417B93AEFD2458765145BA97 /* Pods-SwoopParkingApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwoopParkingApp.release.xcconfig"; path = "Pods/Target Support Files/Pods-SwoopParkingApp/Pods-SwoopParkingApp.release.xcconfig"; sourceTree = "<group>"; };
 		56327B640CD4999BE162E2BD /* Pods_SwoopParkingApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SwoopParkingApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5ACFCA4B78275422A004D327 /* Pods-SwoopParkingApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwoopParkingApp.debug.xcconfig"; path = "Pods/Target Support Files/Pods-SwoopParkingApp/Pods-SwoopParkingApp.debug.xcconfig"; sourceTree = "<group>"; };
+		9C04E2731D93FC6A0012EAE0 /* SPProtocols.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPProtocols.swift; sourceTree = "<group>"; };
 		9C215D9B1D6652D9006C1E3E /* SPTimeAndDayViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPTimeAndDayViewController.swift; sourceTree = "<group>"; };
 		9C42DAB21D5A589E004ECA97 /* SPDataAccessObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPDataAccessObject.swift; sourceTree = "<group>"; };
 		9C4DCF4E1D6D39280060EEBF /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
@@ -252,7 +254,6 @@
 				9CD51DC81CE24662006B741D /* SPSignAndLocationParser.swift */,
 				9C4DCF521D6E01F30060EEBF /* SPSignAndLocationModel.swift */,
 				9CBBB4671D5CD19D00AE1511 /* SPTimeAndDay.swift */,
-				9C04E2711D9028540012EAE0 /* DataAccess */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -354,8 +355,10 @@
 				9C42DAB61D5A6A63004ECA97 /* Model */,
 				9C42DAB51D5A6A47004ECA97 /* Views */,
 				9C42DAB41D5A6A37004ECA97 /* Controller */,
+				9C04E2711D9028540012EAE0 /* DataAccess */,
 				9CA7DDC31D57EAC90050B75D /* ObjC Header files */,
 				9CF750811D354F4F00000823 /* Utils */,
+				9C04E2731D93FC6A0012EAE0 /* SPProtocols.swift */,
 				9CFEE3801CDA6D7A00CE5D53 /* Assets.xcassets */,
 				9C4DCF4E1D6D39280060EEBF /* Main.storyboard */,
 				9CFEE3821CDA6D7A00CE5D53 /* LaunchScreen.storyboard */,
@@ -629,6 +632,7 @@
 				9CBBB4681D5CD19D00AE1511 /* SPTimeAndDay.swift in Sources */,
 				9CBE25E11D555CEE00B5384B /* FMDatabaseQueue.m in Sources */,
 				9C4DCF531D6E01F30060EEBF /* SPSignAndLocationModel.swift in Sources */,
+				9C04E2741D93FC6A0012EAE0 /* SPProtocols.swift in Sources */,
 				9C42DAB31D5A589E004ECA97 /* SPDataAccessObject.swift in Sources */,
 				9C61F0B51D7608CC00BA524C /* SPSearchResultsViewController.swift in Sources */,
 			);

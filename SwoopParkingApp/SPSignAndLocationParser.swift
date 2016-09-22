@@ -12,9 +12,18 @@ import GoogleMaps
 import AWSLambda
 
 struct SPParser {
+    
+    //MARK: Injectable protocol
+    private var dao: SPDataAccessObject!
+    mutating func inject(dao: SPDataAccessObject) {
+        self.dao = dao
+    }
+    func assertDependencies() {
+        assert(dao != nil)
+    }
+
     //MARK: - Parse sign and location objects
     //MARK: ---Lambda
-    var dao: SPDataAccessObject!
     func parseLambdaSignsAndLocationsFromCoordinates(response:NSArray) -> [SPLocation] {
         var returnArray = [SPLocation]()
         for i in 0 ..< response.count {
@@ -173,6 +182,7 @@ struct SPParser {
                 print("No sign content for sign \(sign.signIndex) at location: \(location.locationNumber)")
                 continue
             }
+            assertDependencies()
             let searchedDayAndTime = dao!.formattedTimeAndDayTupleForSQLQuery(forTimeAndDay: dao.primaryTimeAndDay)
             guard signContent.rangeOfString(searchedDayAndTime.day.lowercaseString) != nil  &&
                 signContent.rangeOfString(searchedDayAndTime.time.lowercaseString) != nil else {

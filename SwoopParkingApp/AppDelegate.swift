@@ -58,7 +58,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         dao.getUpcomingStreetCleaningSigns()
         guard let navController = window?.rootViewController as? UINavigationController else { return }
         guard let mapController = navController.topViewController as? SPMapViewController else { return }
-        mapController.dao = dao
+        mapController.inject(dao)
     }
 }
 

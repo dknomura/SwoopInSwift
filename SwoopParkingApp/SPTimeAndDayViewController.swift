@@ -9,13 +9,19 @@
 import Foundation
 import DNTimeAndDay
 
-class SPTimeAndDayViewController: UIViewController, UITextViewDelegate {
+class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInjectable {
     
     weak var delegate: SPTimeViewControllerDelegate?
     
+    private var dao: SPDataAccessObject!
+    func inject(dao: SPDataAccessObject) {
+        self.dao = dao
+    }
+    func assertDependencies() {
+        assert(dao != nil)
+    }
     var timeAndDayFormat = DNTimeAndDayFormat.init(time: DNTimeFormat.format12Hour, day: DNDayFormat.abbr)
     var isInTimeRangeMode = false
-    var dao: SPDataAccessObject!
 
     var timeFormatString:String { return timeAndDayFormat.time == .format12Hour ? "12:00" : "24:00" }
     var timeRangeString:String { return isInTimeRangeMode ? "Range" : "Single" }
@@ -38,6 +44,7 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        assertDependencies()
         setCurrentDayAndTimeTextViews()
     }
     private func setCurrentDayAndTimeTextViews() {

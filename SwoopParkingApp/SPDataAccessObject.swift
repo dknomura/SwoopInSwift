@@ -47,6 +47,7 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
     
     func getUpcomingStreetCleaningSigns() {
         var sqliteReader = SPSQLiteReader()
+        sqliteReader.inject(self)
         sqliteReader.delegate = self
         sqliteReader.queryUpcomingStreetCleaningSignsAndLocations(DNTimeAndDay.currentTimeAndDay())
     }
@@ -56,7 +57,7 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
         
         var sqlReader = SPSQLiteReader()
         sqlReader.delegate = self
-        sqlReader.dao = self
+        sqlReader.inject(self)
         sqlReader.querySignsAndLocations(swCoordinate: visibleRegionBounds.southWest, neCoordinate: visibleRegionBounds.northEast)
     }
     

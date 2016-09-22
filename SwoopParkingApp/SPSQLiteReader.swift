@@ -18,7 +18,14 @@ enum SQLError: ErrorType {
 
 struct SPSQLiteReader {
     weak var delegate: SPSQLiteReaderDelegate?
-    weak var dao:SPDataAccessObject?
+    //MARK: Injectable protocol
+    private var dao: SPDataAccessObject!
+    mutating func inject(dao: SPDataAccessObject) {
+        self.dao = dao
+    }
+    func assertDependencies() {
+        assert(dao != nil)
+    }
     
     var locationColumnsForJoin:[String] {
         return ["l." + kSPLocationNumberSQL, "l." + kSPIdSQL, kSPBoroughSQL, kSPSideOfStreetSQL, kSPStreetSQL, kSPToCrossStreetSQL, kSPFromCrossStreetSQL, kSPFromLatitudeSQL, kSPFromLongitudeSQL, kSPToLatitudeSQL, kSPToLongitudeSQL]
@@ -92,8 +99,9 @@ struct SPSQLiteReader {
     }
     
     private func parseLocationsWithUniqueSignPositions(fromResults results: FMResultSet, queryType:SPSQLLocationQueryTypes) {
+        assertDependencies()
         var parser = SPParser()
-        parser.dao = dao
+        parser.inject(dao)
         let locationResults = parser.parseSQLSignsAndLocationsFromTime(results)
         
         dispatch_async(dispatch_get_main_queue(), {
@@ -103,8 +111,9 @@ struct SPSQLiteReader {
     }
     
     private func parseSignsAndLocations(fromResults results: FMResultSet, queryType:SPSQLLocationQueryTypes) {
+        assertDependencies()
         var parser = SPParser()
-        parser.dao = dao
+        parser.inject(dao)
         let locationResults = parser.parseSQLSignsAndLocationsFromCoordinates(results, queryType: queryType)
         dispatch_async(dispatch_get_main_queue(), {
             self.delegate?.sqlQueryDidFinish(withResults:(queryType, locationResults))

@@ -10,7 +10,7 @@ import UIKit
 import GoogleMaps
 import AWSLambda
 
-class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDelegate, UITextViewDelegate, SPTimeViewControllerDelegate, UIGestureRecognizerDelegate, SPDataAccessObjectDelegate, SPSearchResultsViewControllerDelegate {
+class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDelegate, UITextViewDelegate, SPTimeViewControllerDelegate, UIGestureRecognizerDelegate, SPDataAccessObjectDelegate, SPSearchResultsViewControllerDelegate, SPInjectable {
     @IBOutlet weak var timeAndDayContainerView: UIView!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var streetViewSwitch: UISwitch!
@@ -49,7 +49,6 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     var isSearchBarPresent = false
     var isZoomingIn = false
     
-    var dao: SPDataAccessObject?
     var timeAndDayViewController: SPTimeAndDayViewController?
     var searchContainerViewController: SPSearchResultsViewController?
     
@@ -62,6 +61,16 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         return SPPolylineManager().initialZoom(forViewHeight: Double(mapView.frame.height))
     }
 
+    //MARK: Injectable protocol
+    private var dao: SPDataAccessObject!
+    func inject(dao: SPDataAccessObject) {
+        self.dao = dao
+    }
+    func assertDependencies() {
+        assert(dao != nil)
+    }
+
+    
     //MARK: - Override methods
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -70,10 +79,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         setUpButtons()
         setupGestures()
         setupOtherViews()
-        guard dao != nil else {
-            print("DAO not passed to mapViewController")
-            return
-        }
+        assertDependencies()
         dao!.setUpLocationManager()
         dao!.delegate = self
     }
@@ -91,7 +97,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
                 print("Destination ViewController for segue \(segue.identifier) is not time and day container controller. It is \(segue.destinationViewController)")
                 return
             }
-            timeAndDayViewController!.dao = dao
+            timeAndDayViewController!.inject(dao)
             timeAndDayViewController!.delegate = self
         } else if segue.identifier == searchContainerSegue {
             searchContainerViewController = segue.destinationViewController as? SPSearchResultsViewController
@@ -100,7 +106,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
                 return
             }
             dao!.delegate = self
-            searchContainerViewController!.dao = dao
+            searchContainerViewController!.inject(dao)
             searchContainerViewController!.delegate = self
         }
     }

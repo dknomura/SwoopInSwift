@@ -8,23 +8,33 @@
 
 import Foundation
 
-class SPSearchResultsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate {
+class SPSearchResultsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate, SPInjectable {
     
     @IBOutlet weak var searchBar: UISearchBar!
     @IBOutlet weak var searchResultsTableView: UITableView!
     @IBOutlet weak var heightConstraintOfTableView: NSLayoutConstraint!
     @IBOutlet weak var heightConstraintOfSearchBar: NSLayoutConstraint!
     
-    var dao: SPDataAccessObject!
     weak var delegate: SPSearchResultsViewControllerDelegate?
     
     var cellReuseIdentifier:String { return "searchResultsCellIdentifier" }
     var standardHeightOfToolOrSearchBar: CGFloat { return CGFloat(44.0) }
     
+    //MARK: Injectable protocol
+    private var dao: SPDataAccessObject!
+    func inject(dao: SPDataAccessObject) {
+        self.dao = dao
+    }
+    func assertDependencies() {
+        assert(dao != nil)
+    }
+    
+    //MARK: Setup ViewController
     override func viewDidLoad() {
         super.viewDidLoad()
         searchResultsTableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: cellReuseIdentifier)
         searchResultsTableView.userInteractionEnabled = true
+        assertDependencies()
     }
     
     //MARK: - Search bar
