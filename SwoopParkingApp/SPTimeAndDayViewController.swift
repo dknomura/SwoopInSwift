@@ -16,6 +16,7 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
     var timeFormatString:String { return timeAndDayFormat.time == .format12Hour ? "12:00" : "24:00" }
     var timeRangeString:String { return isInTimeRangeMode ? "Range" : "Single" }
     
+    @IBOutlet weak var timeAndDayContainer: UIView!
     @IBOutlet weak var primaryDayTextView: UITextView!
     @IBOutlet weak var primaryTimeTextView: UITextView!
     @IBOutlet weak var secondaryDayTextView: UITextView!
@@ -121,8 +122,8 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
             setSecondaryTimeAndDay()
             UIView.animateWithDuration(standardAnimationDuration, animations: {
                 self.secondaryDayAndTimeView.hidden = false
-                self.centerYConstraintForPrimaryTimeDayView.constant = -self.view.frame.height / 2
-                self.centerYConstraintForSecondaryTimeDayView.constant = self.view.frame.height / 2
+                self.centerYConstraintForPrimaryTimeDayView.constant = -self.timeAndDayContainer.frame.height / 2
+                self.centerYConstraintForSecondaryTimeDayView.constant = self.timeAndDayContainer.frame.height / 2
                 self.view.layoutIfNeeded()
             })
             

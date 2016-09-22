@@ -54,7 +54,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     var searchContainerViewController: SPSearchResultsViewController?
     
     var standardHeightOfToolOrSearchBar: CGFloat { return CGFloat(44.0) }
-    var heightOfTimeContainer: CGFloat { return isInTimeRangeMode ? CGFloat(120.0) : CGFloat(60.0) }
+    var heightOfTimeContainer: CGFloat { return isInTimeRangeMode ? CGFloat(130.0) : CGFloat(70.0) }
     
     var zoomToSwitchOverlays: Float { return streetZoom - 0.5 }
     var streetZoom: Float { return 16.0 }
@@ -302,7 +302,6 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         })
         toolbarsPresent = false
     }
-    
     private func showToolbars() {
         UIView.animateWithDuration(standardAnimationDuration, animations: {
             self.heightConstraintOfTimeAndDayContainer.constant = self.heightOfTimeContainer
@@ -311,8 +310,6 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         })
         toolbarsPresent = true
     }
-    
-
     
     //MARK: --Blur View animation
     private func showWaitingView(withLabel labelText:String, isStreetView:Bool) {

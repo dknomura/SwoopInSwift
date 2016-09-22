@@ -34,7 +34,6 @@ static const void * const kDispatchQueueSpecificKey = &kDispatchQueueSpecificKey
 
 @synthesize path = _path;
 @synthesize openFlags = _openFlags;
-@synthesize vfsName = _vfsName;
 
 + (instancetype)databaseQueueWithPath:(NSString*)aPath {
     
@@ -83,7 +82,6 @@ static const void * const kDispatchQueueSpecificKey = &kDispatchQueueSpecificKey
         _queue = dispatch_queue_create([[NSString stringWithFormat:@"fmdb.%@", self] UTF8String], NULL);
         dispatch_queue_set_specific(_queue, kDispatchQueueSpecificKey, (__bridge void *)self, NULL);
         _openFlags = openFlags;
-        _vfsName = [vfsName copy];
     }
     
     return self;
@@ -128,17 +126,12 @@ static const void * const kDispatchQueueSpecificKey = &kDispatchQueueSpecificKey
     FMDBRelease(self);
 }
 
-- (void)interrupt
-{
-    [[self database] interrupt];
-}
-
 - (FMDatabase*)database {
     if (!_db) {
-       _db = FMDBReturnRetained([[[self class] databaseClass] databaseWithPath:_path]);
+        _db = FMDBReturnRetained([FMDatabase databaseWithPath:_path]);
         
 #if SQLITE_VERSION_NUMBER >= 3005000
-        BOOL success = [_db openWithFlags:_openFlags vfs:_vfsName];
+        BOOL success = [_db openWithFlags:_openFlags];
 #else
         BOOL success = [_db open];
 #endif
