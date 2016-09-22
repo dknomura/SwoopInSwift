@@ -49,7 +49,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     var isSearchBarPresent = false
     var isZoomingIn = false
     
-    var dao: SPDataAccessObject!
+    var dao: SPDataAccessObject?
     var timeAndDayViewController: SPTimeAndDayViewController?
     var searchContainerViewController: SPSearchResultsViewController?
     
@@ -74,8 +74,8 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
             print("DAO not passed to mapViewController")
             return
         }
-        dao.setUpLocationManager()
-        dao.delegate = self
+        dao!.setUpLocationManager()
+        dao!.delegate = self
     }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -99,7 +99,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
                 print("Destination ViewController for segue \(segue.identifier) is not time and day container controller. It is \(segue.destinationViewController)")
                 return
             }
-            dao.delegate = self
+            dao!.delegate = self
             searchContainerViewController!.dao = dao
             searchContainerViewController!.delegate = self
         }
@@ -244,21 +244,21 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     //MARK: - Button Methods
     //MARK: --Swoop toggle
     @IBAction func toggleOverlaySwitch(sender: UISwitch) {
-        setOverlayAndLabel()
+        setCityStreetOverlayAndLabel()
     }
     private func turnStreetOverlayOn() {
         if !streetViewSwitch.on {
             streetViewSwitch.setOn(true, animated: true)
         }
-        setOverlayAndLabel()
+        setCityStreetOverlayAndLabel()
     }
     private func turnCityOverlayOn() {
         if streetViewSwitch.on  {
             streetViewSwitch.setOn(false, animated: true)
         }
-        setOverlayAndLabel()
+        setCityStreetOverlayAndLabel()
     }
-    private func setOverlayAndLabel() {
+    private func setCityStreetOverlayAndLabel() {
         if streetViewSwitch.on {
             getSignsForCurrentMapView()
             switchLabel.setTitle(switchLabelStreet, forState: .Normal)
@@ -294,7 +294,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         return true
     }
     private func moveCameraToUserLocation() {
-        if let currentCoordinate = dao.currentLocation?.coordinate {
+        if let currentCoordinate = dao!.currentLocation?.coordinate {
             let camera = GMSCameraPosition.cameraWithTarget(currentCoordinate, zoom: streetZoom)
             zoomMap(toCamera: camera)
         }
@@ -372,7 +372,8 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         }
     }
     private func getNewHeatMapOverlays() {
-        currentGroundOverlays =  SPGroundOverlayManager().groundOverlays(forMap: mapView, forLocations: dao.locationsForDayAndTime)
+        hide(mapOverlayViews: currentGroundOverlays)
+        currentGroundOverlays =  SPGroundOverlayManager().groundOverlays(forMap: mapView, forLocations: dao!.locationsForDayAndTime)
         show(mapOverlayViews: currentGroundOverlays, shouldHideOtherOverlay: true)
     }
     private func hide(mapOverlayViews views:[GMSOverlay]) {
@@ -449,7 +450,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     //MARK: -----Search container controller delegate
     func searchContainer(toPerformDelegateAction delegateAction: SPNetworkingDelegateAction) {
         if delegateAction == .presentCoordinate {
-            zoomMap(toCoordinate: dao.searchCoordinate, zoom: streetZoom)
+            zoomMap(toCoordinate: dao!.searchCoordinate, zoom: streetZoom)
         }
     }
     func searchContainerHeightShouldAdjust(height: CGFloat, isTableViewPresent: Bool, isSearchBarPresent: Bool) -> Bool {
