@@ -208,7 +208,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     }
     func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldReceiveTouch touch: UITouch) -> Bool {
         if touch.view != nil {
-            if touch.view === zoomOutButton || touch.view!.isDescendantOfView(searchContainerView) { return false }
+            if touch.view === zoomOutButton || touch.view!.isDescendantOfView(searchContainerView) || touch.view!.isDescendantOfView(bottomToolbar) || touch.view!.isDescendantOfView(timeAndDayContainerView) { return false }
         }
         return true
     }
