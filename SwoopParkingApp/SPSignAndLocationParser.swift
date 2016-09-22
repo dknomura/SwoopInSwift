@@ -212,7 +212,7 @@ struct SPParser {
     
     
     //MARK: - Parse Google API calls
-    func parseGoogleAPIResponse(responseDict:NSDictionary, delegateAction:SPNetworkingDelegateAction, inout returnResponse: SPGoogleResponse) {
+    func parseGoogleAPIResponse(responseDict:NSDictionary, delegateAction:SPNetworkingDelegateAction, inout returnResponse: SPGoogleObject) {
         returnResponse.googleAPIResponse = SPGoogleAPIResponse()
         guard let dictKey = key(forDelegateAction:delegateAction) else {
             print("No key for delegateAction: \(delegateAction)")
@@ -228,7 +228,7 @@ struct SPParser {
     }
     
     //MARK: --Individual API parsers
-    private func parseGoogleAutocomplete(responseArray:[NSDictionary], inout returnResponse:SPGoogleResponse) {
+    private func parseGoogleAutocomplete(responseArray:[NSDictionary], inout returnResponse:SPGoogleObject) {
         var addressResults = [SPGoogleAddressResult]()
         for response in responseArray {
             if let prediction = response["description"] as? String,
@@ -241,7 +241,7 @@ struct SPParser {
         returnResponse.googleAPIResponse?.addressResults = addressResults
     }
     
-    private func parseGoogleAddress(responseDict:[NSDictionary], inout returnResponse:SPGoogleResponse) {
+    private func parseGoogleAddress(responseDict:[NSDictionary], inout returnResponse:SPGoogleObject) {
         var addressResults = [SPGoogleAddressResult]()
         for response in responseDict {
             let addressKey = "formatted_address", placeIDKey = "place_id"
@@ -259,7 +259,7 @@ struct SPParser {
         returnResponse.googleAPIResponse?.addressResults = addressResults
     }
 
-    private func parseGooglePlaceID(responseDict:NSDictionary, inout returnResponse:SPGoogleResponse) {
+    private func parseGooglePlaceID(responseDict:NSDictionary, inout returnResponse:SPGoogleObject) {
         if let coordinate = coordinate(fromDictionary: responseDict) {
             returnResponse.googleAPIResponse?.placeIDCoordinate = coordinate
         } else {

@@ -53,7 +53,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     var searchContainerViewController: SPSearchResultsViewController?
     
     var standardHeightOfToolOrSearchBar: CGFloat { return CGFloat(44.0) }
-    var heightOfTimeContainerWhenInRangeMode: CGFloat { return CGFloat(70.0) }
+    var heightOfTimeContainer: CGFloat { return isInTimeRangeMode ? CGFloat(120.0) : CGFloat(60.0) }
     
     var zoomToSwitchOverlays: Float { return streetZoom - 0.5 }
     var streetZoom: Float { return 16.0 }
@@ -164,25 +164,34 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
                     searchContainerViewController!.hideSearchBar()
                     isSearchBarPresent = true
                 }
-                UIView.animateWithDuration(standardAnimationDuration, animations: {
-                    self.heightConstraintOfTimeAndDayContainer.constant = 0
-                    self.heightConstraintOfToolbar.constant = 0
-                    self.view.layoutIfNeeded()
-                })
+                hideToolbars()
             } else {
                 if isSearchBarPresent {
                     searchContainerViewController!.showSearchBar()
                 }
-                UIView.animateWithDuration(standardAnimationDuration, animations: {
-                    if self.isInTimeRangeMode { self.heightConstraintOfTimeAndDayContainer.constant = self.heightOfTimeContainerWhenInRangeMode }
-                    else { self.heightConstraintOfTimeAndDayContainer.constant = self.standardHeightOfToolOrSearchBar }
-                    self.heightConstraintOfToolbar.constant = self.standardHeightOfToolOrSearchBar
-                    self.view.layoutIfNeeded()
-                })
+                showToolbars()
             }
-            toolbarsPresent = !toolbarsPresent
         }
     }
+    
+    private func hideToolbars() {
+        UIView.animateWithDuration(standardAnimationDuration, animations: {
+            self.heightConstraintOfTimeAndDayContainer.constant = 0
+            self.heightConstraintOfToolbar.constant = 0
+            self.view.layoutIfNeeded()
+        })
+        toolbarsPresent = false
+    }
+    
+    private func showToolbars() {
+        UIView.animateWithDuration(standardAnimationDuration, animations: {
+            self.heightConstraintOfTimeAndDayContainer.constant = self.heightOfTimeContainer
+            self.heightConstraintOfToolbar.constant = self.standardHeightOfToolOrSearchBar
+            self.view.layoutIfNeeded()
+        })
+        toolbarsPresent = true
+    }
+    
     @objc private func zoomToDoubleTapOnMap(gesture:UITapGestureRecognizer) {
         let pointOnMap = gesture.locationInView(mapView)
         let camera = GMSCameraPosition.cameraWithTarget(mapView.projection.coordinateForPoint(pointOnMap), zoom: mapView.camera.zoom + 1)
@@ -439,19 +448,12 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
 
     //MARK: -- Methods that interact with child view controllers
     //MARK: -----Time and Day Container Controller delegate
-    func timeViewControllerDidTapTimeRangeButton(isInRangeMode: Bool) {
-        if isInRangeMode {
-            UIView.animateWithDuration(standardAnimationDuration, animations: {
-                self.heightConstraintOfTimeAndDayContainer.constant = self.standardHeightOfToolOrSearchBar
-                self.view.layoutIfNeeded()
-            })
-        } else {
-            UIView.animateWithDuration(standardAnimationDuration, animations: {
-                self.heightConstraintOfTimeAndDayContainer.constant = self.heightOfTimeContainerWhenInRangeMode
-                self.view.layoutIfNeeded()
-            })
-        }
-        isInTimeRangeMode = !isInRangeMode
+    func timeViewControllerDidTapTimeRangeButton(inRangeMode: Bool) {
+        isInTimeRangeMode = inRangeMode
+        UIView.animateWithDuration(standardAnimationDuration, animations: {
+            self.heightConstraintOfTimeAndDayContainer.constant = self.heightOfTimeContainer
+            self.view.layoutIfNeeded()
+        })
     }
     //MARK: -----Search container controller delegate
     func searchContainer(toPerformDelegateAction delegateAction: SPNetworkingDelegateAction) {
@@ -459,13 +461,16 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
             zoomMap(toCoordinate: dao!.searchCoordinate, zoom: streetZoom)
         }
     }
-    func searchContainerHeightShouldAdjust(height: CGFloat, isTableViewPresent: Bool, isSearchBarPresent: Bool) -> Bool {
+    func searchContainerHeightShouldAdjust(height: CGFloat, tableViewPresent: Bool, searchBarPresent: Bool) -> Bool {
         UIView.animateWithDuration(standardAnimationDuration) {
             self.heightConstraintOfSearchContainer.constant = height
             self.view.layoutIfNeeded()
         }
-        self.isSearchTableViewPresent = isTableViewPresent
-        self.isSearchBarPresent = isSearchBarPresent
+        self.isSearchTableViewPresent = tableViewPresent
+        self.isSearchBarPresent = searchBarPresent
+        if self.isSearchTableViewPresent && isInTimeRangeMode {
+            hideToolbars()
+        }
         return true
     }
 }

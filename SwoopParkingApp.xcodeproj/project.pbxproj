@@ -251,6 +251,7 @@
 		9C42DAB61D5A6A63004ECA97 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				9C04E2711D9028540012EAE0 /* DataAccess */,
 				9CD51DC81CE24662006B741D /* SPSignAndLocationParser.swift */,
 				9C4DCF521D6E01F30060EEBF /* SPSignAndLocationModel.swift */,
 				9CBBB4671D5CD19D00AE1511 /* SPTimeAndDay.swift */,
@@ -355,7 +356,6 @@
 				9C42DAB61D5A6A63004ECA97 /* Model */,
 				9C42DAB51D5A6A47004ECA97 /* Views */,
 				9C42DAB41D5A6A37004ECA97 /* Controller */,
-				9C04E2711D9028540012EAE0 /* DataAccess */,
 				9CA7DDC31D57EAC90050B75D /* ObjC Header files */,
 				9CF750811D354F4F00000823 /* Utils */,
 				9C04E2731D93FC6A0012EAE0 /* SPProtocols.swift */,

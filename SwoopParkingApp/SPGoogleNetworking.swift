@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct SPGoogleResponse {
+struct SPGoogleObject {
     var googleAPIResponse: SPGoogleAPIResponse?
     var googleStatusCode: SPGoogleStatusCodes?
     var delegateAction: SPNetworkingDelegateAction?
@@ -82,7 +82,7 @@ class SPGoogleNetworking {
             else if data != nil {
                 do {
                     if let responseDict: NSDictionary = try NSJSONSerialization.JSONObjectWithData(data!, options:NSJSONReadingOptions.AllowFragments) as? NSDictionary {
-                        var returnResponse = SPGoogleResponse()
+                        var returnResponse = SPGoogleObject()
                         let statusCodeString = responseDict["status"] as? String
                         returnResponse.googleStatusCode = self.statusCode(fromString: statusCodeString)
                         if returnResponse.googleStatusCode == SPGoogleStatusCodes.OK {
@@ -116,5 +116,5 @@ class SPGoogleNetworking {
 }
 
 protocol SPGoogleNetworkingDelegate: class {
-    func googleNetworking(googleNetwork:SPGoogleNetworking, didFinishWithResponse response:SPGoogleResponse, delegateAction:SPNetworkingDelegateAction)
+    func googleNetworking(googleNetwork:SPGoogleNetworking, didFinishWithResponse response:SPGoogleObject, delegateAction:SPNetworkingDelegateAction)
 }

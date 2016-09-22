@@ -10,16 +10,6 @@ import Foundation
 import DNTimeAndDay
 
 class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInjectable {
-    
-    weak var delegate: SPTimeViewControllerDelegate?
-    
-    private var dao: SPDataAccessObject!
-    func inject(dao: SPDataAccessObject) {
-        self.dao = dao
-    }
-    func assertDependencies() {
-        assert(dao != nil)
-    }
     var timeAndDayFormat = DNTimeAndDayFormat.init(time: DNTimeFormat.format12Hour, day: DNDayFormat.abbr)
     var isInTimeRangeMode = false
 
@@ -41,29 +31,46 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
     @IBOutlet weak var timeFormatButton: UIButton!
     @IBOutlet weak var centerYConstraintForSecondaryTimeDayView: NSLayoutConstraint!
     @IBOutlet weak var centerYConstraintForPrimaryTimeDayView: NSLayoutConstraint!
+    
+    //MARK: - Injectable Protocol
+    weak var delegate: SPTimeViewControllerDelegate?
+    
+    private var dao: SPDataAccessObject!
+    func inject(dao: SPDataAccessObject) {
+        self.dao = dao
+    }
+    func assertDependencies() {
+        assert(dao != nil)
+    }
 
+    //MARK: - Setup Methods
     override func viewDidLoad() {
         super.viewDidLoad()
         assertDependencies()
         setCurrentDayAndTimeTextViews()
+        setTextViews()
     }
     private func setCurrentDayAndTimeTextViews() {
         primaryDayTextView.text = dao.primaryTimeAndDay.day.stringValue(forFormat: timeAndDayFormat)
         primaryTimeTextView.text = dao.primaryTimeAndDay.time.stringValue(forFormat: timeAndDayFormat)
     }
 
-    //MARK: Time and Day change methods
-    @IBAction func decreasePrimaryDay(sender: UIButton) {
-        change(day: &dao.primaryTimeAndDay.day, forTextView: primaryDayTextView, increase: false)
+    private func setTextViews() {
+        
     }
+    
+    //MARK: Time and Day change methods
     @IBAction func increasePrimaryDay(sender: UIButton) {
         change(day: &dao.primaryTimeAndDay.day, forTextView: primaryDayTextView, increase: true)
     }
-    @IBAction func decreaseSecondaryDay(sender: UIButton) {
-        change(day: &dao.secondaryTimeAndDay.day, forTextView: secondaryDayTextView, increase: false)
+    @IBAction func decreasePrimaryDay(sender: UIButton) {
+        change(day: &dao.primaryTimeAndDay.day, forTextView: primaryDayTextView, increase: false)
     }
     @IBAction func increaseSecondaryDay(sender: UIButton) {
         change(day: &dao.secondaryTimeAndDay.day, forTextView: secondaryDayTextView, increase: true)
+    }
+    @IBAction func decreaseSecondaryDay(sender: UIButton) {
+        change(day: &dao.secondaryTimeAndDay.day, forTextView: secondaryDayTextView, increase: false)
     }
     private func change(inout day day:DNDay, forTextView textView: UITextView, increase: Bool) {
         increase ? day.increase(by: 1) : day.decrease(by: 1)
@@ -73,18 +80,19 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
     var equalTextViews: Bool {
         return primaryDayTextView.text == secondaryDayTextView.text && primaryTimeTextView.text == secondaryTimeTextView.text
     }
-    @IBAction func decreasePrimaryTime(sender: UIButton) {
-        change(time: &dao.primaryTimeAndDay, forTextViews: primaryTextViews, increase: false)
-    }
     @IBAction func increasePrimaryTime(sender: UIButton) {
         change(time: &dao.primaryTimeAndDay, forTextViews: primaryTextViews, increase: true)
     }
-    @IBAction func decreaseSecondaryTime(sender: UIButton) {
-        change(time: &dao.secondaryTimeAndDay, forTextViews: secondaryTextViews, increase: false)
+    @IBAction func decreasePrimaryTime(sender: UIButton) {
+        change(time: &dao.primaryTimeAndDay, forTextViews: primaryTextViews, increase: false)
     }
     @IBAction func increaseSecondaryTime(sender: UIButton) {
         change(time: &dao.secondaryTimeAndDay, forTextViews: secondaryTextViews, increase: true)
     }
+    @IBAction func decreaseSecondaryTime(sender: UIButton) {
+        change(time: &dao.secondaryTimeAndDay, forTextViews: secondaryTextViews, increase: false)
+    }
+
     private func change(inout time timeAndDay:DNTimeAndDay, forTextViews textViews:(day:UITextView, time:UITextView), increase: Bool) {
         increase ? timeAndDay.increaseTime() : timeAndDay.decreaseTime()
         textViews.time.text = timeAndDay.time.stringValue(forFormat: timeAndDayFormat)
@@ -108,14 +116,13 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
         secondaryTimeTextView.text = dao.secondaryTimeAndDay.time.stringValue(forFormat: timeAndDayFormat)
     }
     @IBAction func toggleTimeRange(sender: UIButton) {
-        delegate?.timeViewControllerDidTapTimeRangeButton(isInTimeRangeMode)
         if !isInTimeRangeMode {
             timeRangeButton.setTitle(timeRangeString, forState: .Normal)
             setSecondaryTimeAndDay()
             UIView.animateWithDuration(standardAnimationDuration, animations: {
                 self.secondaryDayAndTimeView.hidden = false
-                self.centerYConstraintForPrimaryTimeDayView.constant = -15
-                self.centerYConstraintForSecondaryTimeDayView.constant = 15
+                self.centerYConstraintForPrimaryTimeDayView.constant = -self.view.frame.height / 2
+                self.centerYConstraintForSecondaryTimeDayView.constant = self.view.frame.height / 2
                 self.view.layoutIfNeeded()
             })
             
@@ -131,6 +138,7 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
             })
         }
         isInTimeRangeMode = !isInTimeRangeMode
+        delegate?.timeViewControllerDidTapTimeRangeButton(isInTimeRangeMode)
     }
     
     private func setSecondaryTimeAndDay() {
@@ -193,5 +201,5 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
 }
 
 protocol SPTimeViewControllerDelegate: class {
-    func timeViewControllerDidTapTimeRangeButton(isInRangeMode:Bool)
+    func timeViewControllerDidTapTimeRangeButton(inRangeMode:Bool)
 }

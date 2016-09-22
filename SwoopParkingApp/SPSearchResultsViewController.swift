@@ -95,16 +95,15 @@ class SPSearchResultsViewController: UIViewController, UITableViewDelegate, UITa
         searchResultsTableView.reloadData()
         let multipler = self.dao.addressResults.count < 4 ? self.dao.addressResults.count : 3
         let heightOfTableView = standardHeightOfToolOrSearchBar * CGFloat(multipler)
-        if delegate!.searchContainerHeightShouldAdjust(standardHeightOfToolOrSearchBar + heightOfTableView, isTableViewPresent: true, isSearchBarPresent: true) {
+        if delegate!.searchContainerHeightShouldAdjust(standardHeightOfToolOrSearchBar + heightOfTableView, tableViewPresent: true, searchBarPresent: true) {
             UIView.animateWithDuration(standardAnimationDuration) {
                 self.heightConstraintOfTableView.constant = heightOfTableView
                 self.view.layoutIfNeeded()
             }
-
         }
     }
     func hideSearchResultsTableView() {
-        if delegate!.searchContainerHeightShouldAdjust(standardHeightOfToolOrSearchBar, isTableViewPresent: false, isSearchBarPresent: true) {
+        if delegate!.searchContainerHeightShouldAdjust(standardHeightOfToolOrSearchBar, tableViewPresent: false, searchBarPresent: true) {
             UIView.animateWithDuration(standardAnimationDuration) {
                 self.heightConstraintOfTableView.constant = 0
                 self.view.layoutIfNeeded()
@@ -114,19 +113,23 @@ class SPSearchResultsViewController: UIViewController, UITableViewDelegate, UITa
     //MARK: - SearchBar animation
     func showSearchBar() {
         let height = standardHeightOfToolOrSearchBar
-        if delegate!.searchContainerHeightShouldAdjust(height, isTableViewPresent: false, isSearchBarPresent: true) {
+        if delegate!.searchContainerHeightShouldAdjust(height, tableViewPresent: false, searchBarPresent: true) {
             UIView.animateWithDuration(standardAnimationDuration, animations: {
                 self.heightConstraintOfSearchBar.constant = height
                 self.view.layoutIfNeeded()
             })
         }
+        searchBar.becomeFirstResponder()
     }
     func hideSearchBar() {
         let height = CGFloat(0)
-        if delegate!.searchContainerHeightShouldAdjust(height, isTableViewPresent: false, isSearchBarPresent: false) {
+        if delegate!.searchContainerHeightShouldAdjust(height, tableViewPresent: false, searchBarPresent: false) {
             UIView.animateWithDuration(standardAnimationDuration, animations: {
                 self.heightConstraintOfSearchBar.constant = height
                 self.view.layoutIfNeeded()
+                if self.heightConstraintOfTableView.constant > 0 {
+                    self.hideSearchResultsTableView()
+                }
             })
         }
         searchBar.resignFirstResponder()
@@ -135,5 +138,5 @@ class SPSearchResultsViewController: UIViewController, UITableViewDelegate, UITa
 
 protocol SPSearchResultsViewControllerDelegate: class {
     func searchContainer(toPerformDelegateAction delegateAction:SPNetworkingDelegateAction)
-    func searchContainerHeightShouldAdjust(height:CGFloat, isTableViewPresent:Bool, isSearchBarPresent:Bool) -> Bool
+    func searchContainerHeightShouldAdjust(height:CGFloat, tableViewPresent:Bool, searchBarPresent:Bool) -> Bool
 }
