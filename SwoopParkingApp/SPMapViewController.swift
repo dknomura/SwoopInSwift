@@ -155,22 +155,22 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         if isSearchTableViewPresent {
             searchContainerViewController!.hideSearchResultsTableView()
         }
-        if isKeyboardPresent { view.endEditing(true) }
-        else {
-            if CGRectContainsPoint(timeAndDayContainerView.frame, gesture.locationInView(view)) || CGRectContainsPoint(bottomToolbar.frame, gesture.locationInView(view)) { return }
-            
-            if toolbarsPresent {
-                if isSearchBarPresent {
-                    searchContainerViewController!.hideSearchBar()
-                    isSearchBarPresent = true
-                }
-                hideToolbars()
-            } else {
-                if isSearchBarPresent {
-                    searchContainerViewController!.showSearchBar()
-                }
-                showToolbars()
+        if isKeyboardPresent {
+            view.endEditing(true)
+            return
+        }
+        if CGRectContainsPoint(timeAndDayContainerView.frame, gesture.locationInView(view)) || CGRectContainsPoint(bottomToolbar.frame, gesture.locationInView(view)) { return }
+        
+        if toolbarsPresent {
+            if isSearchBarPresent {
+                searchContainerViewController!.hideSearchBar()
             }
+            hideToolbars()
+        } else {
+            if !isSearchBarPresent {
+                searchContainerViewController!.showSearchBar(makeFirstResponder: false)
+            }
+            showToolbars()
         }
     }
     
@@ -284,14 +284,8 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     }
     //MARK: --Searchbar toggle
     @IBAction func showSearchBarButtonPressed(sender: UIBarButtonItem) {
-        toggleSearchBar()
-    }
-    private func toggleSearchBar() {
-        if !toolbarsPresent && !isSearchBarPresent {
-            searchContainerViewController?.showSearchBar()
-        } else if !isSearchBarPresent {
-            searchContainerViewController?.showSearchBar()
-            searchContainerViewController?.searchBar.becomeFirstResponder()
+        if !isSearchBarPresent {
+            searchContainerViewController?.showSearchBar(makeFirstResponder: true)
         } else if isSearchBarPresent {
             searchContainerViewController?.hideSearchBar()
         }
@@ -468,7 +462,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         }
         self.isSearchTableViewPresent = tableViewPresent
         self.isSearchBarPresent = searchBarPresent
-        if self.isSearchTableViewPresent && isInTimeRangeMode {
+        if self.isSearchTableViewPresent {
             hideToolbars()
         }
         return true

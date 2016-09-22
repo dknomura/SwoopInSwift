@@ -39,9 +39,10 @@ class SPSearchResultsViewController: UIViewController, UITableViewDelegate, UITa
     
     //MARK: - Search bar
     func searchBarTextDidBeginEditing(searchBar: UISearchBar) {
-        if searchBar.text?.characters.count == 0 {
-            hideSearchResultsTableView()
-        } else if dao.addressResults.count > 0 {
+//        if searchBar.text?.characters.count == 0 {
+//            hideSearchResultsTableView()
+//        } else 
+        if dao.addressResults.count > 0 {
             showSearchResultsTableView()
         }
     }
@@ -111,7 +112,7 @@ class SPSearchResultsViewController: UIViewController, UITableViewDelegate, UITa
         }
     }
     //MARK: - SearchBar animation
-    func showSearchBar() {
+    func showSearchBar(makeFirstResponder makeFirstResponder: Bool) {
         let height = standardHeightOfToolOrSearchBar
         if delegate!.searchContainerHeightShouldAdjust(height, tableViewPresent: false, searchBarPresent: true) {
             UIView.animateWithDuration(standardAnimationDuration, animations: {
@@ -119,7 +120,9 @@ class SPSearchResultsViewController: UIViewController, UITableViewDelegate, UITa
                 self.view.layoutIfNeeded()
             })
         }
-        searchBar.becomeFirstResponder()
+        if makeFirstResponder {
+            searchBar.becomeFirstResponder()
+        }
     }
     func hideSearchBar() {
         let height = CGFloat(0)
