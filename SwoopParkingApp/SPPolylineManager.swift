@@ -10,7 +10,15 @@ import Foundation
 import GoogleMaps
 import CoreLocation
 
-struct SPPolylineManager {
+struct SPPolylineManager: SPInjectable {
+    
+    private var dao: SPDataAccessObject!
+    mutating func inject(dao: SPDataAccessObject) {
+        self.dao = dao
+    }
+    func assertDependencies() {
+        assert(dao != nil)
+    }
     
     enum PolylineError: ErrorType {
         case notEnoughPoints
@@ -20,32 +28,21 @@ struct SPPolylineManager {
         case unknownErrorPolylineDisplacement
     }
     
-    
-    
     func polylines(forCurrentLocations currentLocations: [SPLocation], zoom: Double) -> [GMSPolyline] {
         var returnArray = [GMSPolyline]()
-        
         //Meters to separate the two sides of the road
         let displacementDistanceInMeters = metersToDisplace(byPoints: 1.8, zoom: zoom)
-        
-        
         for location in currentLocations {
             guard let fromCoordinate = location.fromCoordinate,
                 let toCoordinate = location.toCoordinate else {
                     print("No coordinates for location \(location.locationNumber)")
                     continue
             }
-            
-            let fromLocation = CLLocation(latitude: fromCoordinate.latitude, longitude: fromCoordinate.longitude)
-            let toLocation = CLLocation(latitude: toCoordinate.latitude, longitude: toCoordinate.longitude)
-            let distanceInMetersCL = fromLocation.distanceFromLocation(toLocation)
-            
-            
+            let distanceInMetersCL = distanceInMetersBetween(coordinate1: fromCoordinate, coordinate2: toCoordinate)
             guard let signs = location.signs else {
                 print("No signs for location \(location.locationNumber)")
                 continue
             }
-            
             var previousCoordinate = fromCoordinate
             
             for i in 0 ..< signs.count {
@@ -59,7 +56,7 @@ struct SPPolylineManager {
                 let path = GMSMutablePath()
                 
                 guard let positionInMeters = distanceInMeters(fromFeet: sign.positionInFeet) else {
-                    print("Not enough sign information to draw polyline for sign#\(sign.signIndex) at location #\(location.locationNumber)")
+                    print("Not enough sign information to draw polyline for sign#\(i) at location #\(location.locationNumber)")
                     continue
                 }
                 
@@ -115,15 +112,12 @@ struct SPPolylineManager {
     
     // MARK: - Methods to find coordinates on path
     private func coordinateOnLine(fromCoordinate: CLLocationCoordinate2D, toCoordinate: CLLocationCoordinate2D, positionInMeters: Double) ->CLLocationCoordinate2D {
-        let totalDistance = distanceInMeters(fromCoordinate: fromCoordinate, toCoordinate: toCoordinate)
+        let totalDistance = distanceInMetersBetween(coordinate1: fromCoordinate, coordinate2: toCoordinate)
         
-        //         For some reason, some of the signs.positionInFeet are longer than the street, so the lines extend beyond the street intersection, so return the intersection coordinate if positionInFeet > totalDistance
+        //  For some reason, some of the signs.positionInFeet are longer than the street, so the lines extend beyond the street intersection, so return the intersection coordinate if positionInFeet > totalDistance
         if positionInMeters > totalDistance {
-            //            print("positionInFeet is longer than total distance. Returned toCoordinate")
             return toCoordinate
         }
-        
-        
         let latitude = fromCoordinate.latitude + (toCoordinate.latitude - fromCoordinate.latitude) * (positionInMeters / totalDistance)
         let longitude = fromCoordinate.longitude + (toCoordinate.longitude - fromCoordinate.longitude) * (positionInMeters / totalDistance)
         return CLLocationCoordinate2DMake(latitude, longitude)
@@ -141,9 +135,9 @@ struct SPPolylineManager {
         return meters * 3.28084
     }
     
-    private func distanceInMeters(fromCoordinate fromCoordinate:CLLocationCoordinate2D, toCoordinate:CLLocationCoordinate2D) -> Double {
-        let fromLocation = CLLocation.init(latitude: fromCoordinate.latitude, longitude: fromCoordinate.longitude)
-        let toLocation = CLLocation.init(latitude: toCoordinate.latitude, longitude: toCoordinate.longitude)
+    private func distanceInMetersBetween(coordinate1 coordinate1:CLLocationCoordinate2D, coordinate2:CLLocationCoordinate2D) -> Double {
+        let fromLocation = CLLocation.init(latitude: coordinate1.latitude, longitude: coordinate1.longitude)
+        let toLocation = CLLocation.init(latitude: coordinate2.latitude, longitude: coordinate2.longitude)
         return fromLocation.distanceFromLocation(toLocation)
     }
     
@@ -157,7 +151,6 @@ struct SPPolylineManager {
         var returnArray = [GMSPolyline]()
         
         for polyline in polylines {
-            
             do {
                 returnArray.append(try displacedPolyline(originalPolyline: polyline, xMeters: meters, sideOfStreet: sideOfStreet))
             } catch PolylineError.notEnoughPoints {
@@ -223,50 +216,11 @@ struct SPPolylineManager {
         let y = sin(long2 - long1) * cos(lat2)
         let x = cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(long2 - long1)
         var bearing = atan2(y, x)
-        
-        let side = try normalize(sideOfStreet: sideOfStreet)
-        //MARK: Bearing calculation
-        switch true {
-            // "switch true"; if the case statements are true
+        if bearing.isNaN {
             
-        case (bearing > 0 && bearing < M_PI_2) || bearing == M_PI_2:
-            switch side {
-            case "N", "W":
-                bearing -= M_PI_2
-            case "S", "E":
-                bearing += M_PI_2
-            default: break
-            }
-        case (bearing < 0 && bearing > -M_PI_2) || bearing == 0:
-            switch side {
-            case "N", "E":
-                bearing += M_PI_2
-            case "S", "W":
-                bearing -= M_PI_2
-            default: break
-            }
-        case (bearing > M_PI_2 && bearing < M_PI) || bearing == M_PI, bearing == -M_PI:
-            switch side {
-            case "N", "E":
-                bearing -= M_PI_2
-            case "S", "W":
-                bearing += M_PI_2
-            default: break
-            }
-        case (bearing < -M_PI_2 && bearing > -M_PI || bearing == -M_PI_2):
-            switch side {
-            case "N", "W":
-                bearing += M_PI_2
-            case "S", "E":
-                bearing -= M_PI_2
-            default: break
-            }
-            //        case (bearing.isNaN):
-            //            let slope = (fromCoordinate.latitude - toCoordinate.latitude) / (fromCoordinate.longitude - toCoordinate.longitude)
-            
-            
-        default: throw PolylineError.unableToRotate(geographicalBearing: bearing)
         }
+        let side = try normalize(sideOfStreet: sideOfStreet)
+        try rotate(bearing: &bearing, direction: side)
         
         // Then you can find the displacement of the path
         //        var φ2 = Math.asin( Math.sin(φ1)*Math.cos(d/R) +
@@ -288,6 +242,48 @@ struct SPPolylineManager {
         return CLLocationCoordinate2DMake(radiansToDegrees(newLat) - fromCoordinate.latitude, radiansToDegrees(newLong) - fromCoordinate.longitude)
     }
     
+    private func rotate(inout bearing bearing:Double, direction: String) throws {
+        //MARK: Bearing calculation
+        switch true {
+            // "switch true"; if the case statements are true
+        case (bearing > 0 && bearing < M_PI_2) || bearing == M_PI_2:
+            switch direction {
+            case "N", "W":
+                bearing -= M_PI_2
+            case "S", "E":
+                bearing += M_PI_2
+            default: break
+            }
+        case (bearing < 0 && bearing > -M_PI_2) || bearing == 0:
+            switch direction {
+            case "N", "E":
+                bearing += M_PI_2
+            case "S", "W":
+                bearing -= M_PI_2
+            default: break
+            }
+        case (bearing > M_PI_2 && bearing < M_PI) || bearing == M_PI, bearing == -M_PI:
+            switch direction {
+            case "N", "E":
+                bearing -= M_PI_2
+            case "S", "W":
+                bearing += M_PI_2
+            default: break
+            }
+        case (bearing < -M_PI_2 && bearing > -M_PI || bearing == -M_PI_2):
+            switch direction {
+            case "N", "W":
+                bearing += M_PI_2
+            case "S", "E":
+                bearing -= M_PI_2
+            default: break
+            }
+        default: throw PolylineError.unableToRotate(geographicalBearing: bearing)
+        }
+        
+
+    }
+    
     private func degreesToRadians(degrees:Double) -> Double {
         return degrees * M_PI  / 180
     }
@@ -298,7 +294,6 @@ struct SPPolylineManager {
     
     private func normalize(sideOfStreet sideOfStreet:String) throws -> String {
         let sideString = sideOfStreet.lowercaseString
-        
         switch sideString {
         case "n", "north":
             return "N"
@@ -312,7 +307,6 @@ struct SPPolylineManager {
             throw PolylineError.invalidSideOfStreet
         }
     }
-    
     
     // MARK: - Displacement and stroke width in relation to zoom
     func metersToDisplace(byPoints points:Double, zoom:Double) -> Double {
@@ -344,7 +338,9 @@ struct SPPolylineManager {
     // MARK: - Polyline Color
     
     private func polylineColor(forSign sign:SPSign) -> UIColor {
-        if sign.isUniqueStreetCleaningSign == true {
+        assertDependencies()
+        let timeAndDayTuple = dao.primaryTimeAndDay.stringTupleForSQLQuery()
+        if sign.signContent?.rangeOfString(timeAndDayTuple.day) != nil && sign.signContent?.rangeOfString(timeAndDayTuple.time) != nil {
             return UIColor.greenColor()
         }
         return UIColor.redColor()

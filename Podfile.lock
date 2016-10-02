@@ -5,9 +5,6 @@ PODS:
   - AWSLambda (2.4.9):
     - AWSCore (= 2.4.9)
   - DNTimeAndDay (0.1.5)
-  - FMDB/FTS (2.6.2):
-    - FMDB/standard
-  - FMDB/standard (2.6.2)
   - GoogleMaps (2.0.1):
     - GoogleMaps/Maps (= 2.0.1)
   - GoogleMaps/Base (2.0.1)
@@ -18,7 +15,6 @@ DEPENDENCIES:
   - AWSCognito
   - AWSLambda
   - DNTimeAndDay
-  - FMDB/FTS
   - GoogleMaps
 
 SPEC CHECKSUMS:
@@ -26,9 +22,8 @@ SPEC CHECKSUMS:
   AWSCore: 175208358b95492e0ebe0337df2ab415300bddac
   AWSLambda: 5cfb825a83acbfd6b62a6cf109f9c73896f5cc7a
   DNTimeAndDay: ce9adb6186b06411554d99e688a7c82665f6b1ef
-  FMDB: 854a0341b4726e53276f2a8996f06f1b80f9259a
   GoogleMaps: f09da64fc987c1aa29394567c3cab5a3df83c402
 
-PODFILE CHECKSUM: d4506985e3d10928b0c78c38b7a3852c51cacec2
+PODFILE CHECKSUM: bb340d121708a1a7cff5469e45259165589e94c5
 
 COCOAPODS: 1.0.1

@@ -1,5 +1,5 @@
 Pods/
-SwoopParkingApp/swoop-sqlite.db
+SwoopParkingApp/swoop-sqlite-no-FTS.db
 SwoopParkingApp/swoop-sqlite2.db
 
 

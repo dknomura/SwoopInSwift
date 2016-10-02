@@ -33,6 +33,7 @@ let kSPFromLatitudeSQL = "from_latitude"
 let kSPFromLongitudeSQL = "from_longitude"
 let kSPToLatitudeSQL = "to_latitude"
 let kSPToLongitudeSQL = "to_longitude"
+let kSPSignContentTagSQL = "sign_content_tag"
 
 // sign SQL columns
 let kSPLocationIdSQL = "location_id"

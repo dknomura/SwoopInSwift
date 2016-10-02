@@ -95,7 +95,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         if segue.identifier == timeContainerSegue {
             timeAndDayViewController = segue.destinationViewController as? SPTimeAndDayViewController
             guard timeAndDayViewController != nil else {
-                print("Destination ViewController for segue \(segue.identifier) is not time and day container controller. It is \(segue.destinationViewController)")
+                print("Destination ViewController for segue \(segue.identifier) is not time and day view controller. It is \(segue.destinationViewController)")
                 return
             }
             timeAndDayViewController!.inject(dao)
@@ -103,7 +103,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         } else if segue.identifier == searchContainerSegue {
             searchContainerViewController = segue.destinationViewController as? SPSearchResultsViewController
             guard searchContainerViewController != nil else {
-                print("Destination ViewController for segue \(segue.identifier) is not time and day container controller. It is \(segue.destinationViewController)")
+                print("Destination ViewController for segue \(segue.identifier) is Search results view controller. It is \(segue.destinationViewController)")
                 return
             }
             dao!.delegate = self
@@ -166,12 +166,12 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
             if isSearchBarPresent {
                 searchContainerViewController!.hideSearchBar()
             }
-            hideToolbars()
+            showToolbars(false)
         } else {
             if !isSearchBarPresent && shouldTapShowSearchBar {
                 searchContainerViewController!.showSearchBar(makeFirstResponder: false)
             }
-            showToolbars()
+            showToolbars(true)
         }
     }
     @objc private func zoomToDoubleTapOnMap(gesture:UITapGestureRecognizer) {
@@ -294,21 +294,14 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     }
 
     //MARK: - Animation methods
-    private func hideToolbars() {
+    private func showToolbars(shouldShow:Bool) {
         UIView.animateWithDuration(standardAnimationDuration, animations: {
-            self.heightConstraintOfTimeAndDayContainer.constant = 0
-            self.heightConstraintOfToolbar.constant = 0
+            self.timeAndDayViewController?.show(shouldShow)
+            self.heightConstraintOfTimeAndDayContainer.constant = shouldShow ? self.heightOfTimeContainer : 0
+            self.heightConstraintOfToolbar.constant = shouldShow ? self.standardHeightOfToolOrSearchBar : 0
             self.view.layoutIfNeeded()
         })
-        toolbarsPresent = false
-    }
-    private func showToolbars() {
-        UIView.animateWithDuration(standardAnimationDuration, animations: {
-            self.heightConstraintOfTimeAndDayContainer.constant = self.heightOfTimeContainer
-            self.heightConstraintOfToolbar.constant = self.standardHeightOfToolOrSearchBar
-            self.view.layoutIfNeeded()
-        })
-        toolbarsPresent = true
+        toolbarsPresent = shouldShow
     }
     
     //MARK: --Blur View animation
@@ -376,7 +369,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     private func getSignsForCurrentMapView() {
         if mapView.camera.zoom >= zoomToSwitchOverlays && dao!.isInNYC(mapView) && streetViewSwitch.on {
             showWaitingView(withLabel: waitingText, isStreetView: true)
-            dao!.getSigns(forCurrentMapView: mapView)
+            dao.getSigns(forCurrentMapView: mapView)
         }
     }
     private func getNewHeatMapOverlays() {
@@ -389,9 +382,9 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     }
     private func show<MapOverlayType: GMSOverlay>(mapOverlayViews views:[MapOverlayType], shouldHideOtherOverlay:Bool) {
         if views.count > 0 {
-            let date = NSDate()
+//            let date = NSDate()
             for view in views {  view.map = mapView }
-            print("Time to draw/hide overlays on map: \(date.timeIntervalSinceNow)")
+//            print("Time to draw/hide overlays on map: \(date.timeIntervalSinceNow)")
             if shouldHideOtherOverlay {
                 if MapOverlayType() is GMSPolyline { hide(mapOverlayViews: currentGroundOverlays) }
                 else if MapOverlayType() is GMSGroundOverlay { hide(mapOverlayViews: currentMapPolylines) }
@@ -426,9 +419,11 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     func dataAccessObject(dao: SPDataAccessObject, didSetLocations locations: [SPLocation], forQueryType: SPSQLLocationQueryTypes) {
         if forQueryType == .getLocationsForCurrentMapView {
             if currentMapPolylines.count > 0 { hide(mapOverlayViews: currentMapPolylines) }
-            let date = NSDate()
-            currentMapPolylines = SPPolylineManager().polylines(forCurrentLocations: dao.currentMapViewLocations, zoom: Double(mapView.camera.zoom))
-            print("Time to initialize polylines: \(date.timeIntervalSinceNow)")
+//            let date = NSDate()
+            var polylineManager = SPPolylineManager()
+            polylineManager.inject(dao)
+            currentMapPolylines = polylineManager.polylines(forCurrentLocations: dao.currentMapViewLocations, zoom: Double(mapView.camera.zoom))
+//            print("Time to initialize polylines: \(date.timeIntervalSinceNow)")
             
             if currentMapPolylines.count > 0 && mapView.camera.zoom >= zoomToSwitchOverlays {
                 show(mapOverlayViews: currentMapPolylines, shouldHideOtherOverlay: true)
@@ -462,7 +457,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         self.isSearchTableViewPresent = tableViewPresent
         self.isSearchBarPresent = searchBarPresent
         if self.isSearchTableViewPresent {
-            hideToolbars()
+            showToolbars(false)
         }
         return true
     }

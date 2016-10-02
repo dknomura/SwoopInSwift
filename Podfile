@@ -7,5 +7,4 @@ target 'SwoopParkingApp' do
 	pod 'GoogleMaps'
 	pod 'AWSLambda'
 	pod 'AWSCognito'
-	pod 'FMDB/FTS'
 end

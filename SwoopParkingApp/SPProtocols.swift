@@ -11,6 +11,6 @@ import Foundation
 
 protocol SPInjectable {
     associatedtype T
-    func inject(_: T)
+    mutating func inject(_: T)
     func assertDependencies()
 }

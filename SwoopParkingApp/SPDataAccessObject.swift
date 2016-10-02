@@ -45,11 +45,11 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
     
     // MARK: - SQLite methods
     
-    func getUpcomingStreetCleaningSigns() {
+    func getUpcomingStreetCleaningSigns(shouldSearchRange shouldSearchRange:Bool) {
         var sqliteReader = SPSQLiteReader()
         sqliteReader.inject(self)
         sqliteReader.delegate = self
-        sqliteReader.queryUpcomingStreetCleaningSignsAndLocations(DNTimeAndDay.currentTimeAndDay())
+        sqliteReader.queryUpcomingStreetCleaningSignsAndLocations(shouldSearchRange:shouldSearchRange)
     }
     
     func getSigns(forCurrentMapView mapView:GMSMapView) {
@@ -61,16 +61,6 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
         sqlReader.querySignsAndLocations(swCoordinate: visibleRegionBounds.southWest, neCoordinate: visibleRegionBounds.northEast)
     }
     
-    func formattedTimeAndDayTupleForSQLQuery(forTimeAndDay timeAndDay: DNTimeAndDay) -> (time: String, day: String) {
-        var returnTuple: (time: String, day:String)
-        let timeAndDayFormat = DNTimeAndDayFormat(time: .format12Hour, day: .abbr)
-        returnTuple.day = timeAndDay.day.stringValue(forFormat: timeAndDayFormat)
-        returnTuple.time = timeAndDay.time.stringValue(forFormat: timeAndDayFormat)
-        if let removeRange = returnTuple.time.rangeOfString(":00") {
-            returnTuple.time.removeRange(removeRange)
-        }
-        return returnTuple
-    }
     // MARK: - SQLite and Lambda delegate methods
     func sqlQueryDidFinish(withResults results: (queryType: SPSQLLocationQueryTypes, locationResults: [SPLocation])) {
         if results.queryType == .getLocationsForCurrentMapView {
@@ -82,17 +72,17 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
     }
     
     func lambdaFunctionDidFinish(withResponse responseDict: NSDictionary) {
-        guard responseDict["status"] as? String == "Success" else {
-            print("error with lambda function, \(responseDict["lambdaFunction"]), call: \(responseDict["response"])")
-            return
-        }
-        
-        //NEED TO CHANGE SERVER RESPONSE TO HAVE "lambdaFunction" MATCH "getLocationsForCurrentMapView"
-        if responseDict["lambdaFunction"] as? String == SPSQLLocationQueryTypes.getLocationsForCurrentMapView.rawValue,
-            let data = responseDict["response"] as? NSArray {
-            currentMapViewLocations = SPParser().parseLambdaSignsAndLocationsFromCoordinates(data)
-            delegate?.dataAccessObject(self, didSetLocations: currentMapViewLocations, forQueryType: .getLocationsForCurrentMapView)
-        }
+//        guard responseDict["status"] as? String == "Success" else {
+//            print("error with lambda function, \(responseDict["lambdaFunction"]), call: \(responseDict["response"])")
+//            return
+//        }
+//        
+//        //NEED TO CHANGE SERVER RESPONSE TO HAVE "lambdaFunction" MATCH "getLocationsForCurrentMapView"
+//        if responseDict["lambdaFunction"] as? String == SPSQLLocationQueryTypes.getLocationsForCurrentMapView.rawValue,
+//            let data = responseDict["response"] as? NSArray {
+////            currentMapViewLocations = SPParser().parseLambdaSignsAndLocationsFromCoordinates(data)
+//            delegate?.dataAccessObject(self, didSetLocations: currentMapViewLocations, forQueryType: .getLocationsForCurrentMapView)
+//        }
     }
     
     

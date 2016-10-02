@@ -13,203 +13,203 @@ import AWSLambda
 
 struct SPParser {
     
-    //MARK: Injectable protocol
-    private var dao: SPDataAccessObject!
-    mutating func inject(dao: SPDataAccessObject) {
-        self.dao = dao
-    }
-    func assertDependencies() {
-        assert(dao != nil)
-    }
-
-    //MARK: - Parse sign and location objects
-    //MARK: ---Lambda
-    func parseLambdaSignsAndLocationsFromCoordinates(response:NSArray) -> [SPLocation] {
-        var returnArray = [SPLocation]()
-        for i in 0 ..< response.count {
-            var location = SPLocation()
-            if let locDictionary = response[i] as? NSDictionary {
-                location.borough = locDictionary[kSPBoroughJSON] as? String
-                location.locationNumber = locDictionary[kSPlocationNumberJSON] as? String
-                location.sideOfStreet = locDictionary[kSPSideOfStreetJSON] as? String
-                location.street = locDictionary[kSPStreetJSON] as? String
-                location.fromCrossStreet = locDictionary[kSPFromCrossStreetJSON] as? String
-                location.toCrossStreet = locDictionary[kSPToCrossStreetJSON] as? String
-                
-                if let fromLat = locDictionary[kSPFromLatitudeJSON] as? CLLocationDegrees,
-                    let fromLong = locDictionary[kSPFromLongitudeJSON] as? CLLocationDegrees {
-                    location.fromCoordinate = CLLocationCoordinate2DMake(fromLat, fromLong)
-                }
-                
-                if let toLat = locDictionary[kSPToLatitudeJSON] as? CLLocationDegrees,
-                    let toLong = locDictionary[kSPToLongitudeJSON] as? CLLocationDegrees{
-                    location.toCoordinate = CLLocationCoordinate2DMake(toLat, toLong)
-                }
-                
-                if let signsResponse = locDictionary[kSPSignsJSON] as? NSArray {
-                    location.signs = [SPSign]()
-                    for j in 0 ..< signsResponse.count{
-                        if let signDictionary = signsResponse[j] as? NSDictionary{
-                            var sign = SPSign()
-                            sign.signIndex = signDictionary[kSPSignIndexJSON] as? NSInteger
-                            sign.positionInFeet = signDictionary[kSPPositionInFeetJSON] as? Double
-                            sign.signContent = signDictionary[kSPSignContentJSON] as? String
-                            sign.directionOfArrow = signDictionary[kSPDirectionOfArrowJSON] as? String
-                            location.signs?.append(sign)
-                        }
-                    }
-                    location.signs?.sortInPlace({$0.signIndex < $1.signIndex})
-                }
-                returnArray.append(location)
-            }
-        }
-        return returnArray
-    }
-    
-    //MARK: ---SQL
-    
-    func parseSQLSignsAndLocationsFromCoordinates(results:FMResultSet, queryType:SPSQLLocationQueryTypes) -> [SPLocation] {
-        var locationResults = [SPLocation]()
-        var location = SPLocation()
-        location.signs = [SPSign]()
-        let totalDate = NSDate()
-        var signCounter = 0
-        
-        while results.next() {
-            if location.locationNumber != results.stringForColumn("l." + kSPLocationNumberSQL) {
-                if location.locationNumber != nil {
-                    location.signs = markStreetCleaningSignsWithUniquePosition(atLocation: location)
-                    locationResults.append(location)
-                }
-                location.id = Int(results.intForColumn("l." + kSPIdSQL))
-                location.locationNumber = results.stringForColumn("l." + kSPLocationNumberSQL)
-                location.borough = results.stringForColumn(kSPBoroughSQL)
-                location.sideOfStreet = results.stringForColumn(kSPSideOfStreetSQL)
-                location.street = results.stringForColumn(kSPStreetSQL)
-                location.toCrossStreet = results.stringForColumn(kSPToCrossStreetSQL)
-                location.fromCrossStreet = results.stringForColumn(kSPFromCrossStreetSQL)
-                
-                location.fromCoordinate = CLLocationCoordinate2D()
-                location.fromCoordinate?.latitude = results.doubleForColumn(kSPFromLatitudeSQL)
-                location.fromCoordinate?.longitude = results.doubleForColumn(kSPFromLongitudeSQL)
-                
-                location.toCoordinate = CLLocationCoordinate2D()
-                location.toCoordinate?.latitude = results.doubleForColumn(kSPToLatitudeSQL)
-                location.toCoordinate?.longitude = results.doubleForColumn(kSPToLongitudeSQL)
-                location.signs = [SPSign]()
-            }
-            var sign = SPSign()
-            sign.signIndex = Int(results.intForColumn(kSPSignIndexSQL))
-            sign.directionOfArrow = results.stringForColumn(kSPDirectionOfArrowSQL)
-            sign.positionInFeet = results.doubleForColumn(kSPPositionInFeetSQL)
-            sign.signContent = results.stringForColumn(kSPSignContentSQL)
-            location.signs?.append(sign)
-            signCounter += 1
-        }
-        
-        print("Time lapse for query \(queryType): \(totalDate.timeIntervalSinceNow) \nNumber of signs: \(signCounter)")
-        return locationResults
-    }
-    
-    func parseSQLSignsAndLocationsFromTime (results: FMResultSet) -> [SPLocation] {
-        var locationResults = [SPLocation]()
-        var location = SPLocation()
-        location.signs = [SPSign]()
-        var signCounter = 0
-        let totalDate = NSDate()
-        
-        while results.next() {
-            if location.id != Int(results.intForColumn("l." + kSPIdSQL)) {
-                if location.id != nil {
-                    location.hasUniqueStreetCleaningSign = isThereUniqueSignPosition(forLocation:location)
-                    if location.hasUniqueStreetCleaningSign! {
-                        locationResults.append(location)
-                    }
-                }
-                location.hasUniqueStreetCleaningSign = false
-                location.id = Int(results.intForColumn("l." + kSPIdSQL))
-                location.fromCoordinate = CLLocationCoordinate2D()
-                location.fromCoordinate?.latitude = results.doubleForColumn(kSPFromLatitudeSQL)
-                location.fromCoordinate?.longitude = results.doubleForColumn(kSPFromLongitudeSQL)
-                location.signs?.removeAll()
-            }
-            var sign = SPSign()
-            sign.signContent = results.stringForColumn(kSPSignContentSQL)
-            sign.positionInFeet = results.doubleForColumn(kSPPositionInFeetSQL)
-            location.signs?.append(sign)
-            signCounter += 1
-
-            //            if sign.positionInFeet != nil {
-            //                signPositions.append(sign.positionInFeet!)
-            //            }
-        }
-        print("Time lapse for time and day query: \(totalDate.timeIntervalSinceNow)\nNumber of signs: \(signCounter)")
-        return locationResults
-    }
-    
-    //MARK: ---Marking unique street cleaning signs
-    private func isThereUniqueSignPosition(forLocation location: SPLocation) -> Bool {
-        guard let signs = location.signs else { return false }
-        let numberOfSignsAtPosition = dictionaryOfNumberOfSignsAtPosition(signs)
-        for (_, value) in numberOfSignsAtPosition {
-            if value == 1 {
-                return true
-            }
-        }
-        return false
-    }
-    
-    private func markStreetCleaningSignsWithUniquePosition(atLocation location:SPLocation) -> [SPSign] {
-        guard let signs = location.signs else { return [SPSign]() }
-        var returnSigns = [SPSign]()
-        let numberOfSignsAtPosition = dictionaryOfNumberOfSignsAtPosition(signs)
-        var signsWithUniquePositions = [SPSign]()
-        for var sign in signs {
-            if sign.positionInFeet != nil {
-                if numberOfSignsAtPosition[sign.positionInFeet!] == 1 {
-                    signsWithUniquePositions.append(sign)
-                } else {
-                    sign.isUniqueStreetCleaningSign = false
-                    returnSigns.append(sign)
-                }
-            } else {
-                sign.isUniqueStreetCleaningSign = false
-                returnSigns.append(sign)
-            }
-        }
-        for var sign in signsWithUniquePositions {
-            guard let signContent = sign.signContent?.lowercaseString else {
-                print("No sign content for sign \(sign.signIndex) at location: \(location.locationNumber)")
-                continue
-            }
-            assertDependencies()
-            let searchedDayAndTime = dao!.formattedTimeAndDayTupleForSQLQuery(forTimeAndDay: dao.primaryTimeAndDay)
-            guard signContent.rangeOfString(searchedDayAndTime.day.lowercaseString) != nil  &&
-                signContent.rangeOfString(searchedDayAndTime.time.lowercaseString) != nil else {
-                    sign.isUniqueStreetCleaningSign = false
-                    continue
-            }
-            if signContent.rangeOfString("sanitation") != nil || signContent.rangeOfString("broom") != nil {
-                sign.isUniqueStreetCleaningSign = true
-                returnSigns.append(sign)
-            } else {
-                sign.isUniqueStreetCleaningSign = false
-                returnSigns.append(sign)
-            }
-        }
-        return returnSigns.sort({ $0.signIndex < $1.signIndex })
-    }
-    
-    private func dictionaryOfNumberOfSignsAtPosition(signs:[SPSign]) -> [Double: Int] {
-        var numberOfSignsAtPosition = [Double:Int]()
-        for sign in signs {
-            if sign.positionInFeet != nil {
-                numberOfSignsAtPosition[sign.positionInFeet!] = (numberOfSignsAtPosition[sign.positionInFeet!] ?? 0) + 1
-            }
-        }
-        return numberOfSignsAtPosition
-    }
-    
+//    //MARK: Injectable protocol
+//    private var dao: SPDataAccessObject!
+//    mutating func inject(dao: SPDataAccessObject) {
+//        self.dao = dao
+//    }
+//    func assertDependencies() {
+//        assert(dao != nil)
+//    }
+//
+//    //MARK: - Parse sign and location objects
+//    //MARK: ---Lambda
+//    func parseLambdaSignsAndLocationsFromCoordinates(response:NSArray) -> [SPLocation] {
+//        var returnArray = [SPLocation]()
+//        for i in 0 ..< response.count {
+//            var location = SPLocation()
+//            if let locDictionary = response[i] as? NSDictionary {
+//                location.borough = locDictionary[kSPBoroughJSON] as? String
+//                location.locationNumber = locDictionary[kSPlocationNumberJSON] as? String
+//                location.sideOfStreet = locDictionary[kSPSideOfStreetJSON] as? String
+//                location.street = locDictionary[kSPStreetJSON] as? String
+//                location.fromCrossStreet = locDictionary[kSPFromCrossStreetJSON] as? String
+//                location.toCrossStreet = locDictionary[kSPToCrossStreetJSON] as? String
+//                
+//                if let fromLat = locDictionary[kSPFromLatitudeJSON] as? CLLocationDegrees,
+//                    let fromLong = locDictionary[kSPFromLongitudeJSON] as? CLLocationDegrees {
+//                    location.fromCoordinate = CLLocationCoordinate2DMake(fromLat, fromLong)
+//                }
+//                
+//                if let toLat = locDictionary[kSPToLatitudeJSON] as? CLLocationDegrees,
+//                    let toLong = locDictionary[kSPToLongitudeJSON] as? CLLocationDegrees{
+//                    location.toCoordinate = CLLocationCoordinate2DMake(toLat, toLong)
+//                }
+//                
+//                if let signsResponse = locDictionary[kSPSignsJSON] as? NSArray {
+//                    location.signs = [SPSign]()
+//                    for j in 0 ..< signsResponse.count{
+//                        if let signDictionary = signsResponse[j] as? NSDictionary{
+//                            var sign = SPSign()
+//                            sign.signIndex = signDictionary[kSPSignIndexJSON] as? NSInteger
+//                            sign.positionInFeet = signDictionary[kSPPositionInFeetJSON] as? Double
+//                            sign.signContent = signDictionary[kSPSignContentJSON] as? String
+//                            sign.directionOfArrow = signDictionary[kSPDirectionOfArrowJSON] as? String
+//                            location.signs?.append(sign)
+//                        }
+//                    }
+//                    location.signs?.sortInPlace({$0.signIndex < $1.signIndex})
+//                }
+//                returnArray.append(location)
+//            }
+//        }
+//        return returnArray
+//    }
+//    
+//    //MARK: ---SQL
+//    
+//    func parseSQLSignsAndLocationsFromCoordinates(results:FMResultSet, queryType:SPSQLLocationQueryTypes) -> [SPLocation] {
+//        var locationResults = [SPLocation]()
+//        var location = SPLocation()
+//        location.signs = [SPSign]()
+//        let totalDate = NSDate()
+//        var signCounter = 0
+//        
+//        while results.next() {
+//            if location.locationNumber != results.stringForColumn("l." + kSPLocationNumberSQL) {
+//                if location.locationNumber != nil {
+//                    location.signs = markStreetCleaningSignsWithUniquePosition(atLocation: location)
+//                    locationResults.append(location)
+//                }
+//                location.id = Int(results.intForColumn("l." + kSPIdSQL))
+//                location.locationNumber = results.stringForColumn("l." + kSPLocationNumberSQL)
+//                location.borough = results.stringForColumn(kSPBoroughSQL)
+//                location.sideOfStreet = results.stringForColumn(kSPSideOfStreetSQL)
+//                location.street = results.stringForColumn(kSPStreetSQL)
+//                location.toCrossStreet = results.stringForColumn(kSPToCrossStreetSQL)
+//                location.fromCrossStreet = results.stringForColumn(kSPFromCrossStreetSQL)
+//                
+//                location.fromCoordinate = CLLocationCoordinate2D()
+//                location.fromCoordinate?.latitude = results.doubleForColumn(kSPFromLatitudeSQL)
+//                location.fromCoordinate?.longitude = results.doubleForColumn(kSPFromLongitudeSQL)
+//                
+//                location.toCoordinate = CLLocationCoordinate2D()
+//                location.toCoordinate?.latitude = results.doubleForColumn(kSPToLatitudeSQL)
+//                location.toCoordinate?.longitude = results.doubleForColumn(kSPToLongitudeSQL)
+//                location.signs = [SPSign]()
+//            }
+//            var sign = SPSign()
+//            sign.signIndex = Int(results.intForColumn(kSPSignIndexSQL))
+//            sign.directionOfArrow = results.stringForColumn(kSPDirectionOfArrowSQL)
+//            sign.positionInFeet = results.doubleForColumn(kSPPositionInFeetSQL)
+//            sign.signContent = results.stringForColumn(kSPSignContentSQL)
+//            location.signs?.append(sign)
+//            signCounter += 1
+//        }
+//        
+//        print("Time lapse for query \(queryType): \(totalDate.timeIntervalSinceNow) \nNumber of signs: \(signCounter)")
+//        return locationResults
+//    }
+//    
+//    func parseSQLSignsAndLocationsFromTime (results: FMResultSet) -> [SPLocation] {
+//        var locationResults = [SPLocation]()
+//        var location = SPLocation()
+//        location.signs = [SPSign]()
+//        var signCounter = 0
+//        let totalDate = NSDate()
+//        
+//        while results.next() {
+//            if location.id != Int(results.intForColumn("l." + kSPIdSQL)) {
+//                if location.id != nil {
+//                    location.hasUniqueStreetCleaningSign = isThereUniqueSignPosition(forLocation:location)
+//                    if location.hasUniqueStreetCleaningSign! {
+//                        locationResults.append(location)
+//                    }
+//                }
+//                location.hasUniqueStreetCleaningSign = false
+//                location.id = Int(results.intForColumn("l." + kSPIdSQL))
+//                location.fromCoordinate = CLLocationCoordinate2D()
+//                location.fromCoordinate?.latitude = results.doubleForColumn(kSPFromLatitudeSQL)
+//                location.fromCoordinate?.longitude = results.doubleForColumn(kSPFromLongitudeSQL)
+//                location.signs?.removeAll()
+//            }
+//            var sign = SPSign()
+//            sign.signContent = results.stringForColumn(kSPSignContentSQL)
+//            sign.positionInFeet = results.doubleForColumn(kSPPositionInFeetSQL)
+//            location.signs?.append(sign)
+//            signCounter += 1
+//
+//            //            if sign.positionInFeet != nil {
+//            //                signPositions.append(sign.positionInFeet!)
+//            //            }
+//        }
+//        print("Time lapse for time and day query: \(totalDate.timeIntervalSinceNow)\nNumber of signs: \(signCounter)")
+//        return locationResults
+//    }
+//    
+//    //MARK: ---Marking unique street cleaning signs
+//    private func isThereUniqueSignPosition(forLocation location: SPLocation) -> Bool {
+//        guard let signs = location.signs else { return false }
+//        let numberOfSignsAtPosition = dictionaryOfNumberOfSignsAtPosition(signs)
+//        for (_, value) in numberOfSignsAtPosition {
+//            if value == 1 {
+//                return true
+//            }
+//        }
+//        return false
+//    }
+//    
+//    private func markStreetCleaningSignsWithUniquePosition(atLocation location:SPLocation) -> [SPSign] {
+//        guard let signs = location.signs else { return [SPSign]() }
+//        var returnSigns = [SPSign]()
+//        let numberOfSignsAtPosition = dictionaryOfNumberOfSignsAtPosition(signs)
+//        var signsWithUniquePositions = [SPSign]()
+//        for var sign in signs {
+//            if sign.positionInFeet != nil {
+//                if numberOfSignsAtPosition[sign.positionInFeet!] == 1 {
+//                    signsWithUniquePositions.append(sign)
+//                } else {
+//                    sign.isUniqueStreetCleaningSign = false
+//                    returnSigns.append(sign)
+//                }
+//            } else {
+//                sign.isUniqueStreetCleaningSign = false
+//                returnSigns.append(sign)
+//            }
+//        }
+//        for var sign in signsWithUniquePositions {
+//            guard let signContent = sign.signContent?.lowercaseString else {
+//                print("No sign content for sign \(sign.signIndex) at location: \(location.locationNumber)")
+//                continue
+//            }
+//            assertDependencies()
+//            let searchedDayAndTime = dao.primaryTimeAndDay.stringTupleForSQLQuery()
+//            guard signContent.rangeOfString(searchedDayAndTime.day.lowercaseString) != nil  &&
+//                signContent.rangeOfString(searchedDayAndTime.time.lowercaseString) != nil else {
+//                    sign.isUniqueStreetCleaningSign = false
+//                    continue
+//            }
+//            if signContent.rangeOfString("sanitation") != nil || signContent.rangeOfString("broom") != nil {
+//                sign.isUniqueStreetCleaningSign = true
+//                returnSigns.append(sign)
+//            } else {
+//                sign.isUniqueStreetCleaningSign = false
+//                returnSigns.append(sign)
+//            }
+//        }
+//        return returnSigns.sort({ $0.signIndex < $1.signIndex })
+//    }
+//    
+//    private func dictionaryOfNumberOfSignsAtPosition(signs:[SPSign]) -> [Double: Int] {
+//        var numberOfSignsAtPosition = [Double:Int]()
+//        for sign in signs {
+//            if sign.positionInFeet != nil {
+//                numberOfSignsAtPosition[sign.positionInFeet!] = (numberOfSignsAtPosition[sign.positionInFeet!] ?? 0) + 1
+//            }
+//        }
+//        return numberOfSignsAtPosition
+//    }
+//    
     
     //MARK: - Parse Google API calls
     func parseGoogleAPIResponse(responseDict:NSDictionary, delegateAction:SPNetworkingDelegateAction, inout returnResponse: SPGoogleObject) {

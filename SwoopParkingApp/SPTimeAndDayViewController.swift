@@ -32,6 +32,8 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
     @IBOutlet weak var timeFormatButton: UIButton!
     @IBOutlet weak var centerYConstraintForSecondaryTimeDayView: NSLayoutConstraint!
     @IBOutlet weak var centerYConstraintForPrimaryTimeDayView: NSLayoutConstraint!
+    @IBOutlet weak var heightConstraintOfBorderView: NSLayoutConstraint!
+    var borderViewHeight: CGFloat = 8.0
     
     //MARK: - Injectable Protocol
     weak var delegate: SPTimeViewControllerDelegate?
@@ -49,15 +51,12 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
         super.viewDidLoad()
         assertDependencies()
         setCurrentDayAndTimeTextViews()
-        setTextViews()
     }
     private func setCurrentDayAndTimeTextViews() {
+        dao.primaryTimeAndDay.increaseTime()
+        dao.getUpcomingStreetCleaningSigns(shouldSearchRange: false)
         primaryDayTextView.text = dao.primaryTimeAndDay.day.stringValue(forFormat: timeAndDayFormat)
         primaryTimeTextView.text = dao.primaryTimeAndDay.time.stringValue(forFormat: timeAndDayFormat)
-    }
-
-    private func setTextViews() {
-        
     }
     
     //MARK: Time and Day change methods
@@ -77,7 +76,6 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
         increase ? day.increase(by: 1) : day.decrease(by: 1)
         textView.text = day.stringValue(forFormat: timeAndDayFormat)
     }
-    
     var equalTextViews: Bool {
         return primaryDayTextView.text == secondaryDayTextView.text && primaryTimeTextView.text == secondaryTimeTextView.text
     }
@@ -93,7 +91,6 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
     @IBAction func decreaseSecondaryTime(sender: UIButton) {
         change(time: &dao.secondaryTimeAndDay, forTextViews: secondaryTextViews, increase: false)
     }
-
     private func change(inout time timeAndDay:DNTimeAndDay, forTextViews textViews:(day:UITextView, time:UITextView), increase: Bool) {
         increase ? timeAndDay.increaseTime() : timeAndDay.decreaseTime()
         textViews.time.text = timeAndDay.time.stringValue(forFormat: timeAndDayFormat)
@@ -101,10 +98,67 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
             textViews.day.text = timeAndDay.day.stringValue(forFormat: timeAndDayFormat)
         }
     }
-    //MARK: Time and day accessory button methods
+    //MARK: - Button Methods
+    //MARK: Search signs by time
     @IBAction func searchSignsByTime(sender: UIButton) {
-        
+        dao.getUpcomingStreetCleaningSigns(shouldSearchRange: isInTimeRangeMode)
     }
+    
+//    private func searchSignsByTime() {
+//        if isInTimeRangeMode {
+//            guard dao.primaryTimeAndDay.isValidStreetCleaningTime() else {
+//                alertFor(invalidTimeAndDay: &dao.primaryTimeAndDay, forTextViews: primaryTextViews)
+//                return
+//            }
+//            guard dao.secondaryTimeAndDay.isValidStreetCleaningTime() else {
+//                alertFor(invalidTimeAndDay: &dao.secondaryTimeAndDay, forTextViews: secondaryTextViews)
+//                return
+//            }
+//        } else {
+//            guard dao.primaryTimeAndDay.isValidStreetCleaningTime() else {
+//                alertFor(invalidTimeAndDay: &dao.primaryTimeAndDay, forTextViews: primaryTextViews)
+//                return
+//            }
+//        }
+//        dao.getUpcomingStreetCleaningSigns(shouldSearchRange: isInTimeRangeMode)
+//
+//    }
+    
+    private func set(inout nextValidTimeAndDay timeAndDay: DNTimeAndDay, forTextViews textViews: (day: UITextView, time: UITextView)) {
+        timeAndDay = timeAndDay.nextStreetCleaningTimeAndDay()
+        textViews.day.text = timeAndDay.day.stringValue(forFormat: timeAndDayFormat)
+        textViews.time.text = timeAndDay.time.stringValue(forFormat: timeAndDayFormat)
+    }
+    
+    private func alertFor(inout invalidTimeAndDay timeAndDay:DNTimeAndDay, forTextViews textViews: (day: UITextView, time: UITextView)) {
+        var shouldSetSecondary = false
+        let nextValidTimeAndDay = timeAndDay.nextStreetCleaningTimeAndDay()
+        var title = "No street cleaning at \(timeAndDay.day.stringValue(forFormat: timeAndDayFormat)), \(timeAndDay.time.stringValue(forFormat: timeAndDayFormat))"
+        var message = "Would you like to search \(nextValidTimeAndDay.day.stringValue(forFormat:timeAndDayFormat)), \(nextValidTimeAndDay.time.stringValue(forFormat: timeAndDayFormat))"
+        if isInTimeRangeMode {
+            var timeTuple = dao.secondaryTimeAndDay.stringTupleForSQLQuery()
+            if textViews.day === primaryDayTextView && !dao.secondaryTimeAndDay.isValidStreetCleaningTime() {
+                shouldSetSecondary = true
+                title += " or \(timeTuple.day), \(timeTuple.time)"
+                timeTuple = dao.secondaryTimeAndDay.nextStreetCleaningTimeAndDay().stringTupleForSQLQuery()
+            }
+            message += " thru \(timeTuple.day), \(timeTuple.time))"
+
+        }
+        message += "?"
+        let alertController = UIAlertController.init(title: title, message: message, preferredStyle: .ActionSheet)
+        let confirm = UIAlertAction.init(title: "Yes", style: .Default) { (alert) in
+            self.set(nextValidTimeAndDay: &timeAndDay, forTextViews: textViews)
+            if shouldSetSecondary { self.set(nextValidTimeAndDay: &self.dao.secondaryTimeAndDay, forTextViews: self.secondaryTextViews) }
+            self.dao.getUpcomingStreetCleaningSigns(shouldSearchRange: self.isInTimeRangeMode)
+        }
+        let decline = UIAlertAction.init(title: "No", style: .Cancel, handler: nil)
+        alertController.addAction(confirm)
+        alertController.addAction(decline)
+        presentViewController(alertController, animated: true, completion: nil)
+    }
+    
+    //MARK: Time and day accessory button methods
     @IBAction func toggleTimeFormat(sender: UIButton) {
         if timeAndDayFormat.time == .format24Hour {
             timeAndDayFormat.time = .format12Hour
@@ -117,13 +171,14 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
         secondaryTimeTextView.text = dao.secondaryTimeAndDay.time.stringValue(forFormat: timeAndDayFormat)
     }
     @IBAction func toggleTimeRange(sender: UIButton) {
+        delegate?.timeViewControllerDidTapTimeRangeButton(!isInTimeRangeMode)
         if !isInTimeRangeMode {
             timeRangeButton.setTitle(timeRangeString, forState: .Normal)
             setSecondaryTimeAndDay()
             UIView.animateWithDuration(standardAnimationDuration, animations: {
                 self.secondaryDayAndTimeView.hidden = false
-                self.centerYConstraintForPrimaryTimeDayView.constant = -self.timeAndDayContainer.frame.height / 2
-                self.centerYConstraintForSecondaryTimeDayView.constant = self.timeAndDayContainer.frame.height / 2
+                self.centerYConstraintForPrimaryTimeDayView.constant = -self.timeAndDayContainer.frame.height / 4
+                self.centerYConstraintForSecondaryTimeDayView.constant = self.timeAndDayContainer.frame.height / 4
                 self.view.layoutIfNeeded()
             })
             
@@ -139,9 +194,14 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
             })
         }
         isInTimeRangeMode = !isInTimeRangeMode
-        delegate?.timeViewControllerDidTapTimeRangeButton(isInTimeRangeMode)
     }
     
+    func show(shouldShow:Bool) {
+        UIView.animateWithDuration(standardAnimationDuration) {
+            self.heightConstraintOfBorderView.constant = shouldShow ? 8.0 : 0
+            self.view.setNeedsLayout()
+        }
+    }
     private func setSecondaryTimeAndDay() {
         if let day = DNDay.init(stringValue: primaryDayTextView.text),
             time = DNTime(stringValue: primaryTimeTextView.text) {

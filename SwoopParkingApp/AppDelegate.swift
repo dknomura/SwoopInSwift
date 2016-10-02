@@ -55,7 +55,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     private func setupRootViewController() {
         let dao = SPDataAccessObject()
-        dao.getUpcomingStreetCleaningSigns()
         guard let navController = window?.rootViewController as? UINavigationController else { return }
         guard let mapController = navController.topViewController as? SPMapViewController else { return }
         mapController.inject(dao)
