@@ -301,7 +301,6 @@ struct SPParser {
         default:
             return nil
         }
-        
     }
     private func isAddressInNYC(address:String) -> Bool {
         //This method checks whether the response contains New York, or one of the 5 boroughs to filter out other results

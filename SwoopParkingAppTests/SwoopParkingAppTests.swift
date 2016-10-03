@@ -6,14 +6,20 @@
 //  Copyright © 2016 Daniel Nomura. All rights reserved.
 //
 
-import XCTest
+import Quick
+import Nimble
 @testable import SwoopParkingApp
 
-class SwoopParkingAppTests: XCTestCase {
-    
-    override func setUp() {
-        super.setUp()
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+class SwoopParkingAppTests: QuickSpec {
+    override func spec() {
+        let time = DNTime(hour: 6, min: 30)
+        let day = DNDay.Mon
+        var timeAndDay = DNTimeAndDay.init(time:time, day: day)
+        describe("day value ") {
+            it("gives the double value of the day/time", closure: {
+                expect(timeAndDay.dayValue).to(equal())
+            })
+        }
     }
     
     override func tearDown() {

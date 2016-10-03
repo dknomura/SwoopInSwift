@@ -61,17 +61,6 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     var initialZoom: Float {
         return SPPolylineManager().initialZoom(forViewHeight: Double(mapView.frame.height))
     }
-
-    //MARK: Injectable protocol
-    private var dao: SPDataAccessObject!
-    func inject(dao: SPDataAccessObject) {
-        self.dao = dao
-    }
-    func assertDependencies() {
-        assert(dao != nil)
-    }
-
-    
     //MARK: - Override methods
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -296,7 +285,6 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     //MARK: - Animation methods
     private func showToolbars(shouldShow:Bool) {
         UIView.animateWithDuration(standardAnimationDuration, animations: {
-            self.timeAndDayViewController?.show(shouldShow)
             self.heightConstraintOfTimeAndDayContainer.constant = shouldShow ? self.heightOfTimeContainer : 0
             self.heightConstraintOfToolbar.constant = shouldShow ? self.standardHeightOfToolOrSearchBar : 0
             self.view.layoutIfNeeded()
@@ -460,5 +448,14 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
             showToolbars(false)
         }
         return true
+    }
+    
+    //MARK: Injectable protocol
+    private var dao: SPDataAccessObject!
+    func inject(dao: SPDataAccessObject) {
+        self.dao = dao
+    }
+    func assertDependencies() {
+        assert(dao != nil)
     }
 }

@@ -23,9 +23,9 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
     var streetCleaningLocations = [SPLocation]()
     let locationManager = CLLocationManager()
     var primaryTimeAndDay: DNTimeAndDay = DNTimeAndDay.currentTimeAndDay()
-    var secondaryTimeAndDay: DNTimeAndDay = DNTimeAndDay.currentTimeAndDay()
     var addressResults = [SPGoogleAddressResult]()
     var searchCoordinate: CLLocationCoordinate2D?
+    var locationsForTimeIndexAndDay = [DNDay: [Int: [SPLocation]]]()
     
     
     //MARK: - Determine if current mapView is within NYC

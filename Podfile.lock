@@ -10,12 +10,16 @@ PODS:
   - GoogleMaps/Base (2.0.1)
   - GoogleMaps/Maps (2.0.1):
     - GoogleMaps/Base (= 2.0.1)
+  - Nimble (5.0.0)
+  - Quick (0.9.3)
 
 DEPENDENCIES:
   - AWSCognito
   - AWSLambda
   - DNTimeAndDay
   - GoogleMaps
+  - Nimble
+  - Quick
 
 SPEC CHECKSUMS:
   AWSCognito: 4fa9fefcadae1d8425b01cbde27d564c21e3fd35
@@ -23,7 +27,9 @@ SPEC CHECKSUMS:
   AWSLambda: 5cfb825a83acbfd6b62a6cf109f9c73896f5cc7a
   DNTimeAndDay: ce9adb6186b06411554d99e688a7c82665f6b1ef
   GoogleMaps: f09da64fc987c1aa29394567c3cab5a3df83c402
+  Nimble: 56fc9f5020effa2206de22c3dd910f4fb011b92f
+  Quick: 13a2a2b19a5d8e3ed4fd0c36ee46597fd77ebf71
 
-PODFILE CHECKSUM: bb340d121708a1a7cff5469e45259165589e94c5
+PODFILE CHECKSUM: 5913ca1919261dc8b53b7914ee4555ab8ad968c9
 
 COCOAPODS: 1.0.1

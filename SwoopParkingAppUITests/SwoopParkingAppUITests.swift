@@ -5,7 +5,6 @@
 //  Created by Daniel Nomura on 5/4/16.
 //  Copyright © 2016 Daniel Nomura. All rights reserved.
 //
-
 import XCTest
 
 class SwoopParkingAppUITests: XCTestCase {
