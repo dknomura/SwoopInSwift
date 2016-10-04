@@ -362,7 +362,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     }
     private func getNewHeatMapOverlays() {
         hide(mapOverlayViews: currentGroundOverlays)
-        guard dao.locationsForPrimaryTimeAndDay != nil || dao.locationsForPrimaryTimeAndDay?.count > 0 else { return }
+        guard dao.locationsForPrimaryTimeAndDay != nil else { return }
         currentGroundOverlays = SPGroundOverlayManager().groundOverlays(forMap: mapView, forLocations: dao.locationsForPrimaryTimeAndDay!)
         show(mapOverlayViews: currentGroundOverlays, shouldHideOtherOverlay: true)
     }

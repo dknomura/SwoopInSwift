@@ -68,7 +68,7 @@ extension DNTimeAndDay: DNComparableTimeUnit {
         }
     }
     mutating func adjustTimeToValidStreetCleaningTime() -> Bool {
-        let cleaningHour = earliestAndLatestCleaningTime()
+        let cleaningHour = day.earliestAndLatestCleaningTime
         var didChangeTime = true
         if time >= cleaningHour.latest {
             time = cleaningHour.latest
@@ -78,22 +78,6 @@ extension DNTimeAndDay: DNComparableTimeUnit {
             didChangeTime = false
         }
         return didChangeTime
-    }
-    func earliestAndLatestCleaningTime() -> (earliest:DNTime, latest:DNTime) {
-        var latestCleaningHour = 14.0
-        var earliestCleaningHour = 3.0
-        switch day {
-        case .Sun:
-            latestCleaningHour = 9.5
-            earliestCleaningHour = 6
-        case .Tues, .Fri:
-            latestCleaningHour = 19
-        case .Sat:
-            latestCleaningHour = 13
-        default:
-            break
-        }
-        return (DNTime.init(rawValue: earliestCleaningHour)!, DNTime.init(rawValue: latestCleaningHour)!)
     }
     func isInGapTime() -> Bool {
         if (day == .Tues || day == .Fri) && (timeValue > 14 && timeValue < 19) {
@@ -126,6 +110,23 @@ extension DNDay {
     static var allValues: [DNDay] {
         return [Sun, Mon, Tues, Wed, Thurs, Fri, Sat]
     }
+    var earliestAndLatestCleaningTime: (earliest:DNTime, latest:DNTime) {
+        var latestCleaningHour = 14.0
+        var earliestCleaningHour = 3.0
+        switch self {
+        case .Sun:
+            latestCleaningHour = 9.5
+            earliestCleaningHour = 6
+        case .Tues, .Fri:
+            latestCleaningHour = 19
+        case .Sat:
+            latestCleaningHour = 13
+        default:
+            break
+        }
+        return (DNTime.init(rawValue: earliestCleaningHour)!, DNTime.init(rawValue: latestCleaningHour)!)
+    }
+
 }
 
 extension DNTimeAndDayFormat {

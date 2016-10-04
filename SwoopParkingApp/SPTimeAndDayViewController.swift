@@ -90,7 +90,7 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
     
     var timeRange: [Float]!
     private func setTimeRangeForDay() {
-        let maxMinTime = dao.primaryTimeAndDay.earliestAndLatestCleaningTime()
+        let maxMinTime = dao.primaryTimeAndDay.day.earliestAndLatestCleaningTime
         var minTime = maxMinTime.earliest
         var returnRange = [Float]()
         while minTime <= maxMinTime.latest {
@@ -101,7 +101,7 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
     }
     
     private func setSliderLabels() {
-        let minMaxTime = dao.primaryTimeAndDay.earliestAndLatestCleaningTime()
+        let minMaxTime = dao.primaryTimeAndDay.day.earliestAndLatestCleaningTime
         minTimeLabel.text = minMaxTime.earliest.stringValue(forFormat: DNTimeAndDayFormat.format12Hour())
         maxTimeLabel.text = minMaxTime.latest.stringValue(forFormat: DNTimeAndDayFormat.format12Hour())
         sliderThumbLabel.text = dao.primaryTimeAndDay.time.stringValue(forFormat: DNTimeAndDayFormat.format12Hour())

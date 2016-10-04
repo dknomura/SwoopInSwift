@@ -17,6 +17,8 @@ enum DAOError:ErrorType {
 class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDelegate, SPLambdaManagerDelegate, SPGoogleNetworkingDelegate {
     
     var delegate: SPDataAccessObjectDelegate?
+    var sqlReader: SPSQLiteReader = SPSQLiteReader.init()
+    
     var locationsForDayAndTime = [SPLocation]()
     var currentMapViewLocations = [SPLocation]()
     var currentLocation: CLLocation?
@@ -28,7 +30,6 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
     var locationsForPrimaryTimeAndDay: [SPLocation]? {
         return allLocationsForDayValue[primaryTimeAndDay.rawValue]
     }
-    
     //MARK: - Determine if current mapView is within NYC
     
     func isInNYC(mapView:GMSMapView) -> Bool {
@@ -44,18 +45,18 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
     }
     // MARK: - SQLite methods
     func getAllStreetCleaningLocations() {
-        let sqliteReader = SPSQLiteReader.init(delegate: self)
-        sqliteReader.queryAllStreetCleaningLocations()
+        sqlReader.delegate = self
+        sqlReader.queryAllStreetCleaningLocations()
     }
     
     func getStreetCleaningLocationsForPrimaryTimeAndDay() {
-        let sqliteReader = SPSQLiteReader.init(delegate: self)
-        sqliteReader.queryStreetCleaningLocations(forTimeAndDay: primaryTimeAndDay)
+        sqlReader.delegate = self
+        sqlReader.queryStreetCleaningLocations(forTimeAndDay: primaryTimeAndDay)
     }
     
     func getSigns(forCurrentMapView mapView:GMSMapView) {
         let visibleRegionBounds = GMSCoordinateBounds.init(region: mapView.projection.visibleRegion())
-        let sqlReader = SPSQLiteReader(delegate: self)
+        sqlReader.delegate = self
         sqlReader.querySignsAndLocations(swCoordinate: visibleRegionBounds.southWest, neCoordinate: visibleRegionBounds.northEast)
     }
     
