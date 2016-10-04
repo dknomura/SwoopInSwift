@@ -339,8 +339,8 @@ struct SPPolylineManager: SPInjectable {
     
     private func polylineColor(forSign sign:SPSign) -> UIColor {
         assertDependencies()
-        let timeAndDayTuple = dao.primaryTimeAndDay.stringTupleForSQLQuery()
-        if sign.signContent?.rangeOfString(timeAndDayTuple.day) != nil && sign.signContent?.rangeOfString(timeAndDayTuple.time) != nil {
+        dao.primaryTimeAndDay.stringForSQLTagQuery()
+        if sign.signContent?.rangeOfString(dao.primaryTimeAndDay.stringForSQLTagQuery()) != nil {
             return UIColor.greenColor()
         }
         return UIColor.redColor()

@@ -57,7 +57,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     var heightOfTimeContainer: CGFloat { return isInTimeRangeMode ? CGFloat(130.0) : CGFloat(70.0) }
     
     var zoomToSwitchOverlays: Float { return streetZoom - 0.5 }
-    var streetZoom: Float { return 15.5 }
+    var streetZoom: Float { return 16.0 }
     var initialZoom: Float {
         return SPPolylineManager().initialZoom(forViewHeight: Double(mapView.frame.height))
     }

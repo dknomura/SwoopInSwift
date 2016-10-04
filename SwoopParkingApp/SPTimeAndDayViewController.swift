@@ -31,6 +31,19 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
         setupSlider()
         dao.getStreetCleaningLocationsForPrimaryTimeAndDay()
         dao.getAllStreetCleaningLocations()
+        setupGestures()
+    }
+    
+    private func setupGestures() {
+        let tapGesture = UITapGestureRecognizer.init(target: self, action: #selector(tapToMoveSliderThumb(_:)))
+        timeSlider.addGestureRecognizer(tapGesture)
+    }
+    @objc func tapToMoveSliderThumb(recognizer: UIGestureRecognizer) {
+        let pointOnSlider = recognizer.locationInView(timeSlider)
+        let trackRect = timeSlider.trackRectForBounds(timeSlider.bounds)
+        timeSlider.setValue(Float(Int(CGFloat(timeRange.count) * pointOnSlider.x / trackRect.width)), animated: true)
+        adjustSliderToTimeChange()
+        delegate?.timeViewControllerDidChangeTime()
     }
     
     var thumbRect: CGRect {
@@ -38,7 +51,7 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
         return timeSlider.thumbRectForBounds(timeSlider.bounds, trackRect: trackRect, value: timeSlider.value)
     }
     var centerOfSliderThumb: CGPoint {
-        return CGPointMake(thumbRect.origin.x + thumbRect.size.width/2 + timeSlider.frame.origin.x, thumbRect.origin.y + thumbRect.size.height/2 + timeSlider.frame.origin.y + 30)
+        return CGPointMake(thumbRect.origin.x + thumbRect.size.width/2 + timeSlider.frame.origin.x, thumbRect.origin.y + thumbRect.size.height/2 + timeSlider.frame.origin.y - 15)
     }
     private func setupSlider() {
         sliderThumbLabel = UILabel.init(frame: CGRectMake(0, 0, 55, 20))
@@ -48,6 +61,9 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
         sliderThumbLabel.font = UIFont.systemFontOfSize(12)
         view.addSubview(sliderThumbLabel)
         timeSlider.continuous = true
+        timeSlider.addTarget(self, action: #selector(sliderDidEndSliding(_:)), forControlEvents: UIControlEvents.TouchUpOutside)
+        timeSlider.addTarget(self, action: #selector(sliderDidEndSliding(_:)), forControlEvents: UIControlEvents.TouchUpInside)
+
         timeSlider.minimumValue = 0
         adjustTimeSliderToDay()
     }
@@ -67,13 +83,21 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
     //MARK: ChangeTime
     //MARK: -- Slider Methods
     @IBAction func changeTime(slider: UISlider) {
+        adjustSliderToTimeChange()
+    }
+    
+    @objc func sliderDidEndSliding(notification: NSNotification) {
+        delegate?.timeViewControllerDidChangeTime()
+    }
+    
+    
+    private func adjustSliderToTimeChange() {
         sliderThumbLabel.center = centerOfSliderThumb
-        let sliderValue = Int(slider.value)
+        let sliderValue = Int(timeSlider.value)
         if let newTime = DNTime.init(rawValue: Double(timeRange[sliderValue])) {
             dao.primaryTimeAndDay.time = newTime
         }
         sliderThumbLabel.text = dao.primaryTimeAndDay.time.stringValue(forFormat: DNTimeAndDayFormat.format12Hour())
-        delegate?.timeViewControllerDidChangeTime()
     }
     
     func adjustTimeSliderToDay() {

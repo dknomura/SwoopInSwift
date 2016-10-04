@@ -284,43 +284,50 @@
                                         </variation>
                                     </view>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="E2y-r6-dmi">
-                                        <rect key="frame" x="103" y="1" width="33" height="16"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="13"/>
-                                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="k1n-dd-TQB">
-                                        <rect key="frame" x="557" y="1" width="33" height="16"/>
+                                        <rect key="frame" x="103" y="46" width="33" height="16"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="13"/>
                                         <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="4" translatesAutoresizingMaskIntoConstraints="NO" id="p9S-jK-NDU">
-                                        <rect key="frame" x="101" y="13" width="491" height="36"/>
+                                        <rect key="frame" x="101" y="14" width="491" height="35"/>
                                         <connections>
                                             <action selector="changeTime:" destination="Ygi-5r-sqb" eventType="valueChanged" id="J4Q-kQ-qlC"/>
                                         </connections>
                                     </slider>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="k1n-dd-TQB">
+                                        <rect key="frame" x="557" y="46" width="33" height="16"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
                                 </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <constraints>
-                                    <constraint firstAttribute="bottom" secondItem="p9S-jK-NDU" secondAttribute="bottom" constant="14" id="087-d5-7aQ"/>
                                     <constraint firstItem="E2y-r6-dmi" firstAttribute="top" secondItem="Wut-nT-tHk" secondAttribute="top" constant="1" id="4Mb-Yg-uKC"/>
+                                    <constraint firstAttribute="bottom" secondItem="E2y-r6-dmi" secondAttribute="bottom" id="5vD-6e-RPR"/>
                                     <constraint firstItem="Cvf-0z-KIV" firstAttribute="leading" secondItem="Wut-nT-tHk" secondAttribute="leading" id="6V3-Zx-QW8"/>
                                     <constraint firstItem="p9S-jK-NDU" firstAttribute="top" secondItem="E2y-r6-dmi" secondAttribute="bottom" constant="-4" id="Cga-Jg-NlY"/>
                                     <constraint firstItem="p9S-jK-NDU" firstAttribute="top" secondItem="k1n-dd-TQB" secondAttribute="bottom" constant="-4" id="HLg-UZ-NQQ"/>
                                     <constraint firstItem="Cvf-0z-KIV" firstAttribute="top" secondItem="Wut-nT-tHk" secondAttribute="top" id="LVP-71-Xcy"/>
                                     <constraint firstAttribute="trailing" secondItem="p9S-jK-NDU" secondAttribute="trailing" constant="10" id="SB1-z3-YsW"/>
+                                    <constraint firstItem="E2y-r6-dmi" firstAttribute="top" secondItem="p9S-jK-NDU" secondAttribute="bottom" constant="-2" id="UXP-mj-Pgu"/>
                                     <constraint firstItem="p9S-jK-NDU" firstAttribute="leading" secondItem="Cvf-0z-KIV" secondAttribute="trailing" constant="8" id="eng-ox-txt"/>
                                     <constraint firstAttribute="bottom" secondItem="Cvf-0z-KIV" secondAttribute="bottom" id="h40-mS-hFR"/>
                                     <constraint firstItem="E2y-r6-dmi" firstAttribute="leading" secondItem="p9S-jK-NDU" secondAttribute="leading" id="k3q-S8-T0D"/>
                                     <constraint firstItem="k1n-dd-TQB" firstAttribute="trailing" secondItem="p9S-jK-NDU" secondAttribute="trailing" id="lOW-ni-Pco"/>
+                                    <constraint firstItem="k1n-dd-TQB" firstAttribute="top" secondItem="p9S-jK-NDU" secondAttribute="bottom" constant="-2" id="nP3-nY-oAq"/>
                                     <constraint firstItem="E2y-r6-dmi" firstAttribute="leading" secondItem="Cvf-0z-KIV" secondAttribute="trailing" constant="8" id="rya-VE-05z"/>
+                                    <constraint firstItem="p9S-jK-NDU" firstAttribute="centerY" secondItem="Wut-nT-tHk" secondAttribute="centerY" id="tNH-Qv-SKm"/>
                                     <constraint firstItem="k1n-dd-TQB" firstAttribute="top" secondItem="Wut-nT-tHk" secondAttribute="top" constant="1" id="zg7-CR-aeU"/>
                                 </constraints>
                                 <variation key="default">
                                     <mask key="constraints">
+                                        <exclude reference="Cga-Jg-NlY"/>
+                                        <exclude reference="HLg-UZ-NQQ"/>
+                                        <exclude reference="4Mb-Yg-uKC"/>
                                         <exclude reference="rya-VE-05z"/>
+                                        <exclude reference="zg7-CR-aeU"/>
                                     </mask>
                                 </variation>
                             </view>
