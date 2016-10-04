@@ -11,11 +11,6 @@ import DNTimeAndDay
 
 class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInjectable {
     var timeAndDayFormat = DNTimeAndDayFormat.init(time: DNTimeFormat.format12Hour, day: DNDayFormat.abbr)
-    var isInTimeRangeMode = false
-
-    var timeFormatString:String { return timeAndDayFormat.time == .format12Hour ? "12:00" : "24:00" }
-    var timeRangeString:String { return isInTimeRangeMode ? "Range" : "Single" }
-    
     @IBOutlet weak var timeAndDayContainer: UIView!
 //    @IBOutlet weak var primaryDayTextView: UITextView!
     
@@ -28,6 +23,16 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
     @IBOutlet weak var maxTimeLabel: UILabel!
     var sliderThumbLabel: UILabel!
     
+    //MARK: - Setup Methods
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        dao.primaryTimeAndDay.increaseTime()
+        assertDependencies()
+        setupSlider()
+        dao.getStreetCleaningLocationsForPrimaryTimeAndDay()
+        dao.getAllStreetCleaningLocations()
+    }
+    
     var thumbRect: CGRect {
         let trackRect = timeSlider.trackRectForBounds(timeSlider.bounds)
         return timeSlider.thumbRectForBounds(timeSlider.bounds, trackRect: trackRect, value: timeSlider.value)
@@ -35,16 +40,6 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
     var centerOfSliderThumb: CGPoint {
         return CGPointMake(thumbRect.origin.x + thumbRect.size.width/2 + timeSlider.frame.origin.x, thumbRect.origin.y + thumbRect.size.height/2 + timeSlider.frame.origin.y + 30)
     }
-
-    //MARK: - Setup Methods
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        assertDependencies()
-        setupSlider()
-        dayLabel.text = dao.primaryTimeAndDay.day.stringValue(forFormat: timeAndDayFormat)
-        dao.getUpcomingStreetCleaningSigns(shouldSearchRange: false)
-    }
-    
     private func setupSlider() {
         sliderThumbLabel = UILabel.init(frame: CGRectMake(0, 0, 55, 20))
         sliderThumbLabel.center = centerOfSliderThumb
@@ -66,9 +61,8 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
     }
     private func changeDay(increase:Bool) {
         increase ? dao.primaryTimeAndDay.day.increase(by: 1) : dao.primaryTimeAndDay.day.decrease(by: 1)
-        dayLabel.text = dao.primaryTimeAndDay.day.stringValue(forFormat: timeAndDayFormat)
         adjustTimeSliderToDay()
-        dao.getUpcomingStreetCleaningSigns(shouldSearchRange: false)
+        delegate?.timeViewControllerDidChangeTime()
     }
     //MARK: ChangeTime
     //MARK: -- Slider Methods
@@ -79,10 +73,10 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
             dao.primaryTimeAndDay.time = newTime
         }
         sliderThumbLabel.text = dao.primaryTimeAndDay.time.stringValue(forFormat: DNTimeAndDayFormat.format12Hour())
-        dao.getUpcomingStreetCleaningSigns(shouldSearchRange: false)
+        delegate?.timeViewControllerDidChangeTime()
     }
     
-    private func adjustTimeSliderToDay() {
+    func adjustTimeSliderToDay() {
         setTimeRangeForDay()
         dao.primaryTimeAndDay.adjustTimeToValidStreetCleaningTime()
         timeSlider.maximumValue = Float(timeRange.count - 1)
@@ -90,6 +84,7 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
             timeSlider.value = Float(currentTimeValue)
         }
         sliderThumbLabel.center = centerOfSliderThumb
+        dayLabel.text = dao.primaryTimeAndDay.day.stringValue(forFormat: timeAndDayFormat)
         setSliderLabels()
     }
     
@@ -135,5 +130,5 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
 }
 
 protocol SPTimeViewControllerDelegate: class {
-    func timeViewControllerDidTapTimeRangeButton(inRangeMode:Bool)
+    func timeViewControllerDidChangeTime()
 }

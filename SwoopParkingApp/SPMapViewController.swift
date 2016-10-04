@@ -9,6 +9,7 @@
 import UIKit
 import GoogleMaps
 import AWSLambda
+import DNTimeAndDay
 
 class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDelegate, UITextViewDelegate, SPTimeViewControllerDelegate, UIGestureRecognizerDelegate, SPDataAccessObjectDelegate, SPSearchResultsViewControllerDelegate, SPInjectable {
     @IBOutlet weak var timeAndDayContainerView: UIView!
@@ -29,9 +30,8 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     var initialMapViewCamera: GMSCameraPosition {
         return GMSCameraPosition.cameraWithTarget(CLLocationCoordinate2DMake(40.7193748839769, -73.9289110153913), zoom: initialZoom)
     }
-    
-    var currentMapPolylines = [GMSPolyline]()
     var currentGroundOverlays = [GMSGroundOverlay]()
+    var currentMapPolylines = [GMSPolyline]()
     
     var searchContainerSegue: String { return "searchContainer" }
     var timeContainerSegue:String { return "timeContainer" }
@@ -50,14 +50,14 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     var isZoomingIn = false
     var shouldTapShowSearchBar = false
     
-    var timeAndDayViewController: SPTimeAndDayViewController?
-    var searchContainerViewController: SPSearchResultsViewController?
+    var timeAndDayViewController: SPTimeAndDayViewController!
+    var searchContainerViewController: SPSearchResultsViewController!
     
     var standardHeightOfToolOrSearchBar: CGFloat { return CGFloat(44.0) }
     var heightOfTimeContainer: CGFloat { return isInTimeRangeMode ? CGFloat(130.0) : CGFloat(70.0) }
     
     var zoomToSwitchOverlays: Float { return streetZoom - 0.5 }
-    var streetZoom: Float { return 16.0 }
+    var streetZoom: Float { return 15.5 }
     var initialZoom: Float {
         return SPPolylineManager().initialZoom(forViewHeight: Double(mapView.frame.height))
     }
@@ -230,21 +230,21 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     //MARK: - Button Methods
     //MARK: --Swoop toggle
     @IBAction func toggleOverlaySwitch(sender: UISwitch) {
-        setCityStreetOverlayAndLabel()
+        setOverlayAndSwitchLabel()
     }
     private func turnStreetOverlayOn() {
         if !streetViewSwitch.on {
             streetViewSwitch.setOn(true, animated: true)
         }
-        setCityStreetOverlayAndLabel()
+        setOverlayAndSwitchLabel()
     }
     private func turnCityOverlayOn() {
         if streetViewSwitch.on  {
             streetViewSwitch.setOn(false, animated: true)
         }
-        setCityStreetOverlayAndLabel()
+        setOverlayAndSwitchLabel()
     }
-    private func setCityStreetOverlayAndLabel() {
+    private func setOverlayAndSwitchLabel() {
         if streetViewSwitch.on {
             getSignsForCurrentMapView()
             switchLabel.setTitle(switchLabelStreet, forState: .Normal)
@@ -362,7 +362,8 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     }
     private func getNewHeatMapOverlays() {
         hide(mapOverlayViews: currentGroundOverlays)
-        currentGroundOverlays =  SPGroundOverlayManager().groundOverlays(forMap: mapView, forLocations: dao!.locationsForDayAndTime)
+        guard dao.locationsForPrimaryTimeAndDay != nil || dao.locationsForPrimaryTimeAndDay?.count > 0 else { return }
+        currentGroundOverlays = SPGroundOverlayManager().groundOverlays(forMap: mapView, forLocations: dao.locationsForPrimaryTimeAndDay!)
         show(mapOverlayViews: currentGroundOverlays, shouldHideOtherOverlay: true)
     }
     private func hide(mapOverlayViews views:[GMSOverlay]) {
@@ -404,33 +405,39 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     func dataAccessObject(dao: SPDataAccessObject, didSetSearchCoordinate coordinate: CLLocationCoordinate2D) {
         zoomMap(toCoordinate: coordinate, zoom: streetZoom)
     }
-    func dataAccessObject(dao: SPDataAccessObject, didSetLocations locations: [SPLocation], forQueryType: SPSQLLocationQueryTypes) {
-        if forQueryType == .getLocationsForCurrentMapView {
+    func dataAccessObject(dao: SPDataAccessObject, didSetLocationsForQueryType queryType: SPSQLLocationQueryTypes) {
+        if queryType == .getLocationsForCurrentMapView {
             if currentMapPolylines.count > 0 { hide(mapOverlayViews: currentMapPolylines) }
-//            let date = NSDate()
             var polylineManager = SPPolylineManager()
             polylineManager.inject(dao)
             currentMapPolylines = polylineManager.polylines(forCurrentLocations: dao.currentMapViewLocations, zoom: Double(mapView.camera.zoom))
-//            print("Time to initialize polylines: \(date.timeIntervalSinceNow)")
             
             if currentMapPolylines.count > 0 && mapView.camera.zoom >= zoomToSwitchOverlays {
                 show(mapOverlayViews: currentMapPolylines, shouldHideOtherOverlay: true)
             }
-        } else if forQueryType == .getLocationsForTimeAndDay {
+        } else if queryType == .getAllLocationsWithUniqueCleaningSign || queryType == .getLocationsForTimeAndDay {
             getNewHeatMapOverlays()
+            if queryType == .getAllLocationsWithUniqueCleaningSign {
+                bottomToolbar.backgroundColor = UIColor.redColor()
+            }
         }
         hideWaitingView()
     }
 
     //MARK: -- Methods that interact with child view controllers
     //MARK: -----Time and Day Container Controller delegate
-    func timeViewControllerDidTapTimeRangeButton(inRangeMode: Bool) {
-        isInTimeRangeMode = inRangeMode
-        UIView.animateWithDuration(standardAnimationDuration, animations: {
-            self.heightConstraintOfTimeAndDayContainer.constant = self.heightOfTimeContainer
-            self.view.layoutIfNeeded()
-        })
+    func timeViewControllerDidChangeTime() {
+        if streetViewSwitch.on {
+            getSignsForCurrentMapView()
+        } else {
+            if dao.locationsForPrimaryTimeAndDay == nil {
+                dao.getStreetCleaningLocationsForPrimaryTimeAndDay()
+            } else {
+                getNewHeatMapOverlays()
+            }
+        }
     }
+    
     //MARK: -----Search container controller delegate
     func searchContainer(toPerformDelegateAction delegateAction: SPNetworkingDelegateAction) {
         if delegateAction == .presentCoordinate {

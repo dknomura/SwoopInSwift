@@ -30,7 +30,8 @@ struct SPLocation {
     var snappedPoints: [SPSnappedPoint]?
     var signContentTag: String?
     
-    init(id:Int?, sideOfStreet:String?, fromCoordinate:CLLocationCoordinate2D?, toCoordinate:CLLocationCoordinate2D?, signs:[SPSign]?, signContentTag: String?) {
+    init(locationNumber: String?, id:Int?, sideOfStreet:String?, fromCoordinate:CLLocationCoordinate2D?, toCoordinate:CLLocationCoordinate2D?, signs:[SPSign]?, signContentTag: String?) {
+        self.locationNumber = locationNumber
         self.id = id
         self.sideOfStreet = sideOfStreet
         self.fromCoordinate = fromCoordinate
@@ -40,35 +41,40 @@ struct SPLocation {
     }
     
     init(id:Int?, fromCoordinate:CLLocationCoordinate2D?, signContentTag:String?) {
-        self.init(id:id, sideOfStreet:nil, fromCoordinate:fromCoordinate, toCoordinate:nil, signs:nil, signContentTag: signContentTag)
+        self.init(locationNumber: nil,id:id, sideOfStreet:nil, fromCoordinate:fromCoordinate, toCoordinate:nil, signs:nil, signContentTag: signContentTag)
+    }
+    init(locationNumber:String?, fromCoordinate:CLLocationCoordinate2D?, signContentTag:String?) {
+        self.init(locationNumber: locationNumber, id:nil, sideOfStreet:nil, fromCoordinate:fromCoordinate, toCoordinate:nil, signs:nil, signContentTag: signContentTag)
     }
     
     init(sqlResultSet results:FMResultSet, queryType: SPSQLLocationQueryTypes) {
-        let locID = Int(results.intForColumn(kSPIdSQL))
-        let signContentTag = results.stringForColumn(kSPSignContentTagSQL)
         let fromLat = results.doubleForColumn(kSPFromLatitudeSQL)
         let fromLong = results.doubleForColumn(kSPFromLongitudeSQL)
         let fromCoordinate = CLLocationCoordinate2D.init(latitude: fromLat, longitude: fromLong)
-        if queryType == .getLocationsForTimeAndDay {
-            while Int(results.intForColumn(kSPIdSQL)) == locID {
+        var loc = SPLocation.init(locationNumber: results.stringForColumn(kSPLocationNumberSQL), fromCoordinate: fromCoordinate, signContentTag: results.stringForColumn(kSPSignContentTagSQL))
+        if queryType == .getAllLocationsWithUniqueCleaningSign || queryType == .getLocationsForTimeAndDay {
+            while results.stringForColumn(kSPLocationNumberSQL) == loc.locationNumber {
                 results.next()
             }
-            self.init(id:locID, fromCoordinate: fromCoordinate, signContentTag: signContentTag)
-        } else {
+        }else if queryType == .getLocationsForCurrentMapView {
             let toLat = results.doubleForColumn(kSPToLatitudeSQL)
             let toLong = results.doubleForColumn(kSPToLongitudeSQL)
-            let toCoordinate = CLLocationCoordinate2D.init(latitude: toLat, longitude: toLong)
-            let sideOfStreet = results.stringForColumn(kSPSideOfStreetSQL)
-            var signs = [SPSign]()
-            while Int(results.intForColumn(kSPIdSQL)) == locID {
+            loc.toCoordinate = CLLocationCoordinate2D.init(latitude: toLat, longitude: toLong)
+            loc.sideOfStreet = results.stringForColumn(kSPSideOfStreetSQL)
+            loc.signs = [SPSign]()
+            while results.stringForColumn(kSPLocationNumberSQL) == loc.locationNumber {
+                results.next()
                 let signContent = results.stringForColumn(kSPSignContentSQL)
                 let positionInFeet = results.doubleForColumn(kSPPositionInFeetSQL)
                 let directionOfArrow = results.stringForColumn(kSPDirectionOfArrowSQL)
-                signs.append(SPSign.init(positionInFeet: positionInFeet, directionOfArrow: directionOfArrow, signContent: signContent))
-                results.next()
+                loc.signs!.append(SPSign.init(positionInFeet: positionInFeet, directionOfArrow: directionOfArrow, signContent: signContent))
             }
-            self.init(id:locID, sideOfStreet:sideOfStreet, fromCoordinate:fromCoordinate, toCoordinate:toCoordinate, signs:signs, signContentTag: signContentTag)
         }
+        self.init(location: loc)
+    }
+    
+    init(location: SPLocation) {
+        self.init(locationNumber:location.locationNumber, id: location.id, sideOfStreet:location.sideOfStreet, fromCoordinate:location.fromCoordinate, toCoordinate:location.toCoordinate, signs:location.signs, signContentTag: location.signContentTag)
     }
 }
 

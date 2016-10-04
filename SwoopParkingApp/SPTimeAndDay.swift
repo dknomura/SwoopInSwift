@@ -31,6 +31,7 @@ extension DNTime: DNComparableTimeUnit {
 }
 
 extension DNTimeAndDay: DNComparableTimeUnit {
+    //MARK: Comparable time unit protocol
     public init?(rawValue: Double) {
         let dayValue = Int(rawValue)
         let timeValue = (rawValue - Double(dayValue)) * 24
@@ -41,7 +42,6 @@ extension DNTimeAndDay: DNComparableTimeUnit {
             return nil
         }
     }
-    
     public var rawValue: Double {
         var day = Double(self.day.rawValue)
         var time = timeValue
@@ -56,6 +56,7 @@ extension DNTimeAndDay: DNComparableTimeUnit {
         return self.time.rawValue
     }
 
+    //MARK: Aligning timeAndDay with street cleaning parameters/restrictions
     func isValidStreetCleaningTime() -> Bool {
         switch (day.rawValue, time.hour, time.min) {
         case (_, _, let min) where min != 0 || min != 30: return false
@@ -66,7 +67,6 @@ extension DNTimeAndDay: DNComparableTimeUnit {
             return false
         }
     }
-    
     mutating func adjustTimeToValidStreetCleaningTime() -> Bool {
         let cleaningHour = earliestAndLatestCleaningTime()
         var didChangeTime = true
@@ -79,7 +79,6 @@ extension DNTimeAndDay: DNComparableTimeUnit {
         }
         return didChangeTime
     }
-        
     func earliestAndLatestCleaningTime() -> (earliest:DNTime, latest:DNTime) {
         var latestCleaningHour = 14.0
         var earliestCleaningHour = 3.0
@@ -96,7 +95,18 @@ extension DNTimeAndDay: DNComparableTimeUnit {
         }
         return (DNTime.init(rawValue: earliestCleaningHour)!, DNTime.init(rawValue: latestCleaningHour)!)
     }
+    func isInGapTime() -> Bool {
+        if (day == .Tues || day == .Fri) && (timeValue > 14 && timeValue < 19) {
+            return true
+        } else {
+            return false
+        }        
+    }
+    static var gapTime: String {
+        return "Tues and Fri from 2:30PM to 7:30PM"
+    }
     
+    // MARK: timeAndDay for SQL
     func stringTupleForSQLQuery() -> (time: String, day: String) {
         var returnTuple: (time: String, day:String)
         let timeAndDayFormat = DNTimeAndDayFormat(time: .format12Hour, day: .abbr)
@@ -106,6 +116,15 @@ extension DNTimeAndDay: DNComparableTimeUnit {
             returnTuple.time.removeRange(removeRange)
         }
         return returnTuple
+    }
+    func stringForSQLTagQuery() -> String {
+        return "\(stringTupleForSQLQuery().time)\(stringTupleForSQLQuery().day)"
+    }
+}
+
+extension DNDay {
+    static var allValues: [DNDay] {
+        return [Sun, Mon, Tues, Wed, Thurs, Fri, Sat]
     }
 }
 

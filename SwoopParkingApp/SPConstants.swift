@@ -17,8 +17,9 @@ let kSPSearchTableViewDataSourceDidChange = "SearchTableViewDataSourceDidChange"
 
 //MARK: SQL query types
 enum SPSQLLocationQueryTypes: String {
-    case getLocationsForTimeAndDay
+    case getAllLocationsWithUniqueCleaningSign
     case getLocationsForCurrentMapView
+    case getLocationsForTimeAndDay
 }
 
 // location SQL columns
@@ -34,6 +35,8 @@ let kSPFromLongitudeSQL = "from_longitude"
 let kSPToLatitudeSQL = "to_latitude"
 let kSPToLongitudeSQL = "to_longitude"
 let kSPSignContentTagSQL = "sign_content_tag"
+let kSPHasUniqueCleaningSignSQL = "has_unique_cleaning_sign"
+let kSPHasMeteredParkingSQL = "has_metered_parking"
 
 // sign SQL columns
 let kSPLocationIdSQL = "location_id"

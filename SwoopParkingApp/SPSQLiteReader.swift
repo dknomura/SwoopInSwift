@@ -18,32 +18,40 @@ enum SQLError: ErrorType {
 
 struct SPSQLiteReader {
     weak var delegate: SPSQLiteReaderDelegate?
-    //MARK: Injectable protocol
-    private var dao: SPDataAccessObject!
-    mutating func inject(dao: SPDataAccessObject) {
-        self.dao = dao
-    }
-    func assertDependencies() {
-        assert(dao != nil)
+    init(delegate: SPSQLiteReaderDelegate) {
+        self.delegate = delegate
     }
 
     var dbPath:String { return NSBundle.mainBundle().pathForResource("swoop-sqlite-no-FTS", ofType: "db")! }
     
     func querySignsAndLocations(swCoordinate swCoordinate:CLLocationCoordinate2D, neCoordinate: CLLocationCoordinate2D) {
-        let query = "SELECT l.id, side_of_street, sign_content_tag, from_latitude, from_longitude, to_latitude, to_longitude, sign_content, direction_of_arrow, position_in_feet FROM locations l JOIN signs s ON l.id = s.location_id WHERE (from_latitude BETWEEN ? AND ? AND from_longitude BETWEEN ? AND ?) OR (to_latitude BETWEEN ? AND ? AND to_longitude BETWEEN ? AND ?);"
+        let query = "SELECT l.id, location_number, side_of_street, sign_content_tag, from_latitude, from_longitude, to_latitude, to_longitude, sign_content, direction_of_arrow, position_in_feet FROM locations l JOIN signs s ON l.id = s.location_id WHERE (from_latitude BETWEEN ? AND ? AND from_longitude BETWEEN ? AND ?) OR (to_latitude BETWEEN ? AND ? AND to_longitude BETWEEN ? AND ?);"
         let values = [NSNumber(double:swCoordinate.latitude), NSNumber(double:neCoordinate.latitude), NSNumber(double:swCoordinate.longitude), NSNumber(double:neCoordinate.longitude), NSNumber(double:swCoordinate.latitude), NSNumber(double:neCoordinate.latitude), NSNumber(double:swCoordinate.longitude), NSNumber(double:neCoordinate.longitude)]
         callSQL(query: query, withValues: values, queryType: .getLocationsForCurrentMapView)
     }
     
-    func queryUpcomingStreetCleaningSignsAndLocations(shouldSearchRange shouldSearchRange:Bool) {
+    func queryStreetCleaningLocations(forTimeAndDay timeAndDay: DNTimeAndDay) {
+        var query = "SELECT location_number, sign_content_tag, from_latitude, from_longitude FROM locations WHERE sign_content_tag LIKE '%\(timeAndDay.stringForSQLTagQuery())%'"
+        if timeAndDay.time.hour == 14 {
+            let dayString = timeAndDay.day.stringValue(forFormat: DNTimeAndDayFormat.abbrDay()).uppercaseString
+            var notLike = ""
+            if timeAndDay.time.min == 0 {
+                notLike = "'12PM\(dayString)'"
+            }else if timeAndDay.time.hour == 14 && timeAndDay.time.min == 30 {
+                notLike = "'12:30PM\(dayString)'"
+            }
+            query += " AND sign_content_tag NOT LIKE \(notLike)"
+        }
+        callSQL(query: query, withValues: [], queryType: .getLocationsForTimeAndDay)
+    }
+    
+    func queryAllStreetCleaningLocations() {
         //Query with old signs and locations db
 //        let query = "SELECT l.id, sign_content, position_in_feet, from_latitude, from_longitude FROM locations l INNER JOIN signs s1 ON l.id = s1.location_id WHERE s1.position_in_feet || ' ' || s1.location_id IN ( SELECT s2.position_in_feet || ' ' || s2.location_id FROM signs s2 WHERE s2.sign_content MATCH 'sanitation tues* 12*')"
         
         //Query for new, locations_with_sign_content
-        let timeStringTuple = dao.primaryTimeAndDay.stringTupleForSQLQuery()
-        let signContentTag = timeStringTuple.time + timeStringTuple.day
-        let query = "SELECT id, sign_content_tag, from_latitude, from_longitude FROM locations WHERE sign_content_tag LIKE '%\(signContentTag)%'"
-        callSQL(query: query, withValues: [], queryType: .getLocationsForTimeAndDay)
+        let query = "SELECT location_number, sign_content_tag, from_latitude, from_longitude FROM locations WHERE has_unique_cleaning_sign = 1"
+        callSQL(query: query, withValues: [], queryType: .getAllLocationsWithUniqueCleaningSign)
     }
     
     private func callSQL(query query:String, withValues values:[AnyObject], queryType:SPSQLLocationQueryTypes) {
@@ -66,44 +74,11 @@ struct SPSQLiteReader {
                 print("Error with query: \(query)\n\(database.lastErrorMessage())")
                 return
             } else {
-                let date = NSDate()
-                var locationResults = [SPLocation]()
-                results.next()
-                while results.hasAnotherRow() {
-                    locationResults.append(SPLocation.init(sqlResultSet: results, queryType: queryType))
-                }
-                print("Time to parse \(queryType.rawValue), \(locationResults.count) locations: \(date.timeIntervalSinceNow)")
-                dispatch_async(dispatch_get_main_queue(), {
-                    self.delegate?.sqlQueryDidFinish(withResults:(queryType, locationResults))
-                })
+                self.delegate?.sqlQueryDidFinish(withResults:results, queryType: queryType)
             }
         }
     }
-    
-//    private func parseLocationsWithUniqueSignPositions(fromResults results: FMResultSet, queryType:SPSQLLocationQueryTypes) {
-//        assertDependencies()
-//        var parser = SPParser()
-//        parser.inject(dao)
-//        let locationResults = parser.parseSQLSignsAndLocationsFromTime(results)
-//        
-//        dispatch_async(dispatch_get_main_queue(), {
-//            self.delegate?.sqlQueryDidFinish(withResults:(queryType, locationResults))
-//        })
-//        
-//    }
-//    
-//    private func parseSignsAndLocations(fromResults results: FMResultSet, queryType:SPSQLLocationQueryTypes) {
-//        assertDependencies()
-//        var parser = SPParser()
-//        parser.inject(dao)
-//        let locationResults = parser.parseSQLSignsAndLocationsFromCoordinates(results, queryType: queryType)
-//        dispatch_async(dispatch_get_main_queue(), {
-//            self.delegate?.sqlQueryDidFinish(withResults:(queryType, locationResults))
-//        })
-//    }
-    
 }
-
 protocol SPSQLiteReaderDelegate: class {
-    func sqlQueryDidFinish(withResults results:(queryType: SPSQLLocationQueryTypes, locationResults: [SPLocation]))
+    func sqlQueryDidFinish(withResults results: FMResultSet, queryType: SPSQLLocationQueryTypes)
 }
