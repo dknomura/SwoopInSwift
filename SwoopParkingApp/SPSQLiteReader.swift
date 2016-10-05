@@ -33,7 +33,7 @@ struct SPSQLiteReader {
             let dayString = timeAndDay.day.stringValue(forFormat: DNTimeAndDayFormat.abbrDay()).uppercaseString
             var notLike = ""
             if timeAndDay.time.min == 0 {
-                notLike = "'12PM\(dayString)'"
+                notLike = "'%12PM\(dayString)%'"
             }else if timeAndDay.time.hour == 14 && timeAndDay.time.min == 30 {
                 notLike = "'%12:30PM\(dayString)%'"
             }

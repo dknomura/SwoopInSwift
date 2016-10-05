@@ -58,6 +58,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     
     var zoomToSwitchOverlays: Float { return streetZoom - 0.5 }
     var streetZoom: Float { return 16.0 }
+    var doubleTapZoom: Float { return mapView.camera.zoom < streetZoom - 1.5 ? streetZoom - 1.5 : streetZoom }
     var initialZoom: Float {
         return SPPolylineManager().initialZoom(forViewHeight: Double(mapView.frame.height))
     }
@@ -127,15 +128,14 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         doubleTouchTapZoomGesture.numberOfTapsRequired = 2
         doubleTouchTapZoomGesture.numberOfTouchesRequired = 2
         mapView.addGestureRecognizer(doubleTouchTapZoomGesture)
+//        let tripleTapZoomGesture = UITapGestureRecognizer.init(target: self, action: #selector(zoomToTripleTapOnMap(_:)))
+//        tripleTapZoomGesture.numberOfTapsRequired = 3
+//        mapView.addGestureRecognizer(tripleTapZoomGesture)
+        
+//        singleTapGesture.requireGestureRecognizerToFail(tripleTapZoomGesture)
+//        doubleTapZoomGesture.requireGestureRecognizerToFail(tripleTapZoomGesture)
 
-        
-        let tripleTapZoomGesture = UITapGestureRecognizer.init(target: self, action: #selector(zoomToTripleTapOnMap(_:)))
-        tripleTapZoomGesture.numberOfTapsRequired = 3
-        mapView.addGestureRecognizer(tripleTapZoomGesture)
-        
-        singleTapGesture.requireGestureRecognizerToFail(tripleTapZoomGesture)
         singleTapGesture.requireGestureRecognizerToFail(doubleTapZoomGesture)
-        doubleTapZoomGesture.requireGestureRecognizerToFail(tripleTapZoomGesture)
         
         let pinchGesture = UIPinchGestureRecognizer.init(target: self, action: #selector(pinchZoom(_:)))
         pinchGesture.cancelsTouchesInView = false
@@ -165,22 +165,12 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     }
     @objc private func zoomToDoubleTapOnMap(gesture:UITapGestureRecognizer) {
         let pointOnMap = gesture.locationInView(mapView)
-        let camera = GMSCameraPosition.cameraWithTarget(mapView.projection.coordinateForPoint(pointOnMap), zoom: mapView.camera.zoom + 1)
+        let camera = GMSCameraPosition.cameraWithTarget(mapView.projection.coordinateForPoint(pointOnMap), zoom: doubleTapZoom)
         isZoomingIn = true
-        zoomMap(toCamera: camera)
+        animateMap(toCameraPosition: camera, duration: 0.8)
     }
     @objc private func zoomOutDoubleTouchTapOnMap(gesture:UITapGestureRecognizer) {
         zoomMap(toZoom: mapView.camera.zoom - 1.5)
-    }
-    @objc private func zoomToTripleTapOnMap(gesture: UITapGestureRecognizer) {
-        if mapView.camera.zoom < streetZoom {
-            let pointOnMap = gesture.locationInView(mapView)
-            let camera = GMSCameraPosition.cameraWithTarget(mapView.projection.coordinateForPoint(pointOnMap), zoom: streetZoom)
-            isZoomingIn = true
-            animateMap(toCameraPosition: camera, duration: 0.8)
-        } else {
-            // Maybe add zoomout feature
-        }
     }
     var scale:CGFloat = 0
     @objc private func pinchZoom(gesture:UIPinchGestureRecognizer) {
@@ -188,7 +178,8 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         if gesture.state == .Changed {
             let zoomScale = ((gesture.scale - scale) / scale)
             let zoom = Float( zoomScale / 10 + 1) * mapView.camera.zoom
-            zoomMap(toZoom: zoom)
+            let coordinate = mapView.projection.coordinateForPoint(gesture.locationInView(mapView))
+            zoomMap(toCoordinate: coordinate, zoom: zoom)
         } else { return }
         isPinchZooming = true
     }
@@ -436,6 +427,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
                 getNewHeatMapOverlays()
             }
         }
+//        timeAndDayViewController.avoidGapTime()
     }
     
     //MARK: -----Search container controller delegate

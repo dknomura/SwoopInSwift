@@ -37,13 +37,27 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
     private func setupGestures() {
         let tapGesture = UITapGestureRecognizer.init(target: self, action: #selector(tapToMoveSliderThumb(_:)))
         timeSlider.addGestureRecognizer(tapGesture)
+        let panGesture = UIPanGestureRecognizer.init(target: self, action: #selector(panToMoveSlider(_:)))
+        timeSlider.addGestureRecognizer(panGesture)
+    }
+    @objc func panToMoveSlider(recognizer: UIPanGestureRecognizer) {
+        if recognizer.state == .Began || recognizer.state == .Changed || recognizer.state == .Ended {
+            adjustSlider(toRecognizer: recognizer)
+        }
+        if recognizer.state == .Ended {
+            self.delegate?.timeViewControllerDidChangeTime()
+        }
     }
     @objc func tapToMoveSliderThumb(recognizer: UIGestureRecognizer) {
+        adjustSlider(toRecognizer: recognizer)
+        delegate?.timeViewControllerDidChangeTime()
+    }
+    
+    func adjustSlider(toRecognizer recognizer: UIGestureRecognizer) {
         let pointOnSlider = recognizer.locationInView(timeSlider)
         let trackRect = timeSlider.trackRectForBounds(timeSlider.bounds)
         timeSlider.setValue(Float(Int(CGFloat(timeRange.count) * pointOnSlider.x / trackRect.width)), animated: true)
         adjustSliderToTimeChange()
-        delegate?.timeViewControllerDidChangeTime()
     }
     
     var thumbRect: CGRect {
@@ -90,6 +104,16 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
         delegate?.timeViewControllerDidChangeTime()
     }
     
+//    func avoidGapTime() {
+//        var sliderValue: Int? = Int(timeSlider.value)
+//        if timeRange[sliderValue!] > 14 && timeRange[sliderValue!] < 19 {
+//            sliderValue = timeRange[sliderValue!] > 16.5 ? timeRange.indexOf(19.0) : timeRange.indexOf(14.0)
+//            guard sliderValue != nil else { return }
+//            timeSlider.setValue(Float(sliderValue!), animated: true)
+//            adjustSliderToTimeChange()
+//            delegate?.timeViewControllerDidChangeTime()
+//        }
+//    }
     
     private func adjustSliderToTimeChange() {
         sliderThumbLabel.center = centerOfSliderThumb
@@ -99,7 +123,6 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
         }
         sliderThumbLabel.text = dao.primaryTimeAndDay.time.stringValue(forFormat: DNTimeAndDayFormat.format12Hour())
     }
-    
     func adjustTimeSliderToDay() {
         setTimeRangeForDay()
         dao.primaryTimeAndDay.adjustTimeToValidStreetCleaningTime()
@@ -111,7 +134,6 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
         dayLabel.text = dao.primaryTimeAndDay.day.stringValue(forFormat: timeAndDayFormat)
         setSliderLabels()
     }
-    
     var timeRange: [Float]!
     private func setTimeRangeForDay() {
         let maxMinTime = dao.primaryTimeAndDay.day.earliestAndLatestCleaningTime
