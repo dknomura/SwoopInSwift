@@ -30,6 +30,7 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
     var locationsForPrimaryTimeAndDay: [SPLocation]? {
         return allLocationsForDayValue[primaryTimeAndDay.rawValue]
     }
+    var locationCountForDayValue = [Double: Int]()
     //MARK: - Determine if current mapView is within NYC
     
     func isInNYC(mapView:GMSMapView) -> Bool {
@@ -45,15 +46,13 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
     }
     // MARK: - SQLite methods
     func getAllStreetCleaningLocations() {
-        sqlReader.delegate = self
         sqlReader.queryAllStreetCleaningLocations()
     }
     
     func getStreetCleaningLocationsForPrimaryTimeAndDay() {
-        sqlReader.delegate = self
         sqlReader.queryStreetCleaningLocations(forTimeAndDay: primaryTimeAndDay)
     }
-    
+        
     func getSigns(forCurrentMapView mapView:GMSMapView) {
         let visibleRegionBounds = GMSCoordinateBounds.init(region: mapView.projection.visibleRegion())
         sqlReader.delegate = self
@@ -61,16 +60,20 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
     }
     
     // MARK: - SQLite and Lambda delegate methods
-    func sqlQueryDidFinish(withResults results: FMResultSet, queryType: SPSQLLocationQueryTypes) {
-        if queryType == .getLocationsForCurrentMapView{
-            currentMapViewLocations = locations(fromResults: results, queryType: queryType)
-        } else if queryType == .getAllLocationsWithUniqueCleaningSign {
-            allLocationsForDayValue = locationsForDayValue(fromResults:results, queryType: queryType)
-        } else if queryType == .getLocationsForTimeAndDay {
-            allLocationsForDayValue[primaryTimeAndDay.rawValue] = locations(fromResults: results, queryType: queryType)
+    func sqlQueryDidFinish(withResponse response: SPSQLResponse) {
+        switch response.queryType {
+        case .getLocationsForCurrentMapView:
+            currentMapViewLocations = locations(fromResults: response.results!, queryType: response.queryType)
+        case .getAllLocationsWithUniqueCleaningSign:
+            allLocationsForDayValue = locationsForDayValue(fromResults:response.results!, queryType: response.queryType)
+        case .getLocationsForTimeAndDay:
+            allLocationsForDayValue[primaryTimeAndDay.rawValue] = locations(fromResults: response.results!, queryType: response.queryType)
+//        case .getLocationCountForTimeAndDay:
+//            print("Count for query \(response.query!): \(Int(response.results!.intForColumn("count(*)")))")
+//            locationCountForDayValue[response.timeAndDay!.rawValue] = Int(response.results!.intForColumn("count(*)"))
         }
         dispatch_async(dispatch_get_main_queue()) {
-            self.delegate?.dataAccessObject(self, didSetLocationsForQueryType: queryType)
+            self.delegate?.dataAccessObject(self, didSetLocationsForQueryType: response.queryType)
         }
     }
     private func locations(fromResults results: FMResultSet, queryType: SPSQLLocationQueryTypes) -> [SPLocation]{

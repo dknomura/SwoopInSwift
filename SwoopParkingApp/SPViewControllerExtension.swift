@@ -8,6 +8,8 @@
 
 import Foundation
 
+protocol SPViewControllerDelegate: class {}
+
 extension UIViewController {
     func hideKeyboardWhenTapAround() {
         view.userInteractionEnabled = true

@@ -10,10 +10,27 @@ import Foundation
 import CoreLocation
 import DNTimeAndDay
 
-enum SQLError: ErrorType {
+enum SPSQLError: ErrorType {
     case unableToOpenDB
     case noResults(ErrorMessage:String)
     case invalidQuery(query:String)
+}
+
+struct SPSQLResponse {
+    var results: FMResultSet?
+    var queryType: SPSQLLocationQueryTypes
+    var timeAndDay: DNTimeAndDay?
+    var coordinates: CLLocationCoordinate2D?
+    var error: String?
+    var query: String?
+}
+extension SPSQLResponse {
+    init(queryType: SPSQLLocationQueryTypes) {
+        self.init(results: nil, queryType: queryType, timeAndDay: nil, coordinates: nil, error: nil, query: nil)
+    }
+    init(sqlResponse: SPSQLResponse) {
+        self.init(results: sqlResponse.results, queryType: sqlResponse.queryType, timeAndDay: sqlResponse.timeAndDay, coordinates: sqlResponse.coordinates, error: sqlResponse.error, query:nil)
+    }
 }
 
 struct SPSQLiteReader {
@@ -24,11 +41,23 @@ struct SPSQLiteReader {
     func querySignsAndLocations(swCoordinate swCoordinate:CLLocationCoordinate2D, neCoordinate: CLLocationCoordinate2D) {
         let query = "SELECT l.id, location_number, side_of_street, sign_content_tag, from_latitude, from_longitude, to_latitude, to_longitude, sign_content, direction_of_arrow, position_in_feet FROM locations l JOIN signs s ON l.id = s.location_id WHERE (from_latitude BETWEEN ? AND ? AND from_longitude BETWEEN ? AND ?) OR (to_latitude BETWEEN ? AND ? AND to_longitude BETWEEN ? AND ?);"
         let values = [NSNumber(double:swCoordinate.latitude), NSNumber(double:neCoordinate.latitude), NSNumber(double:swCoordinate.longitude), NSNumber(double:neCoordinate.longitude), NSNumber(double:swCoordinate.latitude), NSNumber(double:neCoordinate.latitude), NSNumber(double:swCoordinate.longitude), NSNumber(double:neCoordinate.longitude)]
-        callSQL(query: query, withValues: values, queryType: .getLocationsForCurrentMapView)
+        callSQL(query: query, withValues: values, responseObject: SPSQLResponse.init(queryType: .getLocationsForCurrentMapView))
     }
     
     func queryStreetCleaningLocations(forTimeAndDay timeAndDay: DNTimeAndDay) {
         var query = "SELECT location_number, sign_content_tag, from_latitude, from_longitude FROM locations WHERE sign_content_tag LIKE '%\(timeAndDay.stringForSQLTagQuery())%'"
+        adjust(&query, forTimeAndDay: timeAndDay)
+        callSQL(query: query, withValues: [], responseObject: SPSQLResponse.init(queryType: .getLocationsForTimeAndDay))
+    }
+    
+//    func queryLocationCount(forTimeAndDay timeAndDay: DNTimeAndDay) {
+//        var query = "SELECT COUNT(*) FROM locations WHERE sign_content_tag LIKE '%\(timeAndDay.stringForSQLTagQuery())%'"
+//        adjust(&query, forTimeAndDay: timeAndDay)
+//        var response = SPSQLResponse.init(queryType: .getLocationCountForTimeAndDay)
+//        response.timeAndDay = timeAndDay
+//        callSQL(query: query, withValues: [], responseObject: response)
+//    }
+    private func adjust(inout query: String, forTimeAndDay timeAndDay: DNTimeAndDay) {
         if timeAndDay.time.hour == 14 {
             let dayString = timeAndDay.day.stringValue(forFormat: DNTimeAndDayFormat.abbrDay()).uppercaseString
             var notLike = ""
@@ -39,7 +68,6 @@ struct SPSQLiteReader {
             }
             query += " AND sign_content_tag NOT LIKE \(notLike)"
         }
-        callSQL(query: query, withValues: [], queryType: .getLocationsForTimeAndDay)
     }
     
     func queryAllStreetCleaningLocations() {
@@ -48,11 +76,13 @@ struct SPSQLiteReader {
         
         //Query for new, locations_with_sign_content
         let query = "SELECT location_number, sign_content_tag, from_latitude, from_longitude FROM locations WHERE has_unique_cleaning_sign = 1"
-        callSQL(query: query, withValues: [], queryType: .getAllLocationsWithUniqueCleaningSign)
+        callSQL(query: query, withValues: [], responseObject: SPSQLResponse.init(queryType: .getAllLocationsWithUniqueCleaningSign))
     }
     
-    private func callSQL(query query:String, withValues values:[AnyObject], queryType:SPSQLLocationQueryTypes) {
+    private func callSQL(query query:String, withValues values:[AnyObject], responseObject:SPSQLResponse) {
         dispatch_async(dispatch_get_global_queue(QOS_CLASS_UTILITY, 0)) {
+            var response = responseObject
+            response.query = query
             let database = FMDatabase.init(path: self.databasePath)
             if !database.open() {
                 print("Unable to open database")
@@ -67,14 +97,16 @@ struct SPSQLiteReader {
             }
             let results = database.executeQuery(query, withArgumentsInArray: values)
             if results == nil {
+                response.error = database.lastErrorMessage()
                 print("Error with query: \(query)\n\(database.lastErrorMessage())")
                 return
             } else {
-                self.delegate?.sqlQueryDidFinish(withResults:results, queryType: queryType)
+                response.results = results
+                self.delegate?.sqlQueryDidFinish(withResponse: response)
             }
         }
     }
 }
 protocol SPSQLiteReaderDelegate: class {
-    func sqlQueryDidFinish(withResults results: FMResultSet, queryType: SPSQLLocationQueryTypes)
+    func sqlQueryDidFinish(withResponse response: SPSQLResponse)
 }

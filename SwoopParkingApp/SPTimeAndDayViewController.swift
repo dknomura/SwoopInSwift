@@ -13,7 +13,9 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
     var timeAndDayFormat = DNTimeAndDayFormat.init(time: DNTimeFormat.format12Hour, day: DNDayFormat.abbr)
     @IBOutlet weak var timeAndDayContainer: UIView!
 //    @IBOutlet weak var primaryDayTextView: UITextView!
+    @IBOutlet weak var dayView: UIView!
     
+    @IBOutlet weak var timeSliderGestureView: UIView!
     @IBOutlet weak var dayLabel: UILabel!
     @IBOutlet weak var heightConstraintOfBorderView: NSLayoutConstraint!
     var borderViewHeight: CGFloat = 8.0
@@ -22,6 +24,7 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
     @IBOutlet weak var minTimeLabel: UILabel!
     @IBOutlet weak var maxTimeLabel: UILabel!
     var sliderThumbLabel: UILabel!
+    var originalThumbWidth: Float!
     
     //MARK: - Setup Methods
     override func viewDidLoad() {
@@ -34,12 +37,42 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
         setupGestures()
     }
     
+    
+    //MARK: Gestures
     private func setupGestures() {
         let tapGesture = UITapGestureRecognizer.init(target: self, action: #selector(tapToMoveSliderThumb(_:)))
-        timeSlider.addGestureRecognizer(tapGesture)
-        let panGesture = UIPanGestureRecognizer.init(target: self, action: #selector(panToMoveSlider(_:)))
-        timeSlider.addGestureRecognizer(panGesture)
+        timeSliderGestureView.addGestureRecognizer(tapGesture)
+        let sliderPanGesture = UIPanGestureRecognizer.init(target: self, action: #selector(panToMoveSlider(_:)))
+        timeSliderGestureView.addGestureRecognizer(sliderPanGesture)
+        let dayPanGesture = UIPanGestureRecognizer.init(target: self, action: #selector(panToChangeDay(_:)))
+        dayView.addGestureRecognizer(dayPanGesture)
     }
+    
+    var originalPanPointY:CGFloat = 0
+    @objc func panToChangeDay(recognizer: UIPanGestureRecognizer) {
+        switch recognizer.state {
+        case .Began:
+            originalPanPointY = recognizer.locationInView(view).y
+        case .Changed, .Ended:
+            let change = Int(recognizer.locationInView(view).y - originalPanPointY)
+            if recognizer.state == .Changed {
+                if change % 8 != 0 { return }
+                var tempDay = DNDay.init(stringValue: dayLabel.text!)
+                tempDay?.increase(by: change)
+                dayLabel.text = tempDay?.stringValue(forFormat: DNTimeAndDayFormat.abbrDay())
+            } else {
+                dao.primaryTimeAndDay.day.increase(by: change)
+                let tempTime = dao.primaryTimeAndDay
+                adjustTimeSliderToDay()
+                if tempTime != dao.primaryTimeAndDay {
+                    delegate?.timeViewControllerDidChangeTime()
+                }
+            }
+        default:
+            break
+        }
+    }
+    
     @objc func panToMoveSlider(recognizer: UIPanGestureRecognizer) {
         if recognizer.state == .Began || recognizer.state == .Changed || recognizer.state == .Ended {
             adjustSlider(toRecognizer: recognizer)
@@ -60,6 +93,7 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
         adjustSliderToTimeChange()
     }
     
+    
     var thumbRect: CGRect {
         let trackRect = timeSlider.trackRectForBounds(timeSlider.bounds)
         return timeSlider.thumbRectForBounds(timeSlider.bounds, trackRect: trackRect, value: timeSlider.value)
@@ -74,6 +108,7 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
         sliderThumbLabel!.textAlignment = .Center
         sliderThumbLabel.font = UIFont.systemFontOfSize(12)
         view.addSubview(sliderThumbLabel)
+        originalThumbWidth = Float(thumbRect.size.width)
         timeSlider.continuous = true
         timeSlider.addTarget(self, action: #selector(sliderDidEndSliding(_:)), forControlEvents: UIControlEvents.TouchUpOutside)
         timeSlider.addTarget(self, action: #selector(sliderDidEndSliding(_:)), forControlEvents: UIControlEvents.TouchUpInside)
@@ -99,27 +134,19 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
     @IBAction func changeTime(slider: UISlider) {
         adjustSliderToTimeChange()
     }
-    
     @objc func sliderDidEndSliding(notification: NSNotification) {
         delegate?.timeViewControllerDidChangeTime()
     }
-    
-//    func avoidGapTime() {
-//        var sliderValue: Int? = Int(timeSlider.value)
-//        if timeRange[sliderValue!] > 14 && timeRange[sliderValue!] < 19 {
-//            sliderValue = timeRange[sliderValue!] > 16.5 ? timeRange.indexOf(19.0) : timeRange.indexOf(14.0)
-//            guard sliderValue != nil else { return }
-//            timeSlider.setValue(Float(sliderValue!), animated: true)
-//            adjustSliderToTimeChange()
-//            delegate?.timeViewControllerDidChangeTime()
-//        }
-//    }
     
     private func adjustSliderToTimeChange() {
         sliderThumbLabel.center = centerOfSliderThumb
         let sliderValue = Int(timeSlider.value)
         if let newTime = DNTime.init(rawValue: Double(timeRange[sliderValue])) {
+            if newTime == dao.primaryTimeAndDay.time { return }
             dao.primaryTimeAndDay.time = newTime
+        }
+        if dao.locationsForPrimaryTimeAndDay != nil {
+            setNewImage()
         }
         sliderThumbLabel.text = dao.primaryTimeAndDay.time.stringValue(forFormat: DNTimeAndDayFormat.format12Hour())
     }
@@ -134,6 +161,49 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
         dayLabel.text = dao.primaryTimeAndDay.day.stringValue(forFormat: timeAndDayFormat)
         setSliderLabels()
     }
+    
+    private func setSliderLabels() {
+        let minMaxTime = dao.primaryTimeAndDay.day.earliestAndLatestCleaningTime
+        minTimeLabel.text = minMaxTime.earliest.stringValue(forFormat: DNTimeAndDayFormat.format12Hour())
+        maxTimeLabel.text = minMaxTime.latest.stringValue(forFormat: DNTimeAndDayFormat.format12Hour())
+        sliderThumbLabel.text = dao.primaryTimeAndDay.time.stringValue(forFormat: DNTimeAndDayFormat.format12Hour())
+    }
+    //MARK: Image processing
+    let thumbImage: UIImage! = UIImage(named:"smart-car copy")
+    let noParkingImage: UIImage! = UIImage(named:"red-p-no-parking")
+    func setNewImage() {
+        guard let locationsCount = (self.dao.locationsForPrimaryTimeAndDay?.count) else {
+            timeSlider.setThumbImage(nil, forState: .Normal)
+            return
+        }
+        let newImage: UIImage
+        if locationsCount == 0 {
+            newImage = noParkingImage
+        } else {
+            let thumbSizeSide: CGFloat
+            if locationsCount < 200 {
+                thumbSizeSide = 10
+            } else {
+                thumbSizeSide = CGFloat((self.originalThumbWidth - 20) * Float(locationsCount) / 3600 + 20)
+            }
+            newImage = self.imageWith(image: self.thumbImage, scaledToSize: CGSizeMake(thumbSizeSide, thumbSizeSide))
+        }
+        self.timeSlider.setThumbImage(newImage, forState: .Normal)
+    }
+    
+    private func imageWith(image image: UIImage, scaledToSize size:CGSize) -> UIImage {
+        UIGraphicsBeginImageContextWithOptions(size, false, 0.0)
+        image.drawInRect(CGRectMake(0, 0, size.width, size.width))
+        let returnImage: UIImage
+        if let newImage = UIGraphicsGetImageFromCurrentImageContext() {
+            returnImage = newImage
+        } else {
+            returnImage = thumbImage
+        }
+        UIGraphicsEndImageContext()
+        return returnImage
+    }
+    
     var timeRange: [Float]!
     private func setTimeRangeForDay() {
         let maxMinTime = dao.primaryTimeAndDay.day.earliestAndLatestCleaningTime
@@ -145,14 +215,6 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
         }
         timeRange = returnRange
     }
-    
-    private func setSliderLabels() {
-        let minMaxTime = dao.primaryTimeAndDay.day.earliestAndLatestCleaningTime
-        minTimeLabel.text = minMaxTime.earliest.stringValue(forFormat: DNTimeAndDayFormat.format12Hour())
-        maxTimeLabel.text = minMaxTime.latest.stringValue(forFormat: DNTimeAndDayFormat.format12Hour())
-        sliderThumbLabel.text = dao.primaryTimeAndDay.time.stringValue(forFormat: DNTimeAndDayFormat.format12Hour())
-    }
-
     //MARK: - TextView delegate
     func textViewDidBeginEditing(textView: UITextView) {
         dispatch_async(dispatch_get_main_queue()) {

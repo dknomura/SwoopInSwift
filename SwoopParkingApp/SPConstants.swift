@@ -15,11 +15,19 @@ let kSPGoogleMapsKey = "AIzaSyCGKTmya_bbd5_S9hJOzO9eKf4pDckrffQ"
 //MARK: NotificationCenter names
 let kSPSearchTableViewDataSourceDidChange = "SearchTableViewDataSourceDidChange"
 
+enum SPCities: String {
+    case NYC
+    case Chicago
+    case Denver
+    case LA
+}
+
 //MARK: SQL query types
 enum SPSQLLocationQueryTypes: String {
     case getAllLocationsWithUniqueCleaningSign
     case getLocationsForCurrentMapView
     case getLocationsForTimeAndDay
+//    case getLocationCountForTimeAndDay
 }
 
 // location SQL columns

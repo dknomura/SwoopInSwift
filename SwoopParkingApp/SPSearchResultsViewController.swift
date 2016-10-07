@@ -37,6 +37,7 @@ class SPSearchResultsViewController: UIViewController, UITableViewDelegate, UITa
         assertDependencies()
     }
     
+    
     //MARK: - Search bar
     func searchBarTextDidBeginEditing(searchBar: UISearchBar) {
 //        if searchBar.text?.characters.count == 0 {

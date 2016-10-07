@@ -43,12 +43,12 @@ extension DNTimeAndDay: DNComparableTimeUnit {
         }
     }
     public var rawValue: Double {
-        var day = Double(self.day.rawValue)
+        let day = Double(self.day.rawValue)
         var time = timeValue
         time /= 24
-        if time > 0 && day == 7 {
-            day = 0
-        }
+//        if time > 0 && day == 7 {
+//            day = 0
+//        }
         return day + time
     }
     
@@ -79,16 +79,7 @@ extension DNTimeAndDay: DNComparableTimeUnit {
         }
         return didChangeTime
     }
-    func isInGapTime() -> Bool {
-        if (day == .Tues || day == .Fri) && (timeValue > 14 && timeValue < 19) {
-            return true
-        } else {
-            return false
-        }        
-    }
-    static var gapTime: String {
-        return "Tues and Fri from 2:30PM to 7:30PM"
-    }
+    
     
     // MARK: timeAndDay for SQL
     func stringTupleForSQLQuery() -> (time: String, day: String) {
@@ -103,6 +94,19 @@ extension DNTimeAndDay: DNComparableTimeUnit {
     }
     func stringForSQLTagQuery() -> String {
         return "\(stringTupleForSQLQuery().time)\(stringTupleForSQLQuery().day)"
+    }
+    
+    static func allStreetLocationTimeAndDays(forCity:SPCities) -> [DNTimeAndDay] {
+        var returnTimeAndDays = [DNTimeAndDay]()
+        for day in DNDay.allValues {
+            let earliestLatestTime = day.earliestAndLatestCleaningTime
+            var earliestTime = earliestLatestTime.earliest
+            while earliestTime != earliestLatestTime.latest {
+                returnTimeAndDays.append(DNTimeAndDay.init(day: day, time: earliestTime))
+                earliestTime.increase(by: 30)
+            }
+        }
+        return returnTimeAndDays
     }
 }
 
@@ -126,7 +130,6 @@ extension DNDay {
         }
         return (DNTime.init(rawValue: earliestCleaningHour)!, DNTime.init(rawValue: latestCleaningHour)!)
     }
-
 }
 
 extension DNTimeAndDayFormat {

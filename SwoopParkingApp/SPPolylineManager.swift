@@ -10,8 +10,12 @@ import Foundation
 import GoogleMaps
 import CoreLocation
 
+protocol SPPolylineManagerDelegate {
+    func polylineManagerDidSet(tappablePolyline polyline: GMSPolyline, withSign: SPSign)
+}
+
 struct SPPolylineManager: SPInjectable {
-    
+    var delegate: SPPolylineManagerDelegate?
     private var dao: SPDataAccessObject!
     mutating func inject(dao: SPDataAccessObject) {
         self.dao = dao
@@ -31,83 +35,66 @@ struct SPPolylineManager: SPInjectable {
     func polylines(forCurrentLocations currentLocations: [SPLocation], zoom: Double) -> [GMSPolyline] {
         var returnArray = [GMSPolyline]()
         //Meters to separate the two sides of the road
-        let displacementDistanceInMeters = metersToDisplace(byPoints: 1.8, zoom: zoom)
+        let metersToDisplacePolyline = metersToDisplace(byPoints: 1.8, zoom: zoom)
+
         for location in currentLocations {
-            guard let fromCoordinate = location.fromCoordinate,
-                let toCoordinate = location.toCoordinate else {
-                    print("No coordinates for location \(location.locationNumber)")
-                    continue
-            }
-            let distanceInMetersCL = distanceInMetersBetween(coordinate1: fromCoordinate, coordinate2: toCoordinate)
-            guard let signs = location.signs else {
-                print("No signs for location \(location.locationNumber)")
+            guard let fromCoordinate = location.fromCoordinate, toCoordinate = location.toCoordinate, sideOfStreet = location.sideOfStreet, signs = location.signs else { continue }
+            let path = gmsPath(forCoordinate1: fromCoordinate, coordinate2: toCoordinate)
+            guard let deltaCoordinates = try? latLngDifference(forPath: path, xMeters: metersToDisplacePolyline, sideOfStreet: sideOfStreet) else {
                 continue
             }
             var previousCoordinate = fromCoordinate
-            
-            for i in 0 ..< signs.count {
-                let sign = signs[i]
-                
-                //Most location's first sign is "Curb line" that is at position 0 ft
-                if sign.positionInFeet == 0 {
-                    continue
-                }
-                
-                let path = GMSMutablePath()
-                
-                guard let positionInMeters = distanceInMeters(fromFeet: sign.positionInFeet) else {
-                    print("Not enough sign information to draw polyline for sign#\(i) at location #\(location.locationNumber)")
-                    continue
-                }
-                
-                let metersDownPath: Double
-                
-                // The position in feet from the database is a few meters off, so the last sign.positionInFeet will be substituted with the calculated street distance
-                if i == signs.count - 1 {
-                    metersDownPath = distanceInMetersCL
+            var i = 0
+            repeat {
+                let pathCoordinate1 = previousCoordinate
+                var pathCoordinate2: CLLocationCoordinate2D
+                let sign: SPSign?
+                if signs.count != 0 {
+                    sign = signs[i]
+                    guard sign!.positionInFeet != nil else { continue }
+                    let positionInMeters = meters(fromFeet: sign!.positionInFeet!)
+                    // The position in feet from the database is a few meters off, so the last sign.positionInFeet will be substituted with the calculated street distance
+                    let metersDownStreet =  i != signs.count - 1 ? positionInMeters : distanceInMetersBetween(coordinate1: fromCoordinate, coordinate2: toCoordinate)
+                    pathCoordinate2 = coordinateOnLine(fromCoordinate, toCoordinate: toCoordinate, positionInMeters: metersDownStreet)
+                    previousCoordinate = pathCoordinate2
                 } else {
-                    metersDownPath = positionInMeters
+                    sign = nil
+                    pathCoordinate2 = toCoordinate
                 }
-                let pathCoordinate1 = coordinateOnLine(fromCoordinate, toCoordinate: toCoordinate, positionInMeters: metersDownPath)
-                path.addCoordinate(pathCoordinate1)
-                let pathCoordinate2 = previousCoordinate
-                
-                previousCoordinate = pathCoordinate1
-                
-                path.addCoordinate(pathCoordinate2)
-                var polyline = GMSPolyline(path: path)
-                do {
-                    if let sideOfStreet = location.sideOfStreet {
-                        polyline = try displacedPolyline(originalPolyline: polyline, xMeters: displacementDistanceInMeters, sideOfStreet: sideOfStreet)
-                    }
-                } catch PolylineError.notEnoughPoints {
-                    print("Not enough points on path to make a line")
-                    continue
-                } catch PolylineError.unableToRotate {
-                    //                    print("Unable to rotate geographical bearing for sign \(sign.signIndex) at location \(location.locationNumber). \nLocation streets \(location.street) from: \(location.fromCrossStreet) to: \(location.toCrossStreet). \nLocation Coordinates from: \(location.fromCoordinate) to:\(location.toCoordinate). \nBearing is not between pi and -pi")
-                    continue
-                } catch PolylineError.noPath(let polyline) {
-                    print("No path for polyline: \(polyline)")
-                    continue
-                } catch PolylineError.invalidSideOfStreet {
-                    print("Invalid side of street, must be N/S/E/W or North/South/East/West, case insensitive")
-                    continue
-                } catch {
-                    print("Unknown polyline displacement error.. Sorry!")
-                }
-                polyline.strokeColor = polylineColor(forSign: sign)
-                polyline.strokeWidth = 2.5
-                
-                returnArray.append(polyline)
-            }
+                let path = gmsPath(forCoordinate1: pathCoordinate1, coordinate2: pathCoordinate2)
+                returnArray.append(setupPolyline(path, deltaCoordinates: deltaCoordinates!, forSign: sign))
+                i += 1
+            } while i < signs.count
         }
-        
-        //        var total = 0.0
-        //        for percent in percentChanges {
-        //            total += percent
-        //        }
-        //        print("Avereage percent change: \(total / Double(percentChanges.count))")
         return returnArray
+    }
+    
+    // MARK: - Polyline Color
+    
+    private func setupPolyline(path: GMSPath, deltaCoordinates:CLLocationCoordinate2D, forSign sign: SPSign?) -> GMSPolyline {
+        let displacedPath = path.pathOffsetByLatitude(deltaCoordinates.latitude, longitude: deltaCoordinates.longitude)
+        let polyline = GMSPolyline(path: displacedPath)
+        if sign == nil {
+            polyline.strokeColor = UIColor.redColor()
+        } else {
+            assertDependencies()
+            let timeAndDayStringTuple = dao.primaryTimeAndDay.stringTupleForSQLQuery()
+            if sign!.signContent?.rangeOfString(timeAndDayStringTuple.day) != nil && sign?.signContent?.rangeOfString(timeAndDayStringTuple.time) != nil {
+                polyline.strokeColor = UIColor.greenColor()
+                polyline.tappable = true
+                
+            }
+            polyline.strokeColor = UIColor.redColor()
+        }
+        polyline.strokeWidth = 2.5
+        return polyline
+    }
+    
+    private func gmsPath(forCoordinate1 coordinate1: CLLocationCoordinate2D, coordinate2: CLLocationCoordinate2D) -> GMSMutablePath {
+        let path = GMSMutablePath()
+        path.addCoordinate(coordinate1)
+        path.addCoordinate(coordinate2)
+        return path
     }
     
     // MARK: - Methods to find coordinates on path
@@ -123,15 +110,11 @@ struct SPPolylineManager: SPInjectable {
         return CLLocationCoordinate2DMake(latitude, longitude)
     }
     
-    private func distanceInMeters(fromFeet feet: Double?) -> Double? {
-        if feet != nil {
-            return feet! / 3.28084
-        } else {
-            return nil
-        }
+    private func meters(fromFeet feet: Double) -> Double {
+        return feet / 3.28084
     }
     
-    private func distancesInFeet(fromMeters meters: Double) -> Double {
+    private func feet(fromMeters meters: Double) -> Double {
         return meters * 3.28084
     }
     
@@ -178,18 +161,15 @@ struct SPPolylineManager: SPInjectable {
             throw PolylineError.noPath(forPolyline: polyline)
         }
         
-        if let offset = try displacementCoordinate(fromPath: path, xMeters: meters, sideOfStreet:sideOfStreet) {
+        if let offset = try latLngDifference(forPath: path, xMeters: meters, sideOfStreet:sideOfStreet) {
             path = path.pathOffsetByLatitude(offset.latitude, longitude: offset.longitude)
         }
         
         let polyline = GMSPolyline(path: path)
-        polyline.strokeColor = UIColor.greenColor()
-        polyline.strokeWidth = 2
-        
         return polyline
     }
     
-    private func displacementCoordinate(fromPath path:GMSPath, xMeters meters:Double, sideOfStreet:String) throws -> CLLocationCoordinate2D? {
+    private func latLngDifference(forPath path:GMSPath, xMeters meters:Double, sideOfStreet:String) throws -> CLLocationCoordinate2D? {
         // http://www.movable-type.co.uk/scripts/latlong.html
         // first find the bearing
         // θ = atan2( sin Δλ ⋅ cos φ2 , cos φ1 ⋅ sin φ2 − sin φ1 ⋅ cos φ2 ⋅ cos Δλ )
@@ -320,29 +300,31 @@ struct SPPolylineManager: SPInjectable {
         let meters = points * worldMeters / worldPoints
         return meters
     }
-    func initialZoom(forViewHeight viewHeight: Double) -> Float {
+}
+
+extension GMSMapView {
+    func initialStreetCleaningZoom(forCity city: SPCities) -> Float {
         // Using the logic above to find zoom, local points / world width point = local meters / world width meters
         // world width points = local points * world width meters / local meters
         // 2 ^ N = world width points / 256
         // N = log2(world width points / 256)
-        // local points = map width, local meters = 27425.3366774176
-        let localPoints = viewHeight
-        let localMeters = 36000.0
+        // local points = map width 
+        // Local Meters: for NYC = 27425.3366774176
+        
+        let localMeters: Double
+
+        switch city {
+        case .NYC:
+            localMeters = 40000
+        case .Chicago, .Denver, .LA :
+            localMeters = 40000
+        }
+        let localPoints = Double(self.bounds.width)
         let worldMeters = 40075000.0
+        
         let worldPoints = localPoints * worldMeters / localMeters
         let zoom = log2(worldPoints / 256.0)
         return Float(zoom)
     }
-    
-    
-    // MARK: - Polyline Color
-    
-    private func polylineColor(forSign sign:SPSign) -> UIColor {
-        assertDependencies()
-        dao.primaryTimeAndDay.stringForSQLTagQuery()
-        if sign.signContent?.rangeOfString(dao.primaryTimeAndDay.stringForSQLTagQuery()) != nil {
-            return UIColor.greenColor()
-        }
-        return UIColor.redColor()
-    }
 }
+

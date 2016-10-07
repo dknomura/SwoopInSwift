@@ -24,9 +24,10 @@
 		9C14BA7D1DA2A4C400441E84 /* Nimble.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C14BA7C1DA2A4C400441E84 /* Nimble.framework */; };
 		9C14BA7F1DA2A4C700441E84 /* Quick.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C14BA7E1DA2A4C700441E84 /* Quick.framework */; };
 		9C1A86C51DA4577400DAD930 /* swoop-sqlite-no-FTS.db in Resources */ = {isa = PBXBuildFile; fileRef = 9C1A86C41DA4577400DAD930 /* swoop-sqlite-no-FTS.db */; };
+		9C1A86C71DA5517E00DAD930 /* SPMainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C1A86C61DA5517E00DAD930 /* SPMainViewController.swift */; };
+		9C1A86C81DA586C900DAD930 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9C1A86CA1DA586C900DAD930 /* Main.storyboard */; };
 		9C215D9C1D6652D9006C1E3E /* SPTimeAndDayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C215D9B1D6652D9006C1E3E /* SPTimeAndDayViewController.swift */; };
 		9C42DAB31D5A589E004ECA97 /* SPDataAccessObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C42DAB21D5A589E004ECA97 /* SPDataAccessObject.swift */; };
-		9C4DCF4F1D6D39280060EEBF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9C4DCF4E1D6D39280060EEBF /* Main.storyboard */; };
 		9C4DCF531D6E01F30060EEBF /* SPSignAndLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C4DCF521D6E01F30060EEBF /* SPSignAndLocation.swift */; };
 		9C5279C81CEB62B900AF88FF /* SPQuickGCD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C5279C71CEB62B900AF88FF /* SPQuickGCD.swift */; };
 		9C617EF51D51BF5100FFA51A /* SPTileLayerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C617EF41D51BF5100FFA51A /* SPTileLayerManager.swift */; };
@@ -126,9 +127,10 @@
 		9C14BA7C1DA2A4C400441E84 /* Nimble.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Nimble.framework; path = "Pods/../build/Debug-iphoneos/Nimble/Nimble.framework"; sourceTree = "<group>"; };
 		9C14BA7E1DA2A4C700441E84 /* Quick.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quick.framework; path = "Pods/../build/Debug-iphoneos/Quick/Quick.framework"; sourceTree = "<group>"; };
 		9C1A86C41DA4577400DAD930 /* swoop-sqlite-no-FTS.db */ = {isa = PBXFileReference; lastKnownFileType = file; path = "swoop-sqlite-no-FTS.db"; sourceTree = "<group>"; };
+		9C1A86C61DA5517E00DAD930 /* SPMainViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPMainViewController.swift; sourceTree = "<group>"; };
+		9C1A86CB1DA5872000DAD930 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		9C215D9B1D6652D9006C1E3E /* SPTimeAndDayViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPTimeAndDayViewController.swift; sourceTree = "<group>"; };
 		9C42DAB21D5A589E004ECA97 /* SPDataAccessObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPDataAccessObject.swift; sourceTree = "<group>"; };
-		9C4DCF4E1D6D39280060EEBF /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		9C4DCF521D6E01F30060EEBF /* SPSignAndLocation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPSignAndLocation.swift; sourceTree = "<group>"; };
 		9C5279C71CEB62B900AF88FF /* SPQuickGCD.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPQuickGCD.swift; sourceTree = "<group>"; };
 		9C617EF41D51BF5100FFA51A /* SPTileLayerManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPTileLayerManager.swift; sourceTree = "<group>"; };
@@ -299,10 +301,11 @@
 		9C42DAB41D5A6A37004ECA97 /* Controller */ = {
 			isa = PBXGroup;
 			children = (
+				9C1A86C61DA5517E00DAD930 /* SPMainViewController.swift */,
 				9CFEE37B1CDA6D7900CE5D53 /* SPMapViewController.swift */,
 				9C215D9B1D6652D9006C1E3E /* SPTimeAndDayViewController.swift */,
-				9C96EE8F1D625EC4007C4EC8 /* SPViewControllerExtension.swift */,
 				9C61F0B41D7608CC00BA524C /* SPSearchResultsViewController.swift */,
+				9C96EE8F1D625EC4007C4EC8 /* SPViewControllerExtension.swift */,
 			);
 			name = Controller;
 			sourceTree = "<group>";
@@ -410,7 +413,7 @@
 				9CF750811D354F4F00000823 /* Utils */,
 				9C04E2731D93FC6A0012EAE0 /* SPProtocols.swift */,
 				9CFEE3801CDA6D7A00CE5D53 /* Assets.xcassets */,
-				9C4DCF4E1D6D39280060EEBF /* Main.storyboard */,
+				9C1A86CA1DA586C900DAD930 /* Main.storyboard */,
 				9CFEE3821CDA6D7A00CE5D53 /* LaunchScreen.storyboard */,
 				9CFEE3851CDA6D7A00CE5D53 /* Info.plist */,
 				9CBE25BC1D552BFA00B5384B /* SwoopParkingApp-Bridging-Header.h */,
@@ -586,7 +589,7 @@
 				9CFEE3841CDA6D7A00CE5D53 /* LaunchScreen.storyboard in Resources */,
 				9C1A86C51DA4577400DAD930 /* swoop-sqlite-no-FTS.db in Resources */,
 				9CFEE3811CDA6D7A00CE5D53 /* Assets.xcassets in Resources */,
-				9C4DCF4F1D6D39280060EEBF /* Main.storyboard in Resources */,
+				9C1A86C81DA586C900DAD930 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -756,6 +759,7 @@
 				9C61F0B11D7496DC00BA524C /* SPGoogleNetworking.swift in Sources */,
 				9CA7DDC21D57EAB50050B75D /* LFHeatMap.m in Sources */,
 				9C5279C81CEB62B900AF88FF /* SPQuickGCD.swift in Sources */,
+				9C1A86C71DA5517E00DAD930 /* SPMainViewController.swift in Sources */,
 				9CFF46E71D501FBE00504407 /* SPPolylineManager.swift in Sources */,
 				9CC46A131D2EAFE500AC0717 /* SPLambdaManager.swift in Sources */,
 				9CFEE3A81CDA6E6600CE5D53 /* SPConstants.swift in Sources */,
@@ -808,6 +812,14 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		9C1A86CA1DA586C900DAD930 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				9C1A86CB1DA5872000DAD930 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
 		9CFEE3821CDA6D7A00CE5D53 /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (

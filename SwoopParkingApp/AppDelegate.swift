@@ -19,6 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         setupRootViewController()
         GMSServices.provideAPIKey(kSPGoogleMapsKey)
         setupAWS()
+        
         // Override point for customization after application launch.
         return true
     }
@@ -56,8 +57,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     private func setupRootViewController() {
         let dao = SPDataAccessObject()
         guard let navController = window?.rootViewController as? UINavigationController else { return }
-        guard let mapController = navController.topViewController as? SPMapViewController else { return }
-        mapController.inject(dao)
+        guard let mainController = navController.topViewController as? SPMainViewController else { return }
+        mainController.inject(dao)
+        dao.sqlReader.delegate = dao
     }
 }
 
