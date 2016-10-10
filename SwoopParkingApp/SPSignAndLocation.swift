@@ -9,10 +9,15 @@
 import Foundation
 
 
-struct SPSign {
-    var positionInFeet: Double?
-    var directionOfArrow: String?
-    var signContent: String?
+class SPSign {
+    var positionInFeet: Double!
+    var directionOfArrow: String!
+    var signContent: String!
+    init(positionInFeet: Double?, directionOfArrow:String?, signContent:String?) {
+        self.positionInFeet = positionInFeet
+        self.directionOfArrow = directionOfArrow
+        self.signContent = signContent
+    }
 }
 
 struct SPLocation {

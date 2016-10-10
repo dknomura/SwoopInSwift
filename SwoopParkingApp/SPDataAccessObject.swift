@@ -25,12 +25,13 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
     let locationManager = CLLocationManager()
     var primaryTimeAndDay: DNTimeAndDay = DNTimeAndDay.currentTimeAndDay()
     var addressResults = [SPGoogleAddressResult]()
+    var googleSearchObject = SPGoogleCoordinateAndInfo()
     var searchCoordinate: CLLocationCoordinate2D?
     var allLocationsForDayValue = [Double: [SPLocation]]()
     var locationsForPrimaryTimeAndDay: [SPLocation]? {
         return allLocationsForDayValue[primaryTimeAndDay.rawValue]
     }
-    var locationCountForDayValue = [Double: Int]()
+    var signForPathCoordinates = [String: SPSign]()
     //MARK: - Determine if current mapView is within NYC
     
     func isInNYC(mapView:GMSMapView) -> Bool {
@@ -61,61 +62,13 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
     
     // MARK: - SQLite and Lambda delegate methods
     func sqlQueryDidFinish(withResponse response: SPSQLResponse) {
-        switch response.queryType {
-        case .getLocationsForCurrentMapView:
-            currentMapViewLocations = locations(fromResults: response.results!, queryType: response.queryType)
-        case .getAllLocationsWithUniqueCleaningSign:
-            allLocationsForDayValue = locationsForDayValue(fromResults:response.results!, queryType: response.queryType)
-        case .getLocationsForTimeAndDay:
-            allLocationsForDayValue[primaryTimeAndDay.rawValue] = locations(fromResults: response.results!, queryType: response.queryType)
-//        case .getLocationCountForTimeAndDay:
-//            print("Count for query \(response.query!): \(Int(response.results!.intForColumn("count(*)")))")
+        var parser = SPParser()
+        parser.inject(self)
+        parser.parseSQL(fromResults: response.results!, queryType: response.queryType)
 //            locationCountForDayValue[response.timeAndDay!.rawValue] = Int(response.results!.intForColumn("count(*)"))
-        }
         dispatch_async(dispatch_get_main_queue()) {
             self.delegate?.dataAccessObject(self, didSetLocationsForQueryType: response.queryType)
         }
-    }
-    private func locations(fromResults results: FMResultSet, queryType: SPSQLLocationQueryTypes) -> [SPLocation]{
-        var locationResults = [SPLocation]()
-        results.next()
-        while results.hasAnotherRow() {
-            locationResults.append(SPLocation.init(sqlResultSet: results, queryType: queryType))
-        }
-        return locationResults
-    }
-    private func locationsForDayValue(fromResults results: FMResultSet, queryType: SPSQLLocationQueryTypes) -> [Double: [SPLocation]] {
-        var locationResults = [Double: [SPLocation]]()
-        results.next()
-        while results.hasAnotherRow() {
-            let location = SPLocation.init(sqlResultSet: results, queryType: queryType)
-            let keys: [Double] = dayValues(forLocation: location)
-            for key in keys  {
-                if locationResults[key] == nil { locationResults[key] = [SPLocation]() }
-                locationResults[key]?.append(location)
-            }
-        }
-        return locationResults
-    }
-    private func dayValues(forLocation location:SPLocation) -> [Double] {
-        var returnDoubles = [Double]()
-        let tags = location.signContentTag?.characters.split{$0 == " "}.map(String.init)
-        for tag in tags! {
-            if tag.containsString("HOUR") { continue }
-            var mRange = tag.rangeOfString("AM")
-            if mRange == nil {
-                mRange = tag.rangeOfString("PM")
-                if mRange == nil { continue }
-            }
-            let timeString = tag.substringWithRange(tag.startIndex..<mRange!.endIndex)
-            let dayString = tag.substringWithRange(mRange!.endIndex..<tag.endIndex)
-            guard let timeAndDay = DNTimeAndDay.init(dayString: dayString, timeString: timeString) else {
-                print("Error creating time and day object for location: \(location.locationNumber)/\(location.id)")
-                continue
-            }
-            returnDoubles.append(timeAndDay.rawValue)
-        }
-        return returnDoubles
     }
     func lambdaFunctionDidFinish(withResponse responseDict: NSDictionary) {
 //        guard responseDict["status"] as? String == "Success" else {
@@ -152,18 +105,22 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
     //MARK: - Networking Delegate methods
     //MARK: ---Google networking delegate
     func googleNetworking(googleNetwork: SPGoogleNetworking, didFinishWithResponse response: SPGoogleObject, delegateAction: SPNetworkingDelegateAction) {
-        if delegateAction == .presentAutocompleteResults {
+        switch delegateAction {
+        case .presentAutocompleteResults:
             setAddressResultsForTableView(fromResponse: response)
-        } else if delegateAction == .presentCoordinate {
-            searchCoordinate = response.googleAPIResponse?.placeIDCoordinate
-            delegate?.dataAccessObject(self, didSetSearchCoordinate: searchCoordinate!)
-        } else if delegateAction == .presentAddress {
+        case .presentCoordinate:
+            googleSearchObject.coordinate = response.googleAPIResponse?.placeIDCoordinate
+            googleSearchObject.info = response.googleAPIResponse?.formattedAddress
+            delegate?.dataAccessObject(self, didSetGoogleSearchObject: googleSearchObject)
+        case .presentAddress:
             if response.googleAPIResponse?.addressResults?.count == 1 {
-                searchCoordinate = response.googleAPIResponse?.addressResults?[0].coordinate
-                delegate?.dataAccessObject(self, didSetSearchCoordinate: searchCoordinate!)
+                googleSearchObject.coordinate = response.googleAPIResponse?.addressResults?[0].coordinate
+                googleSearchObject.info = response.googleAPIResponse?.addressResults?[0].address
+                delegate?.dataAccessObject(self, didSetGoogleSearchObject: googleSearchObject)
             } else {
                 setAddressResultsForTableView(fromResponse: response)
             }
+        default: break
         }
     }
     
@@ -180,7 +137,7 @@ protocol SPDataAccessObjectDelegate: class {
     func dataAccessObject(dao: SPDataAccessObject, didSetLocationsForQueryType:SPSQLLocationQueryTypes)
     
     //For google API calls
-    func dataAccessObject(dao: SPDataAccessObject, didSetSearchCoordinate coordinate:CLLocationCoordinate2D)
+    func dataAccessObject(dao: SPDataAccessObject, didSetGoogleSearchObject googleSearchObject:SPGoogleCoordinateAndInfo)
     func dataAccessObject(dao: SPDataAccessObject, didUpdateAddressResults:[SPGoogleAddressResult])
     
 }

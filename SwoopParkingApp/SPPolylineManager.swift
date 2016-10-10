@@ -32,11 +32,13 @@ struct SPPolylineManager: SPInjectable {
         case unknownErrorPolylineDisplacement
     }
     
+    
+    //MARK: - Polyline creation
     func polylines(forCurrentLocations currentLocations: [SPLocation], zoom: Double) -> [GMSPolyline] {
         var returnArray = [GMSPolyline]()
         //Meters to separate the two sides of the road
         let metersToDisplacePolyline = metersToDisplace(byPoints: 1.8, zoom: zoom)
-
+        dao.signForPathCoordinates.removeAll()
         for location in currentLocations {
             guard let fromCoordinate = location.fromCoordinate, toCoordinate = location.toCoordinate, sideOfStreet = location.sideOfStreet, signs = location.signs else { continue }
             let path = gmsPath(forCoordinate1: fromCoordinate, coordinate2: toCoordinate)
@@ -69,7 +71,7 @@ struct SPPolylineManager: SPInjectable {
         return returnArray
     }
     
-    // MARK: - Polyline Color
+    // MARK: Polyline Color
     
     private func setupPolyline(path: GMSPath, deltaCoordinates:CLLocationCoordinate2D, forSign sign: SPSign?) -> GMSPolyline {
         let displacedPath = path.pathOffsetByLatitude(deltaCoordinates.latitude, longitude: deltaCoordinates.longitude)
@@ -78,17 +80,65 @@ struct SPPolylineManager: SPInjectable {
             polyline.strokeColor = UIColor.redColor()
         } else {
             assertDependencies()
-            let timeAndDayStringTuple = dao.primaryTimeAndDay.stringTupleForSQLQuery()
-            if sign!.signContent?.rangeOfString(timeAndDayStringTuple.day) != nil && sign?.signContent?.rangeOfString(timeAndDayStringTuple.time) != nil {
+            if isStreetCleaningSign(sign!.signContent!) {
                 polyline.strokeColor = UIColor.greenColor()
                 polyline.tappable = true
-                
+                dao.signForPathCoordinates[SPPolylineManager.hashedString(forPolyline:polyline)] = sign
+            } else {
+                polyline.strokeColor = UIColor.redColor()
             }
-            polyline.strokeColor = UIColor.redColor()
         }
         polyline.strokeWidth = 2.5
         return polyline
     }
+    enum SPSignTypes:String {
+        case streetCleaning, meteredParking
+        var identifier:String {
+            switch self {
+            case .streetCleaning: return "BROOM"
+            case .meteredParking: return "HOUR"
+            }
+        }
+    }
+    
+    private func isStreetCleaningSign(signContent: String) -> Bool {
+        if signContent.rangeOfString(SPSignTypes.meteredParking.identifier) != nil { return false }
+        let stringTuple = dao.primaryTimeAndDay.stringTupleForSQLQuery
+        if signContent.rangeOfString(stringTuple.time) != nil && signContent.rangeOfString(stringTuple.day) != nil {
+            return true
+        }
+        return false
+    }
+    
+    static func hashedString(forPolyline polyline: GMSPolyline) -> String {
+        guard let path = polyline.path else { return "" }
+        return hashedString(forPath: path)
+    }
+    static func hashedString(forPath path:GMSPath) -> String {
+        var latValue: Double = 0
+        var longValue: Double = 0
+        for i in 0..<path.count() {
+            let coordinate = path.coordinateAtIndex(i)
+            latValue += coordinate.latitude
+            longValue += coordinate.longitude
+        }
+        latValue /= Double(path.count())
+        longValue /= Double(path.count())
+        return "\(latValue) \(longValue)"
+    }
+    static func coordinate(fromHashedString hashString: String) -> CLLocationCoordinate2D? {
+        let coordinateStrings = hashString.characters.split{  $0 == " " }.map(String.init)
+        if let lat = Double(coordinateStrings[0]),
+            let long = Double(coordinateStrings[1]){
+            return CLLocationCoordinate2D.init(latitude: lat, longitude: long)
+        }
+        return nil
+    }
+    static func coordinate(fromPolyline polyline: GMSPolyline) -> CLLocationCoordinate2D? {
+        let hashString = hashedString(forPolyline: polyline)
+        return coordinate(fromHashedString: hashString)
+    }
+    
     
     private func gmsPath(forCoordinate1 coordinate1: CLLocationCoordinate2D, coordinate2: CLLocationCoordinate2D) -> GMSMutablePath {
         let path = GMSMutablePath()
@@ -315,9 +365,9 @@ extension GMSMapView {
 
         switch city {
         case .NYC:
-            localMeters = 40000
+            localMeters = 45000
         case .Chicago, .Denver, .LA :
-            localMeters = 40000
+            localMeters = 45000
         }
         let localPoints = Double(self.bounds.width)
         let worldMeters = 40075000.0

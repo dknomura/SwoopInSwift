@@ -22,6 +22,33 @@ enum SPCities: String {
     case LA
 }
 
+enum SPMapApp: String {
+    case Google
+    case Apple
+    case Waze
+    var scheme: String {
+        switch self {
+        case .Google: return "comgooglemaps://"
+        case .Apple: return "http://maps.apple.com/"
+        case .Waze: return "waze://"
+        }
+    }
+    static var allMaps: [SPMapApp] {
+        return [Google, Apple, Waze]
+    }
+    static var appsForThisDevice: [SPMapApp] {
+        var mapOptions = [SPMapApp]()
+        for map in SPMapApp.allMaps {
+            guard let scheme = NSURL(string:map.scheme) else { continue }
+            if UIApplication.sharedApplication().canOpenURL(scheme) {
+                mapOptions.append(map)
+            }
+        }
+        return mapOptions
+    }
+
+}
+
 //MARK: SQL query types
 enum SPSQLLocationQueryTypes: String {
     case getAllLocationsWithUniqueCleaningSign

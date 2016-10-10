@@ -82,7 +82,7 @@ extension DNTimeAndDay: DNComparableTimeUnit {
     
     
     // MARK: timeAndDay for SQL
-    func stringTupleForSQLQuery() -> (time: String, day: String) {
+    var stringTupleForSQLQuery: (time: String, day: String) {
         var returnTuple: (time: String, day:String)
         let timeAndDayFormat = DNTimeAndDayFormat(time: .format12Hour, day: .abbr)
         returnTuple.day = day.stringValue(forFormat: timeAndDayFormat).uppercaseString
@@ -93,7 +93,7 @@ extension DNTimeAndDay: DNComparableTimeUnit {
         return returnTuple
     }
     func stringForSQLTagQuery() -> String {
-        return "\(stringTupleForSQLQuery().time)\(stringTupleForSQLQuery().day)"
+        return "\(stringTupleForSQLQuery.time)\(stringTupleForSQLQuery.day)"
     }
     
     static func allStreetLocationTimeAndDays(forCity:SPCities) -> [DNTimeAndDay] {

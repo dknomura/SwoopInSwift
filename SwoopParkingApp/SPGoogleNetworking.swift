@@ -8,38 +8,7 @@
 
 import Foundation
 
-struct SPGoogleObject {
-    var googleAPIResponse: SPGoogleAPIResponse?
-    var googleStatusCode: SPGoogleStatusCodes?
-    var delegateAction: SPNetworkingDelegateAction?
-    var error: NSError?
-}
-struct SPGoogleAPIResponse{
-    var addressResults: [SPGoogleAddressResult]?
-    var placeIDCoordinate: CLLocationCoordinate2D?
-}
-struct SPGoogleAddressResult {
-    var address:String
-    var placeID:String
-    var coordinate:CLLocationCoordinate2D?
-}
-
-
-enum SPNetworkingDelegateAction {
-    case presentCoordinate
-    case presentAutocompleteResults
-    case presentAddress
-    case presentNetworkingError
-    case presentLocalError
-}
-
-enum SPGoogleStatusCodes:String {
-    case OK, ZERO_RESULTS, OVER_QUERY_LIMIT, INVALID_REQUEST, UNKNOWN_ERROR, NOT_FOUND, REQUEST_DENIED
-    static let allValues = [OK, ZERO_RESULTS, OVER_QUERY_LIMIT, INVALID_REQUEST, UNKNOWN_ERROR, NOT_FOUND, REQUEST_DENIED]
-}
-
-
-class SPGoogleNetworking {
+struct SPGoogleNetworking {
     let googlePlacesAPIKey = "AIzaSyCHTQ_3E4We3iwfp8miz15Nm6Un6oYBCmk"
     let googleGeocodingAPIKey = "AIzaSyA1mzaCuwm88uF1LSlkHvxzwQoTMm-ZptY"
     var centerLat: Double { return 40.7054094949 }

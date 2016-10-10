@@ -36,6 +36,16 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
     var shouldTapShowSearchBar = false
     var didGetLocations = false
     
+    private enum ChildViewController: String {
+        case timeAndDay, map, search
+        var segue: String {
+            switch self {
+            case timeAndDay: return "timeContainer"
+            case map: return "mapContainer"
+            case search: return "searchContainer"
+            }
+        }
+    }
     var timeAndDayViewController: SPTimeAndDayViewController!
     var searchViewController: SPSearchResultsViewController!
     var mapViewController: SPMapViewController!
@@ -133,7 +143,16 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
             view.endEditing(true)
             return
         }
+        
+//        if mapViewController.isMarkerPresent {
+//            mapViewController.hideMarkerInfoWindow()
+//            return
+//        }
+        
         if CGRectContainsPoint(timeAndDayContainerView.frame, gesture.locationInView(view)) || CGRectContainsPoint(bottomToolbar.frame, gesture.locationInView(view)) { return }
+        if mapViewController.currentInfoWindow != nil {
+            if CGRectContainsPoint(mapViewController.currentInfoWindow!.frame, gesture.locationInView(mapViewController.view)) { return }
+        }
         
         if toolbarsPresent {
             if isSearchBarPresent {
@@ -150,7 +169,11 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
 
     func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldReceiveTouch touch: UITouch) -> Bool {
         if touch.view != nil {
-            if touch.view!.isDescendantOfView(mapViewController.zoomOutButton) || touch.view!.isDescendantOfView(searchContainerView) || touch.view!.isDescendantOfView(bottomToolbar) || touch.view!.isDescendantOfView(timeAndDayContainerView) { return false }
+            let viewsToCancelTouch: [UIView?] = [mapViewController.zoomOutButton, searchContainerView, bottomToolbar, timeAndDayContainerView, mapViewController.currentInfoWindow, mapViewController.signMarker?.iconView, mapViewController.searchMarker?.iconView]
+            for untappableView in viewsToCancelTouch {
+                if untappableView == nil { continue }
+                if touch.view!.isDescendantOfView(untappableView!) { return false }
+            }
         }
         return true
     }
@@ -242,15 +265,17 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
     func dataAccessObject(dao: SPDataAccessObject, didUpdateAddressResults: [SPGoogleAddressResult]) {
         searchViewController?.showSearchResultsTableView()
     }
-    func dataAccessObject(dao: SPDataAccessObject, didSetSearchCoordinate coordinate: CLLocationCoordinate2D) {
-        mapViewController.zoomMap(toCoordinate: coordinate, zoom: mapViewController.streetZoom)
+    func dataAccessObject(dao: SPDataAccessObject, didSetGoogleSearchObject googleSearchObject: SPGoogleCoordinateAndInfo) {
+        zoomAndSetMapMarker()
     }
     func dataAccessObject(dao: SPDataAccessObject, didSetLocationsForQueryType queryType: SPSQLLocationQueryTypes) {
         switch queryType {
         case .getLocationsForCurrentMapView:
             mapViewController.getNewPolylines()
         case .getAllLocationsWithUniqueCleaningSign, .getLocationsForTimeAndDay:
-            mapViewController.getNewHeatMapOverlays()
+            if !streetViewSwitch.on {
+                mapViewController.getNewHeatMapOverlays()
+            }
             if queryType == .getAllLocationsWithUniqueCleaningSign {
                 bottomToolbar.backgroundColor = UIColor.redColor()
             } else {
@@ -275,10 +300,19 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
     }
     
     //MARK: -----Search container controller delegate
-    func searchContainer(toPerformDelegateAction delegateAction: SPNetworkingDelegateAction) {
+    func searchContainer(toPerformDelegateAction delegateAction: SPNetworkingDelegateAction, withInfo: String) {
         if delegateAction == .presentCoordinate {
-            mapViewController.zoomMap(toCoordinate: dao.searchCoordinate, zoom: mapViewController.streetZoom)
+            zoomAndSetMapMarker()
         }
+    }
+    
+    func zoomAndSetMapMarker() {
+        if dao.googleSearchObject.coordinate == nil { return }
+        mapViewController.zoomMap(toCoordinate: dao.googleSearchObject.coordinate!, zoom: mapViewController.streetZoom)
+        if dao.googleSearchObject.info == nil { return }
+        mapViewController.setSearchMarker(withUserData: dao.googleSearchObject.info!, atCoordinate: dao.googleSearchObject.coordinate!)
+        turnStreetSwitch(on: true, shouldGetOverlays: true)
+
     }
     func searchContainerHeightShouldAdjust(height: CGFloat, tableViewPresent: Bool, searchBarPresent: Bool) -> Bool {
         UIView.animateWithDuration(standardAnimationDuration) {
@@ -293,7 +327,7 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
         return true
     }
 
-    //MARK: --- Map Container Controller delegate 
+    //MARK: --- Map Container Controller delegate
     func mapViewControllerFinishedDrawingPolylines() {
         hideWaitingView()
     }
@@ -309,6 +343,8 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
     }
     func mapViewControllerDidZoom(switchOn on: Bool?, shouldGetOverlay: Bool) {
         turnStreetSwitch(on: on, shouldGetOverlays: shouldGetOverlay)
+        mapViewController.hideMarkerInfoWindow()
+
     }
     
     //MARK: - Injectable protocol

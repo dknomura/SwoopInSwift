@@ -49,7 +49,7 @@ class SPSearchResultsViewController: UIViewController, UITableViewDelegate, UITa
     }
     func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
         if searchBar.text?.characters.count > 0 {
-            let googleNetworking = SPGoogleNetworking()
+            var googleNetworking = SPGoogleNetworking()
             googleNetworking.delegate = dao
             googleNetworking.autocomplete(searchBar.text!)
         } else if searchBar.text?.characters.count == 0 {
@@ -59,7 +59,7 @@ class SPSearchResultsViewController: UIViewController, UITableViewDelegate, UITa
  
     func searchBarSearchButtonClicked(searchBar: UISearchBar) {
         if searchBar.text?.characters.count > 0 {
-            let googleNetworking = SPGoogleNetworking()
+            var googleNetworking = SPGoogleNetworking()
             googleNetworking.delegate = dao
             googleNetworking.searchAddress(searchBar.text!)
         }
@@ -83,10 +83,11 @@ class SPSearchResultsViewController: UIViewController, UITableViewDelegate, UITa
         let addressResult = dao.addressResults[indexPath.row]
         searchBar.text = addressResult.address
         if addressResult.coordinate != nil {
-            dao.searchCoordinate = addressResult.coordinate
-            delegate?.searchContainer(toPerformDelegateAction: .presentCoordinate)
+            dao.googleSearchObject.coordinate = addressResult.coordinate
+            dao.googleSearchObject.info = addressResult.address
+            delegate?.searchContainer(toPerformDelegateAction: .presentCoordinate, withInfo: addressResult.address)
         } else {
-            let googleNetworking = SPGoogleNetworking()
+            var googleNetworking = SPGoogleNetworking()
             googleNetworking.delegate = dao
             googleNetworking.geocode(addressResultWithoutCoordinate: addressResult)
         }
@@ -141,6 +142,6 @@ class SPSearchResultsViewController: UIViewController, UITableViewDelegate, UITa
 }
 
 protocol SPSearchResultsViewControllerDelegate: class {
-    func searchContainer(toPerformDelegateAction delegateAction:SPNetworkingDelegateAction)
+    func searchContainer(toPerformDelegateAction delegateAction:SPNetworkingDelegateAction, withInfo: String)
     func searchContainerHeightShouldAdjust(height:CGFloat, tableViewPresent:Bool, searchBarPresent:Bool) -> Bool
 }

@@ -28,4 +28,4 @@ var GlobalBackgroundQueue: dispatch_queue_t {
     return dispatch_get_global_queue(QOS_CLASS_BACKGROUND, 0)
 }
 
-let concurrentSignAndLocationQueue = dispatch_queue_create("com.dnom.SwoopParking.signAndLocationQueue", DISPATCH_QUEUE_CONCURRENT)
+let concurrentSignDictionaryQueue = dispatch_queue_create("com.dnom.SwoopParking.daoSignAndCoordinateStringDictionary", DISPATCH_QUEUE_CONCURRENT)

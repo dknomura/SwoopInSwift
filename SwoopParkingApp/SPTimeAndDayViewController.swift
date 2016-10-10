@@ -103,7 +103,6 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
     }
     private func setupSlider() {
         sliderThumbLabel = UILabel.init(frame: CGRectMake(0, 0, 55, 20))
-        sliderThumbLabel.center = centerOfSliderThumb
         sliderThumbLabel!.backgroundColor = UIColor.clearColor()
         sliderThumbLabel!.textAlignment = .Center
         sliderThumbLabel.font = UIFont.systemFontOfSize(12)
@@ -145,9 +144,7 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
             if newTime == dao.primaryTimeAndDay.time { return }
             dao.primaryTimeAndDay.time = newTime
         }
-        if dao.locationsForPrimaryTimeAndDay != nil {
-            setNewImage()
-        }
+        setNewImage()
         sliderThumbLabel.text = dao.primaryTimeAndDay.time.stringValue(forFormat: DNTimeAndDayFormat.format12Hour())
     }
     func adjustTimeSliderToDay() {
@@ -155,11 +152,12 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
         dao.primaryTimeAndDay.adjustTimeToValidStreetCleaningTime()
         timeSlider.maximumValue = Float(timeRange.count - 1)
         if let currentTimeValue = timeRange.indexOf(Float(dao.primaryTimeAndDay.time.rawValue)) {
-            timeSlider.value = Float(currentTimeValue)
+            timeSlider.setValue(Float(currentTimeValue), animated: true)
         }
         sliderThumbLabel.center = centerOfSliderThumb
         dayLabel.text = dao.primaryTimeAndDay.day.stringValue(forFormat: timeAndDayFormat)
         setSliderLabels()
+        setNewImage()
     }
     
     private func setSliderLabels() {
@@ -169,11 +167,12 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
         sliderThumbLabel.text = dao.primaryTimeAndDay.time.stringValue(forFormat: DNTimeAndDayFormat.format12Hour())
     }
     //MARK: Image processing
-    let thumbImage: UIImage! = UIImage(named:"smart-car copy")
-    let noParkingImage: UIImage! = UIImage(named:"red-p-no-parking")
+    let thumbImage: UIImage! = UIImage(named:"smart-car-icon")
+    let noParkingImage: UIImage! = UIImage(named:"smart-car-no-parking")
+    let unknownParkingImage: UIImage! = UIImage(named: "smart-car-question-mark")
     func setNewImage() {
         guard let locationsCount = (self.dao.locationsForPrimaryTimeAndDay?.count) else {
-            timeSlider.setThumbImage(nil, forState: .Normal)
+            timeSlider.setThumbImage(unknownParkingImage, forState: .Normal)
             return
         }
         let newImage: UIImage
@@ -184,7 +183,7 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
             if locationsCount < 200 {
                 thumbSizeSide = 10
             } else {
-                thumbSizeSide = CGFloat((self.originalThumbWidth - 20) * Float(locationsCount) / 3600 + 20)
+                thumbSizeSide = CGFloat((self.originalThumbWidth - 30) * Float(locationsCount) / 2000 + 20)
             }
             newImage = self.imageWith(image: self.thumbImage, scaledToSize: CGSizeMake(thumbSizeSide, thumbSizeSide))
         }

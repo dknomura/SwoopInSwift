@@ -9,7 +9,7 @@
 import UIKit
 import GoogleMaps
 
-class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDelegate, UIGestureRecognizerDelegate, SPInjectable {
+class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDelegate, UIGestureRecognizerDelegate, SPSignInfoOverlayDelegate, SPInjectable {
     
     weak var delegate: SPMapViewControllerDelegate?
     @IBOutlet weak var mapView: GMSMapView!
@@ -178,16 +178,6 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         var polylineManager = SPPolylineManager()
         polylineManager.inject(dao)
         self.currentMapPolylines = polylineManager.polylines(forCurrentLocations: dao.currentMapViewLocations, zoom: Double(self.mapView.camera.zoom))
-        
-        var printDictionary = [String: [String]]()
-        for location in dao.currentMapViewLocations {
-            if printDictionary[location.signContentTag!] != nil {
-                printDictionary[location.signContentTag!]!.append(location.locationNumber!)
-            } else {
-                printDictionary[location.signContentTag!] = [location.locationNumber!]
-            }
-        }
-        print("All tags for currentMapView: \(printDictionary.keys)")
         if self.currentMapPolylines.count > 0 &&  self.mapView.camera.zoom >= self.streetZoom {
             self.show(mapOverlayViews: self.currentMapPolylines, shouldHideOtherOverlay: true)
         }
@@ -224,8 +214,91 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         else { userControl = false }
     }
     
+    //MARK: GMSMarker methods
+    var signMarker: GMSMarker?
     func mapView(mapView: GMSMapView, didTapOverlay overlay: GMSOverlay) {
-        
+        if let polyline = overlay as? GMSPolyline {
+            guard let coordinate = SPPolylineManager.coordinate(fromPolyline: polyline) else { return }
+            if signMarker != nil { signMarker?.map = nil }
+            print("Hashed string: \(SPPolylineManager.hashedString(forPolyline: polyline)), sign value: \(dao.signForPathCoordinates[SPPolylineManager.hashedString(forPolyline: polyline)])")
+            guard let sign: SPSign = dao.signForPathCoordinates[SPPolylineManager.hashedString(forPolyline: polyline)] else { return }
+            signMarker = marker(withUserData: sign.signContent, atCoordinate: coordinate)
+            mapView.selectedMarker = signMarker
+        }
+    }
+    var searchMarker: GMSMarker?
+    func setSearchMarker(withUserData userData:String, atCoordinate coordinate: CLLocationCoordinate2D) {
+        if searchMarker != nil { searchMarker?.map = nil }
+        searchMarker = marker(withUserData: userData, atCoordinate: coordinate)
+    }
+    func marker(withUserData userData: String, atCoordinate coordinate: CLLocationCoordinate2D) -> GMSMarker {
+        let marker = GMSMarker.init(position: coordinate)
+        marker.map = mapView
+        marker.userData = userData
+        return marker
+    }
+    
+    func hideMarkerInfoWindow() {
+        if isMarkerPresent {
+            mapView.selectedMarker = nil
+        }
+    }
+    var isMarkerPresent: Bool {
+        return mapView.selectedMarker === signMarker || mapView.selectedMarker === searchMarker
+    }
+    
+    var currentInfoWindow: SPSignInfoOverlay?
+    func mapView(mapView: GMSMapView, markerInfoWindow marker: GMSMarker) -> UIView? {
+        if marker === signMarker || marker === searchMarker {
+            guard let displayString = marker.userData as? String else { return nil }
+            guard let infoWindow = NSBundle.mainBundle().loadNibNamed("SPSignInfoOverlay", owner: self, options: nil)[0] as? SPSignInfoOverlay else { return nil }
+            infoWindow.delegate = self
+            infoWindow.destinationCoordinate = marker.position
+            infoWindow.signContentTextView.text = displayString
+            currentInfoWindow = infoWindow
+            return infoWindow
+        }
+        return nil
+    }
+    
+    //MARK: Sign overlay delegate methods
+    
+    func signInfoViewDidTapDirectionsButton(toCoordinate coordinate:CLLocationCoordinate2D){
+        alertControllerForDirections(forCoordinate: coordinate)
+    }
+    
+    private func alertControllerForDirections(forCoordinate coordinate: CLLocationCoordinate2D) {
+        if mapOptions.count == 0 { return }
+        let startCoordinate = dao.currentLocation?.coordinate
+        let startAddress = "\(startCoordinate!.latitude),\(startCoordinate!.longitude)"
+        let endAddress = "\(coordinate.latitude),\(coordinate.longitude)"
+        let alertController = UIAlertController.init(title: "Get Directions", message: nil, preferredStyle: .ActionSheet)
+        for map in mapOptions {
+            let parameters: String
+            switch map {
+            case .Apple:
+                parameters = "?daddr=\(endAddress)&dirflg=d"
+            case .Google: parameters = "?saddr=\(startAddress)&daddr=\(endAddress)&directionsmode=driving"
+            case .Waze: parameters = "?ll=\(endAddress)&navigate=yes"
+            }
+            guard let mapURL = NSURL(string: map.scheme + parameters) else {continue}
+            let action = UIAlertAction.init(title: map.rawValue, style: .Default, handler: { (_) in
+                UIApplication.sharedApplication().openURL(mapURL)
+            })
+            alertController.addAction(action)
+        }
+        alertController.addAction(UIAlertAction.init(title: "Cancel", style: .Destructive, handler: nil))
+        presentViewController(alertController, animated: true, completion: nil)
+    }
+    private var mapOptions: [SPMapApp] {
+        var mapOptions = [SPMapApp]()
+        for map in SPMapApp.allMaps {
+            guard let scheme = NSURL(string:map.scheme) else { continue }
+            if UIApplication.sharedApplication().canOpenURL(scheme) {
+                mapOptions.append(map)
+            }
+        }
+        return mapOptions
     }
     
     //MARK: Injectable protocol
