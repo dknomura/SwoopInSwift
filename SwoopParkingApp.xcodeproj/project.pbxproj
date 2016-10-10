@@ -267,14 +267,14 @@
 			name = Pods;
 			sourceTree = "<group>";
 		};
-		9C04E2711D9028540012EAE0 /* DataAccess */ = {
+		9C04E2711D9028540012EAE0 /* DataAccessLayer */ = {
 			isa = PBXGroup;
 			children = (
 				9C42DAB21D5A589E004ECA97 /* SPDataAccessObject.swift */,
 				9C04E2721D9028680012EAE0 /* Local */,
 				9C61F0AF1D7496C100BA524C /* Networking */,
 			);
-			name = DataAccess;
+			name = DataAccessLayer;
 			sourceTree = "<group>";
 		};
 		9C04E2721D9028680012EAE0 /* Local */ = {
@@ -418,7 +418,7 @@
 				9C42DAB61D5A6A63004ECA97 /* Model */,
 				9C42DAB51D5A6A47004ECA97 /* Views */,
 				9C42DAB41D5A6A37004ECA97 /* Controller */,
-				9C04E2711D9028540012EAE0 /* DataAccess */,
+				9C04E2711D9028540012EAE0 /* DataAccessLayer */,
 				9CF750811D354F4F00000823 /* Utils */,
 				9C04E2731D93FC6A0012EAE0 /* SPProtocols.swift */,
 				9CFEE3801CDA6D7A00CE5D53 /* Assets.xcassets */,
@@ -973,7 +973,7 @@
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				"FRAMEWORK_SEARCH_PATHS[arch=*]" = "$(inherited)";
 				INFOPLIST_FILE = SwoopParkingApp/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = dnom.SwoopParkingApp;
@@ -997,7 +997,7 @@
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				"FRAMEWORK_SEARCH_PATHS[arch=*]" = "$(inherited)";
 				INFOPLIST_FILE = SwoopParkingApp/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = dnom.SwoopParkingApp;

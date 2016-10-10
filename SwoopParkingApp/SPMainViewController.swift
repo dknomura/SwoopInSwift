@@ -71,6 +71,7 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
         NSNotificationCenter.defaultCenter().removeObserver(self)
     }
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        // Make a protocol to make a interface for child view controllers to abstract a method to set the delegate and dao for the child view controllers
         guard segue.identifier != nil else { return }
         switch segue.identifier! {
         case timeContainerSegue:
@@ -344,7 +345,7 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
     func mapViewControllerDidZoom(switchOn on: Bool?, shouldGetOverlay: Bool) {
         turnStreetSwitch(on: on, shouldGetOverlays: shouldGetOverlay)
         mapViewController.hideMarkerInfoWindow()
-
+        mapViewController.hideMarkers()
     }
     
     //MARK: - Injectable protocol

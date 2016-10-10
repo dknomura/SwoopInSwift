@@ -239,11 +239,15 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     }
     
     func hideMarkerInfoWindow() {
-        if isMarkerPresent {
+        if isMarkerSelected {
             mapView.selectedMarker = nil
         }
     }
-    var isMarkerPresent: Bool {
+    func hideMarkers() {
+        signMarker?.map = nil
+        searchMarker?.map = nil
+    }
+    var isMarkerSelected: Bool {
         return mapView.selectedMarker === signMarker || mapView.selectedMarker === searchMarker
     }
     
