@@ -18,3 +18,12 @@ extension UIViewController {
         view.endEditing(true)
     }
 }
+
+protocol SPChildViewController {
+    associatedtype T
+    func inject(dao: SPDataAccessObject, delegate: T)
+}
+
+extension SPChildViewController where Self: UIViewController {
+    
+}

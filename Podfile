@@ -8,8 +8,8 @@ def testing_pods
 end
 
 target 'SwoopParkingApp' do
-	pod "DNTimeAndDay"
 	use_frameworks!
+    pod "DNTimeAndDay"
 	pod 'GoogleMaps'
 	pod 'AWSLambda'
 	pod 'AWSCognito'	
