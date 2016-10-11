@@ -9,7 +9,7 @@
 import UIKit
 import GoogleMaps
 
-class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDelegate, UIGestureRecognizerDelegate, SPSignInfoOverlayDelegate, SPInjectable {
+class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDelegate, UIGestureRecognizerDelegate, SPInjectable {
     
     weak var delegate: SPMapViewControllerDelegate?
     @IBOutlet weak var mapView: GMSMapView!
@@ -31,6 +31,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     var initialZoom: Float {
         return mapView.initialStreetCleaningZoom(forCity: .NYC)
     }
+    var restoredCamera: GMSCameraPosition?
     //MARK: - Override methods
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -83,8 +84,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     
     //MARK: --Views
     private func setUpMap() {
-        mapView.camera = initialMapViewCamera
-        mapView.myLocationEnabled = true
+        mapView.camera = restoredCamera != nil ? restoredCamera! : initialMapViewCamera
         mapView.settings.myLocationButton = true
         mapView.settings.rotateGestures = false
         mapView.settings.zoomGestures = false
@@ -214,7 +214,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         else { userControl = false }
     }
     
-    //MARK: GMSMarker methods
+    //MARK: GMSMarker methods/delegate methods
     var signMarker: GMSMarker?
     func mapView(mapView: GMSMapView, didTapOverlay overlay: GMSOverlay) {
         if let polyline = overlay as? GMSPolyline {
@@ -256,32 +256,37 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         if marker === signMarker || marker === searchMarker {
             guard let displayString = marker.userData as? String else { return nil }
             guard let infoWindow = NSBundle.mainBundle().loadNibNamed("SPSignInfoOverlay", owner: self, options: nil)[0] as? SPSignInfoOverlay else { return nil }
-            infoWindow.delegate = self
             infoWindow.destinationCoordinate = marker.position
-            infoWindow.signContentTextView.text = displayString
+            infoWindow.signContentLabel.text = displayString
             currentInfoWindow = infoWindow
             return infoWindow
         }
         return nil
     }
     
-    //MARK: Sign overlay delegate methods
-    
-    func signInfoViewDidTapDirectionsButton(toCoordinate coordinate:CLLocationCoordinate2D){
-        alertControllerForDirections(forCoordinate: coordinate)
+    var endCoordinateBeforeLocationRequest:CLLocationCoordinate2D?
+    func mapView(mapView: GMSMapView, didTapInfoWindowOfMarker marker: GMSMarker) {
+        if NSUserDefaults.standardUserDefaults().boolForKey(kSPDidAllowLocationServices) {
+            presentAlertControllerForDirections(forCoordinate: marker.position)
+        } else {
+            dao.locationManager.requestWhenInUseAuthorization()
+            mapView.myLocationEnabled = true
+            endCoordinateBeforeLocationRequest = marker.position
+        }
     }
     
-    private func alertControllerForDirections(forCoordinate coordinate: CLLocationCoordinate2D) {
-        if mapOptions.count == 0 { return }
-        let startCoordinate = dao.currentLocation?.coordinate
-        let startAddress = "\(startCoordinate!.latitude),\(startCoordinate!.longitude)"
+    //MARK: - Open map app
+    func presentAlertControllerForDirections(forCoordinate coordinate: CLLocationCoordinate2D) {
+        if SPMapApp.appsForThisDevice.count == 0 { return }
+        guard let startCoordinate = dao.currentLocation?.coordinate else { return }
+        let startAddress = "\(startCoordinate.latitude),\(startCoordinate.longitude)"
         let endAddress = "\(coordinate.latitude),\(coordinate.longitude)"
         let alertController = UIAlertController.init(title: "Get Directions", message: nil, preferredStyle: .ActionSheet)
-        for map in mapOptions {
+        for map in SPMapApp.appsForThisDevice {
             let parameters: String
             switch map {
             case .Apple:
-                parameters = "?daddr=\(endAddress)&dirflg=d"
+                parameters = "?saddr=\(startAddress)&daddr=\(endAddress)&dirflg=d"
             case .Google: parameters = "?saddr=\(startAddress)&daddr=\(endAddress)&directionsmode=driving"
             case .Waze: parameters = "?ll=\(endAddress)&navigate=yes"
             }
@@ -294,16 +299,32 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         alertController.addAction(UIAlertAction.init(title: "Cancel", style: .Destructive, handler: nil))
         presentViewController(alertController, animated: true, completion: nil)
     }
-    private var mapOptions: [SPMapApp] {
-        var mapOptions = [SPMapApp]()
-        for map in SPMapApp.allMaps {
-            guard let scheme = NSURL(string:map.scheme) else { continue }
-            if UIApplication.sharedApplication().canOpenURL(scheme) {
-                mapOptions.append(map)
+    enum SPMapApp: String {
+        case Google
+        case Apple
+        case Waze
+        var scheme: String {
+            switch self {
+            case .Google: return "comgooglemaps://"
+            case .Apple: return "http://maps.apple.com/"
+            case .Waze: return "waze://"
             }
         }
-        return mapOptions
+        static var allMaps: [SPMapApp] {
+            return [Google, Apple, Waze]
+        }
+        static var appsForThisDevice: [SPMapApp] {
+            var mapOptions = [SPMapApp]()
+            for map in SPMapApp.allMaps {
+                guard let scheme = NSURL(string:map.scheme) else { continue }
+                if UIApplication.sharedApplication().canOpenURL(scheme) {
+                    mapOptions.append(map)
+                }
+            }
+            return mapOptions
+        }
     }
+
     
     //MARK: Injectable protocol
     private var dao: SPDataAccessObject!
@@ -321,3 +342,5 @@ protocol SPMapViewControllerDelegate: class {
     func mapViewControllerDidZoom(switchOn on: Bool?, shouldGetOverlay: Bool)
     func mapViewControllerFinishedDrawingPolylines()
 }
+
+

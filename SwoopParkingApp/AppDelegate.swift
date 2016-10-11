@@ -9,6 +9,7 @@
 import UIKit
 import GoogleMaps
 import AWSCore
+import DNTimeAndDay
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -16,12 +17,29 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-        setupRootViewController()
+        setupRootViewController(withDAO: SPDataAccessObject())
         GMSServices.provideAPIKey(kSPGoogleMapsKey)
         setupAWS()
         
         // Override point for customization after application launch.
         return true
+    }
+    
+    func application(application: UIApplication, shouldSaveApplicationState coder: NSCoder) -> Bool {
+        return true
+    }
+    func application(application: UIApplication, shouldRestoreApplicationState coder: NSCoder) -> Bool {
+        return true
+    }
+    
+    
+    func application(application: UIApplication, didDecodeRestorableStateWithCoder coder: NSCoder) {
+        let hour = coder.decodeIntegerForKey(CoderKeys.hour),
+        min = coder.decodeIntegerForKey(CoderKeys.min),
+        day = coder.decodeIntegerForKey(CoderKeys.day)
+        let dao = SPDataAccessObject()
+        dao.primaryTimeAndDay = DNTimeAndDay.init(dayInt: day, hourInt: hour, minInt:min)!
+        setupRootViewController(withDAO: dao)
     }
     
     func applicationWillResignActive(application: UIApplication) {
@@ -30,6 +48,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func applicationDidEnterBackground(application: UIApplication) {
+        
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
     }
@@ -46,7 +65,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
     
-    
     //MARK: - Setup Methods
     private func setupAWS() {
         let credentialProvider = AWSCognitoCredentialsProvider(regionType:.USEast1, identityPoolId: "us-east-1:14495a5f-65b5-4859-b8f5-4de05fbce775")
@@ -54,12 +72,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         AWSServiceManager.defaultServiceManager().defaultServiceConfiguration = configuration
     }
     
-    private func setupRootViewController() {
-        let dao = SPDataAccessObject()
+    private func setupRootViewController(withDAO dao: SPDataAccessObject) {
         guard let navController = window?.rootViewController as? UINavigationController else { return }
         guard let mainController = navController.topViewController as? SPMainViewController else { return }
+        
+        let sqliteReader = SPSQLiteReader(delegate: dao)
+        dao.sqlReader = sqliteReader
+        dao.delegate = mainController
         mainController.inject(dao)
-        dao.sqlReader.delegate = dao
     }
 }
 

@@ -35,6 +35,7 @@ struct SPPolylineManager: SPInjectable {
     
     //MARK: - Polyline creation
     func polylines(forCurrentLocations currentLocations: [SPLocation], zoom: Double) -> [GMSPolyline] {
+        assertDependencies()
         var returnArray = [GMSPolyline]()
         //Meters to separate the two sides of the road
         let metersToDisplacePolyline = metersToDisplace(byPoints: 1.8, zoom: zoom)

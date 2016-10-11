@@ -9,16 +9,8 @@
 import Foundation
 
 
-class SPSignInfoOverlay: UIView {
-    weak var delegate: SPSignInfoOverlayDelegate?
-    @IBOutlet weak var signContentTextView: UITextView!
+class SPSignInfoOverlay: UIView, UITextViewDelegate {
+    
+    @IBOutlet weak var signContentLabel: UILabel!
     var destinationCoordinate: CLLocationCoordinate2D?
-    @IBAction func getDirections(sender: UIButton) {
-        guard destinationCoordinate != nil else { return }
-        delegate?.signInfoViewDidTapDirectionsButton(toCoordinate: destinationCoordinate!)
-    }
-}
-
-protocol SPSignInfoOverlayDelegate: class {
-    func signInfoViewDidTapDirectionsButton(toCoordinate coordinate:CLLocationCoordinate2D)
 }

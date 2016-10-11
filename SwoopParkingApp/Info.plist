@@ -36,10 +36,8 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
-	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Will help you locate nearby areas with a high probability of open parking spots</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Will help you locate nearby areas with a high probability of open parking spots</string>
+	<string>For directions to street cleaning locations. </string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

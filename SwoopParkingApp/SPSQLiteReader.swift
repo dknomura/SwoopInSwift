@@ -35,6 +35,9 @@ extension SPSQLResponse {
 
 struct SPSQLiteReader {
     weak var delegate: SPSQLiteReaderDelegate?
+    init(delegate: SPSQLiteReaderDelegate){
+        self.delegate = delegate
+    }
     var databasePath : String {
         return NSBundle.mainBundle().pathForResource("swoop-sqlite-no-FTS", ofType: "db")!
     }

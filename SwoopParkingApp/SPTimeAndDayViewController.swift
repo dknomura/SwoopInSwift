@@ -42,24 +42,26 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
     private func setupGestures() {
         let tapGesture = UITapGestureRecognizer.init(target: self, action: #selector(tapToMoveSliderThumb(_:)))
         timeSliderGestureView.addGestureRecognizer(tapGesture)
-        let sliderPanGesture = UIPanGestureRecognizer.init(target: self, action: #selector(panToMoveSlider(_:)))
+        let sliderPanGesture = UIPanGestureRecognizer.init(target: self, action: #selector(panTimeSlider(_:)))
         timeSliderGestureView.addGestureRecognizer(sliderPanGesture)
         let dayPanGesture = UIPanGestureRecognizer.init(target: self, action: #selector(panToChangeDay(_:)))
         dayView.addGestureRecognizer(dayPanGesture)
     }
     
-    var originalPanPointY:CGFloat = 0
+    var pointForDay0:CGFloat = 0
     @objc func panToChangeDay(recognizer: UIPanGestureRecognizer) {
         switch recognizer.state {
         case .Began:
-            originalPanPointY = recognizer.locationInView(view).y
+            pointForDay0 = recognizer.locationInView(view).y
         case .Changed, .Ended:
-            let change = Int(recognizer.locationInView(view).y - originalPanPointY)
+            let newPanLocation = recognizer.locationInView(view).y
+            let change = Int(newPanLocation * 21 / (view.frame.height - pointForDay0))
             if recognizer.state == .Changed {
                 if change % 8 != 0 { return }
                 var tempDay = DNDay.init(stringValue: dayLabel.text!)
                 tempDay?.increase(by: change)
                 dayLabel.text = tempDay?.stringValue(forFormat: DNTimeAndDayFormat.abbrDay())
+                pointForDay0 = newPanLocation
             } else {
                 dao.primaryTimeAndDay.day.increase(by: change)
                 let tempTime = dao.primaryTimeAndDay
@@ -73,20 +75,20 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
         }
     }
     
-    @objc func panToMoveSlider(recognizer: UIPanGestureRecognizer) {
+    @objc func panTimeSlider(recognizer: UIPanGestureRecognizer) {
         if recognizer.state == .Began || recognizer.state == .Changed || recognizer.state == .Ended {
-            adjustSlider(toRecognizer: recognizer)
+            adjustTimeSlider(toRecognizer: recognizer)
         }
         if recognizer.state == .Ended {
             self.delegate?.timeViewControllerDidChangeTime()
         }
     }
     @objc func tapToMoveSliderThumb(recognizer: UIGestureRecognizer) {
-        adjustSlider(toRecognizer: recognizer)
+        adjustTimeSlider(toRecognizer: recognizer)
         delegate?.timeViewControllerDidChangeTime()
     }
     
-    func adjustSlider(toRecognizer recognizer: UIGestureRecognizer) {
+    func adjustTimeSlider(toRecognizer recognizer: UIGestureRecognizer) {
         let pointOnSlider = recognizer.locationInView(timeSlider)
         let trackRect = timeSlider.trackRectForBounds(timeSlider.bounds)
         timeSlider.setValue(Float(Int(CGFloat(timeRange.count) * pointOnSlider.x / trackRect.width)), animated: true)

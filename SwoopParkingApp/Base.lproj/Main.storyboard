@@ -10,7 +10,7 @@
         <!--Swoop Parking-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="SPMainViewController" customModule="SwoopParkingApp" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="SPMainViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="BYZ-38-t0r" customClass="SPMainViewController" customModule="SwoopParkingApp" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
                         <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
@@ -175,7 +175,7 @@
         <!--Title-->
         <scene sceneID="1Mp-CJ-hCv">
             <objects>
-                <navigationController title="Title" automaticallyAdjustsScrollViewInsets="NO" id="bSp-j0-CnO" sceneMemberID="viewController">
+                <navigationController storyboardIdentifier="SPNavController" title="Title" automaticallyAdjustsScrollViewInsets="NO" useStoryboardIdentifierAsRestorationIdentifier="YES" id="bSp-j0-CnO" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="AMx-02-eUA">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
@@ -193,7 +193,7 @@
         <!--Time And Day View Controller-->
         <scene sceneID="ovt-kO-zka">
             <objects>
-                <viewController id="Ygi-5r-sqb" customClass="SPTimeAndDayViewController" customModule="SwoopParkingApp" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="timeAndDayController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="Ygi-5r-sqb" customClass="SPTimeAndDayViewController" customModule="SwoopParkingApp" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="lLr-sC-nbn"/>
                         <viewControllerLayoutGuide type="bottom" id="SRn-Yb-lCN"/>
@@ -458,7 +458,7 @@
         <!--Map View Controller-->
         <scene sceneID="DcG-OM-yXn">
             <objects>
-                <viewController id="tF9-3D-TiD" customClass="SPMapViewController" customModule="SwoopParkingApp" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="mapViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="tF9-3D-TiD" customClass="SPMapViewController" customModule="SwoopParkingApp" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="Upa-dP-sz1"/>
                         <viewControllerLayoutGuide type="bottom" id="ddR-V9-5bI"/>

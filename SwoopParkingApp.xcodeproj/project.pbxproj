@@ -23,9 +23,9 @@
 		9C14BA7B1DA2A4BC00441E84 /* Nimble.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C14BA7A1DA2A4BC00441E84 /* Nimble.framework */; };
 		9C14BA7D1DA2A4C400441E84 /* Nimble.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C14BA7C1DA2A4C400441E84 /* Nimble.framework */; };
 		9C14BA7F1DA2A4C700441E84 /* Quick.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C14BA7E1DA2A4C700441E84 /* Quick.framework */; };
+		9C170D321DAD325D006CA0E2 /* swoop-sqlite-no-FTS.db in Resources */ = {isa = PBXBuildFile; fileRef = 9C170D311DAD325D006CA0E2 /* swoop-sqlite-no-FTS.db */; };
 		9C1A86C71DA5517E00DAD930 /* SPMainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C1A86C61DA5517E00DAD930 /* SPMainViewController.swift */; };
 		9C1A86C81DA586C900DAD930 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9C1A86CA1DA586C900DAD930 /* Main.storyboard */; };
-		9C1CA59D1DA7F46200EB875F /* swoop-sqlite-no-FTS.db in Resources */ = {isa = PBXBuildFile; fileRef = 9C1CA59C1DA7F46200EB875F /* swoop-sqlite-no-FTS.db */; };
 		9C1CA59F1DA8125B00EB875F /* SPSignInfoOverlay.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9C1CA59E1DA8125B00EB875F /* SPSignInfoOverlay.xib */; };
 		9C1CA5A11DA8130D00EB875F /* SPSignInfoOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C1CA5A01DA8130D00EB875F /* SPSignInfoOverlay.swift */; };
 		9C1CA5A31DA83FB800EB875F /* SPGoogleNetworkingObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C1CA5A21DA83FB800EB875F /* SPGoogleNetworkingObject.swift */; };
@@ -129,9 +129,9 @@
 		9C14BA7A1DA2A4BC00441E84 /* Nimble.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Nimble.framework; path = "Pods/../build/Debug-iphoneos/Nimble/Nimble.framework"; sourceTree = "<group>"; };
 		9C14BA7C1DA2A4C400441E84 /* Nimble.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Nimble.framework; path = "Pods/../build/Debug-iphoneos/Nimble/Nimble.framework"; sourceTree = "<group>"; };
 		9C14BA7E1DA2A4C700441E84 /* Quick.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quick.framework; path = "Pods/../build/Debug-iphoneos/Quick/Quick.framework"; sourceTree = "<group>"; };
+		9C170D311DAD325D006CA0E2 /* swoop-sqlite-no-FTS.db */ = {isa = PBXFileReference; lastKnownFileType = file; path = "swoop-sqlite-no-FTS.db"; sourceTree = "<group>"; };
 		9C1A86C61DA5517E00DAD930 /* SPMainViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPMainViewController.swift; sourceTree = "<group>"; };
 		9C1A86CB1DA5872000DAD930 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		9C1CA59C1DA7F46200EB875F /* swoop-sqlite-no-FTS.db */ = {isa = PBXFileReference; lastKnownFileType = file; path = "swoop-sqlite-no-FTS.db"; sourceTree = "<group>"; };
 		9C1CA59E1DA8125B00EB875F /* SPSignInfoOverlay.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SPSignInfoOverlay.xib; sourceTree = "<group>"; };
 		9C1CA5A01DA8130D00EB875F /* SPSignInfoOverlay.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPSignInfoOverlay.swift; sourceTree = "<group>"; };
 		9C1CA5A21DA83FB800EB875F /* SPGoogleNetworkingObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPGoogleNetworkingObject.swift; sourceTree = "<group>"; };
@@ -426,7 +426,7 @@
 				9CFEE3821CDA6D7A00CE5D53 /* LaunchScreen.storyboard */,
 				9CFEE3851CDA6D7A00CE5D53 /* Info.plist */,
 				9CBE25BC1D552BFA00B5384B /* SwoopParkingApp-Bridging-Header.h */,
-				9C1CA59C1DA7F46200EB875F /* swoop-sqlite-no-FTS.db */,
+				9C170D311DAD325D006CA0E2 /* swoop-sqlite-no-FTS.db */,
 				9CA7DDC31D57EAC90050B75D /* ObjC Header files */,
 			);
 			path = SwoopParkingApp;
@@ -596,7 +596,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9CFEE3841CDA6D7A00CE5D53 /* LaunchScreen.storyboard in Resources */,
-				9C1CA59D1DA7F46200EB875F /* swoop-sqlite-no-FTS.db in Resources */,
+				9C170D321DAD325D006CA0E2 /* swoop-sqlite-no-FTS.db in Resources */,
 				9CFEE3811CDA6D7A00CE5D53 /* Assets.xcassets in Resources */,
 				9C1A86C81DA586C900DAD930 /* Main.storyboard in Resources */,
 				9C1CA59F1DA8125B00EB875F /* SPSignInfoOverlay.xib in Resources */,
@@ -972,7 +972,7 @@
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				"FRAMEWORK_SEARCH_PATHS[arch=*]" = "$(inherited)";
 				INFOPLIST_FILE = SwoopParkingApp/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = dnom.SwoopParkingApp;
@@ -995,7 +995,7 @@
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				"FRAMEWORK_SEARCH_PATHS[arch=*]" = "$(inherited)";
 				INFOPLIST_FILE = SwoopParkingApp/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = dnom.SwoopParkingApp;

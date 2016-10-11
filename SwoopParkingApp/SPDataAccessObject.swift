@@ -15,9 +15,8 @@ enum DAOError:ErrorType {
 }
 
 class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDelegate, SPLambdaManagerDelegate, SPGoogleNetworkingDelegate {
-    
     var delegate: SPDataAccessObjectDelegate?
-    var sqlReader: SPSQLiteReader = SPSQLiteReader.init()
+    var sqlReader: SPSQLiteReader!
     
     var locationsForDayAndTime = [SPLocation]()
     var currentMapViewLocations = [SPLocation]()
@@ -56,7 +55,6 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
         
     func getSigns(forCurrentMapView mapView:GMSMapView) {
         let visibleRegionBounds = GMSCoordinateBounds.init(region: mapView.projection.visibleRegion())
-        sqlReader.delegate = self
         sqlReader.querySignsAndLocations(swCoordinate: visibleRegionBounds.southWest, neCoordinate: visibleRegionBounds.northEast)
     }
     
@@ -90,16 +88,25 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
         locationManager.delegate = self
         locationManager.distanceFilter = kCLDistanceFilterNone
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        locationManager.requestAlwaysAuthorization()
-        locationManager.requestWhenInUseAuthorization()
         locationManager.startUpdatingLocation()
     }
-    
     // MARK: - CLManager delegate
-    
+    var isFirstLocationAfterAuthorization = false
     func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        currentLocation = locations.last!
         if (locations.count == 0) { return }
+        currentLocation = locations.last!
+        if isFirstLocationAfterAuthorization {
+            isFirstLocationAfterAuthorization = false
+            delegate?.dataAccessObjectDidAllowLocationServicesAndSetCurrentLocation()
+        }
+    }
+    func locationManager(manager: CLLocationManager, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
+        if status == .AuthorizedWhenInUse {
+            if !NSUserDefaults.standardUserDefaults().boolForKey(kSPDidAllowLocationServices) {
+                NSUserDefaults.standardUserDefaults().setBool(true, forKey: kSPDidAllowLocationServices)
+                isFirstLocationAfterAuthorization = true
+            }
+        }
     }
     
     //MARK: - Networking Delegate methods
@@ -139,5 +146,5 @@ protocol SPDataAccessObjectDelegate: class {
     //For google API calls
     func dataAccessObject(dao: SPDataAccessObject, didSetGoogleSearchObject googleSearchObject:SPGoogleCoordinateAndInfo)
     func dataAccessObject(dao: SPDataAccessObject, didUpdateAddressResults:[SPGoogleAddressResult])
-    
+    func dataAccessObjectDidAllowLocationServicesAndSetCurrentLocation()
 }

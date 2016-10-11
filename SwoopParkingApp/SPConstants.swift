@@ -12,9 +12,14 @@ var standardAnimationDuration:Double { return 0.2 }
 
 let kSPGoogleMapsKey = "AIzaSyCGKTmya_bbd5_S9hJOzO9eKf4pDckrffQ"
 
-//MARK: NotificationCenter names
+//MARK: - NotificationCenter names
 let kSPSearchTableViewDataSourceDidChange = "SearchTableViewDataSourceDidChange"
 
+//MARK: NSUserDefaults keys
+let kSPDidAllowLocationServices = "didAllowLocationServices"
+
+
+//MARK: - Global enums
 enum SPCities: String {
     case NYC
     case Chicago
@@ -22,32 +27,6 @@ enum SPCities: String {
     case LA
 }
 
-enum SPMapApp: String {
-    case Google
-    case Apple
-    case Waze
-    var scheme: String {
-        switch self {
-        case .Google: return "comgooglemaps://"
-        case .Apple: return "http://maps.apple.com/"
-        case .Waze: return "waze://"
-        }
-    }
-    static var allMaps: [SPMapApp] {
-        return [Google, Apple, Waze]
-    }
-    static var appsForThisDevice: [SPMapApp] {
-        var mapOptions = [SPMapApp]()
-        for map in SPMapApp.allMaps {
-            guard let scheme = NSURL(string:map.scheme) else { continue }
-            if UIApplication.sharedApplication().canOpenURL(scheme) {
-                mapOptions.append(map)
-            }
-        }
-        return mapOptions
-    }
-
-}
 
 //MARK: SQL query types
 enum SPSQLLocationQueryTypes: String {
@@ -56,6 +35,17 @@ enum SPSQLLocationQueryTypes: String {
     case getLocationsForTimeAndDay
 //    case getLocationCountForTimeAndDay
 }
+
+struct CoderKeys {
+    static let hour = "hour"
+    static let min = "min"
+    static let day = "day"
+    static let zoom = "zoom"
+    static let centerLat = "centerLat"
+    static let centerLong = "centerLong"
+    static let searchText = "searchText"
+}
+
 
 // location SQL columns
 let kSPIdSQL = "id"

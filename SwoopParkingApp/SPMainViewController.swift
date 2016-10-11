@@ -8,8 +8,9 @@
 
 import Foundation
 import GoogleMaps
+import DNTimeAndDay
 
-class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDataAccessObjectDelegate, SPSearchResultsViewControllerDelegate, SPMapViewControllerDelegate, SPTimeViewControllerDelegate{
+class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDataAccessObjectDelegate, SPSearchResultsViewControllerDelegate, SPMapViewControllerDelegate, SPTimeViewControllerDelegate {
     @IBOutlet weak var timeAndDayContainerView: UIView!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var streetViewSwitch: UISwitch!
@@ -57,11 +58,10 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
     //MARK: - Override methods
     override func viewDidLoad() {
         super.viewDidLoad()
+        assertDependencies()
         setObservers()
         setupGestures()
         setupViews()
-        assertDependencies()
-        dao.delegate = self
     }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -71,7 +71,7 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
         NSNotificationCenter.defaultCenter().removeObserver(self)
     }
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Make a protocol to make a interface for child view controllers to abstract a method to set the delegate and dao for the child view controllers
+        // To do: Make a protocol to make a interface for child view controllers to abstract a method to set the delegate and dao for the child view controllers
         guard segue.identifier != nil else { return }
         switch segue.identifier! {
         case timeContainerSegue:
@@ -182,7 +182,7 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
     //MARK: Other Views
     func setupViews() {
         showHideSearchBar(shouldShow: true, makeFirstResponder: false)
-        NSTimer.scheduledTimerWithTimeInterval(2.8, target: self, selector: #selector(hideSearchBarAfterLaunch), userInfo: nil, repeats: false)
+        NSTimer.scheduledTimerWithTimeInterval(2.3, target: self, selector: #selector(hideSearchBarAfterLaunch), userInfo: nil, repeats: false)
         
         searchContainerView.userInteractionEnabled = true
         activityIndicator.hidesWhenStopped = true
@@ -285,6 +285,12 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
             hideWaitingView()
         }
     }
+    
+    func dataAccessObjectDidAllowLocationServicesAndSetCurrentLocation() {
+        if let endCoordinate = mapViewController.endCoordinateBeforeLocationRequest {
+            mapViewController.presentAlertControllerForDirections(forCoordinate: endCoordinate)
+        }
+    }
     //MARK: -- Methods that interact with child view controllers
     //MARK: -----Time and Day Container Controller delegate
     func timeViewControllerDidChangeTime() {
@@ -346,6 +352,27 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
         turnStreetSwitch(on: on, shouldGetOverlays: shouldGetOverlay)
         mapViewController.hideMarkerInfoWindow()
         mapViewController.hideMarkers()
+    }
+    
+    //MARK: - UIStateRestoring Protocol
+    override func encodeRestorableStateWithCoder(coder: NSCoder) {
+        coder.encodeInteger(dao.primaryTimeAndDay.day.rawValue, forKey: CoderKeys.day)
+        coder.encodeInteger(dao.primaryTimeAndDay.time.hour, forKey: CoderKeys.hour)
+        coder.encodeInteger(dao.primaryTimeAndDay.time.min, forKey: CoderKeys.min)
+        coder.encodeFloat(mapViewController.mapView.camera.zoom, forKey: CoderKeys.zoom)
+        let centerCoordinates = mapViewController.mapView.camera.target
+        coder.encodeDouble(centerCoordinates.latitude, forKey: CoderKeys.centerLat)
+        coder.encodeDouble(centerCoordinates.longitude, forKey: CoderKeys.centerLong)
+        coder.encodeObject(searchViewController.searchBar.text, forKey: CoderKeys.searchText)
+        super.encodeRestorableStateWithCoder(coder)
+    }
+    override func decodeRestorableStateWithCoder(coder: NSCoder) {
+        let zoom = coder.decodeFloatForKey(CoderKeys.zoom),
+            centerLat = coder.decodeDoubleForKey(CoderKeys.centerLat),
+            centerLong = coder.decodeDoubleForKey(CoderKeys.centerLong)
+        mapViewController.restoredCamera = GMSCameraPosition.cameraWithLatitude(centerLat, longitude: centerLong, zoom: zoom)
+        searchViewController.searchBar.text = coder.decodeObjectForKey(CoderKeys.searchText) as? String
+        super.decodeRestorableStateWithCoder(coder)
     }
     
     //MARK: - Injectable protocol
