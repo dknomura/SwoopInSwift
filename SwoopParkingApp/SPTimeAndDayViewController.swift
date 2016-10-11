@@ -169,7 +169,7 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
     //MARK: Image processing
     let thumbImage: UIImage! = UIImage(named:"smart-car-icon")
     let noParkingImage: UIImage! = UIImage(named:"smart-car-no-parking")
-    let unknownParkingImage: UIImage! = UIImage(named: "smart-car-question-mark")
+    let unknownParkingImage: UIImage! = UIImage(named:"smart-car-no-parking")
     func setNewImage() {
         guard let locationsCount = (self.dao.locationsForPrimaryTimeAndDay?.count) else {
             timeSlider.setThumbImage(unknownParkingImage, forState: .Normal)
