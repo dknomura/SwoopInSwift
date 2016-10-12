@@ -1,4 +1,4 @@
-//
+    	//
 //  SPMainViewController.swift
 //  SwoopParkingApp
 //
@@ -101,6 +101,7 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
         default: return
         }
     }
+    
     
     //MARK: - Setup/breakdown methods
     //MARK: --NotificationCenter
@@ -285,7 +286,7 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
             hideWaitingView()
         }
     }
-    
+
     func dataAccessObjectDidAllowLocationServicesAndSetCurrentLocation() {
         if let endCoordinate = mapViewController.endCoordinateBeforeLocationRequest {
             mapViewController.presentAlertControllerForDirections(forCoordinate: endCoordinate)
@@ -356,24 +357,42 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
     
     //MARK: - UIStateRestoring Protocol
     override func encodeRestorableStateWithCoder(coder: NSCoder) {
-        coder.encodeInteger(dao.primaryTimeAndDay.day.rawValue, forKey: CoderKeys.day)
-        coder.encodeInteger(dao.primaryTimeAndDay.time.hour, forKey: CoderKeys.hour)
-        coder.encodeInteger(dao.primaryTimeAndDay.time.min, forKey: CoderKeys.min)
-        coder.encodeFloat(mapViewController.mapView.camera.zoom, forKey: CoderKeys.zoom)
+        coder.encodeFloat(mapViewController.mapView.camera.zoom, forKey: SPRestoreCoderKeys.zoom)
         let centerCoordinates = mapViewController.mapView.camera.target
-        coder.encodeDouble(centerCoordinates.latitude, forKey: CoderKeys.centerLat)
-        coder.encodeDouble(centerCoordinates.longitude, forKey: CoderKeys.centerLong)
-        coder.encodeObject(searchViewController.searchBar.text, forKey: CoderKeys.searchText)
+        coder.encodeDouble(centerCoordinates.latitude, forKey: SPRestoreCoderKeys.centerLat)
+        coder.encodeDouble(centerCoordinates.longitude, forKey: SPRestoreCoderKeys.centerLong)
+        coder.encodeObject(searchViewController.searchBar.text, forKey: SPRestoreCoderKeys.searchText)
+        coder.encodeInt(Int32(dao.primaryTimeAndDay.day.rawValue), forKey: SPRestoreCoderKeys.day)
+        coder.encodeInt(Int32(dao.primaryTimeAndDay.time.hour), forKey: SPRestoreCoderKeys.hour)
+        coder.encodeInt(Int32(dao.primaryTimeAndDay.time.min), forKey: SPRestoreCoderKeys.min)
         super.encodeRestorableStateWithCoder(coder)
     }
     override func decodeRestorableStateWithCoder(coder: NSCoder) {
-        let zoom = coder.decodeFloatForKey(CoderKeys.zoom),
-            centerLat = coder.decodeDoubleForKey(CoderKeys.centerLat),
-            centerLong = coder.decodeDoubleForKey(CoderKeys.centerLong)
+        let zoom = coder.decodeFloatForKey(SPRestoreCoderKeys.zoom),
+            centerLat = coder.decodeDoubleForKey(SPRestoreCoderKeys.centerLat),
+            centerLong = coder.decodeDoubleForKey(SPRestoreCoderKeys.centerLong)
         mapViewController.restoredCamera = GMSCameraPosition.cameraWithLatitude(centerLat, longitude: centerLong, zoom: zoom)
-        searchViewController.searchBar.text = coder.decodeObjectForKey(CoderKeys.searchText) as? String
+        
+        let hour = coder.decodeIntegerForKey(SPRestoreCoderKeys.hour),
+            min = coder.decodeIntegerForKey(SPRestoreCoderKeys.min),
+            day = coder.decodeIntegerForKey(SPRestoreCoderKeys.day)
+        if let restoredTimeAndDay = DNTimeAndDay.init(dayInt: day, hourInt: hour, minInt:min) {
+            dao.primaryTimeAndDay = restoredTimeAndDay
+        }
+        searchViewController.searchBar.text = coder.decodeObjectForKey(SPRestoreCoderKeys.searchText) as? String
         super.decodeRestorableStateWithCoder(coder)
     }
+    override func applicationFinishedRestoringState() {
+        mapViewController.mapView.camera = mapViewController.restoredCamera!
+        let shouldTurnSwitchOn = mapViewController.restoredCamera?.zoom >= mapViewController.zoomToSwitchOverlays
+        dao.getStreetCleaningLocationsForPrimaryTimeAndDay()
+        turnStreetSwitch(on: shouldTurnSwitchOn, shouldGetOverlays: false)
+        mapViewController.adjustViewsToZoom()
+        timeAndDayViewController.adjustTimeSliderToDay()
+        timeAndDayViewController.adjustSliderToTimeChange()
+    }
+    
+
     
     //MARK: - Injectable protocol
     private var dao: SPDataAccessObject!

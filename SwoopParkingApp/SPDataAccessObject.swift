@@ -14,7 +14,7 @@ enum DAOError:ErrorType {
     case noDao(forFunction: String)
 }
 
-class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDelegate, SPLambdaManagerDelegate, SPGoogleNetworkingDelegate {
+class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDelegate, SPLambdaManagerDelegate, SPGoogleNetworkingDelegate, UIStateRestoring {
     var delegate: SPDataAccessObjectDelegate?
     var sqlReader: SPSQLiteReader!
     
@@ -22,7 +22,7 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
     var currentMapViewLocations = [SPLocation]()
     var currentLocation: CLLocation?
     let locationManager = CLLocationManager()
-    var primaryTimeAndDay: DNTimeAndDay = DNTimeAndDay.currentTimeAndDay()
+    var primaryTimeAndDay = DNTimeAndDay.currentTimeAndDay()
     var addressResults = [SPGoogleAddressResult]()
     var googleSearchObject = SPGoogleCoordinateAndInfo()
     var searchCoordinate: CLLocationCoordinate2D?
@@ -138,7 +138,6 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
         }
     }
 }
-
 protocol SPDataAccessObjectDelegate: class {
     //For SQL calls
     func dataAccessObject(dao: SPDataAccessObject, didSetLocationsForQueryType:SPSQLLocationQueryTypes)

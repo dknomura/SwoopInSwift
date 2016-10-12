@@ -139,6 +139,18 @@ class SPSearchResultsViewController: UIViewController, UITableViewDelegate, UITa
         }
         searchBar.resignFirstResponder()
     }
+    
+//    //MARK: - UIStateRestoring Protocol
+//    override func encodeRestorableStateWithCoder(coder: NSCoder) {
+//        coder.encodeObject(searchBar.text, forKey: SPRestoreCoderKeys.searchText)
+//        super.encodeRestorableStateWithCoder(coder)
+//    }
+//    override func decodeRestorableStateWithCoder(coder: NSCoder) {
+//        if let searchText = coder.decodeObjectForKey(SPRestoreCoderKeys.searchText) as? String {
+//            searchBar.text = searchText
+//        }
+//        super.decodeRestorableStateWithCoder(coder)
+//    }
 }
 
 protocol SPSearchResultsViewControllerDelegate: class {

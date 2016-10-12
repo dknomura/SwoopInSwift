@@ -92,10 +92,7 @@ struct SPParser {
         var returnLocations = [SPLocation]()
         var location = SPLocation.init(locationNumber: nil, fromCoordinate: nil, signContentTag: nil)
         while results.next() {
-            if results.stringForColumn(kSPLocationNumberSQL) == location.locationNumber {
-                let sign = SPSign.init(positionInFeet: results.doubleForColumn(kSPPositionInFeetSQL), directionOfArrow: results.stringForColumn(kSPDirectionOfArrowSQL), signContent: results.stringForColumn(kSPSignContentSQL))
-                location.signs?.append(sign)
-            } else {
+            if results.stringForColumn(kSPLocationNumberSQL) != location.locationNumber {
                 if location.locationNumber != nil {
                     returnLocations.append(location)
                 }
@@ -106,6 +103,8 @@ struct SPParser {
                 location.sideOfStreet = results.stringForColumn(kSPSideOfStreetSQL)
                 location.signs = [SPSign]()
             }
+            let sign = SPSign.init(positionInFeet: results.doubleForColumn(kSPPositionInFeetSQL), directionOfArrow: results.stringForColumn(kSPDirectionOfArrowSQL), signContent: results.stringForColumn(kSPSignContentSQL))
+            location.signs?.append(sign)
         }
         return returnLocations
     }

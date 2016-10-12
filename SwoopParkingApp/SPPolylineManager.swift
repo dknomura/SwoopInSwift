@@ -40,6 +40,7 @@ struct SPPolylineManager: SPInjectable {
         //Meters to separate the two sides of the road
         let metersToDisplacePolyline = metersToDisplace(byPoints: 1.8, zoom: zoom)
         dao.signForPathCoordinates.removeAll()
+        print("\n\nNew polylines")
         for location in currentLocations {
             guard let fromCoordinate = location.fromCoordinate, toCoordinate = location.toCoordinate, sideOfStreet = location.sideOfStreet, signs = location.signs else { continue }
             let path = gmsPath(forCoordinate1: fromCoordinate, coordinate2: toCoordinate)
@@ -57,14 +58,18 @@ struct SPPolylineManager: SPInjectable {
                     guard sign!.positionInFeet != nil else { continue }
                     let positionInMeters = meters(fromFeet: sign!.positionInFeet!)
                     // The position in feet from the database is a few meters off, so the last sign.positionInFeet will be substituted with the calculated street distance
-                    let metersDownStreet =  i != signs.count - 1 ? positionInMeters : distanceInMetersBetween(coordinate1: fromCoordinate, coordinate2: toCoordinate)
-                    pathCoordinate2 = coordinateOnLine(fromCoordinate, toCoordinate: toCoordinate, positionInMeters: metersDownStreet)
+                    if i == signs.count - 1 {
+                        pathCoordinate2 = toCoordinate
+                    } else {
+                        pathCoordinate2 = coordinateOnLine(fromCoordinate, toCoordinate: toCoordinate, positionInMeters: positionInMeters)
+                    }
                     previousCoordinate = pathCoordinate2
                 } else {
                     sign = nil
                     pathCoordinate2 = toCoordinate
                 }
                 let path = gmsPath(forCoordinate1: pathCoordinate1, coordinate2: pathCoordinate2)
+//                print("Path for location # \(location.locationNumber): from coordinate \(pathCoordinate1), to coordinate \(pathCoordinate2)")
                 returnArray.append(setupPolyline(path, deltaCoordinates: deltaCoordinates!, forSign: sign))
                 i += 1
             } while i < signs.count
@@ -74,6 +79,7 @@ struct SPPolylineManager: SPInjectable {
     
     // MARK: Polyline Color
     
+    var greenCoordinates = [(fromCoordinate: CLLocationCoordinate2D, toCoordinate: CLLocationCoordinate2D)]()
     private func setupPolyline(path: GMSPath, deltaCoordinates:CLLocationCoordinate2D, forSign sign: SPSign?) -> GMSPolyline {
         let displacedPath = path.pathOffsetByLatitude(deltaCoordinates.latitude, longitude: deltaCoordinates.longitude)
         let polyline = GMSPolyline(path: displacedPath)
@@ -82,6 +88,7 @@ struct SPPolylineManager: SPInjectable {
         } else {
             assertDependencies()
             if isStreetCleaningSign(sign!.signContent!) {
+//                greenCoordinates.append((path.coordinateAtIndex(0), path.coordinateAtIndex(path.count() - 1)))
                 polyline.strokeColor = UIColor.greenColor()
                 polyline.tappable = true
                 dao.signForPathCoordinates[SPPolylineManager.hashedString(forPolyline:polyline)] = sign
@@ -148,7 +155,7 @@ struct SPPolylineManager: SPInjectable {
         return path
     }
     
-    // MARK: - Methods to find coordinates on path
+    // MARK: Methods to find coordinates on path
     private func coordinateOnLine(fromCoordinate: CLLocationCoordinate2D, toCoordinate: CLLocationCoordinate2D, positionInMeters: Double) ->CLLocationCoordinate2D {
         let totalDistance = distanceInMetersBetween(coordinate1: fromCoordinate, coordinate2: toCoordinate)
         
@@ -220,6 +227,28 @@ struct SPPolylineManager: SPInjectable {
         return polyline
     }
     
+    private func bearing(fromCoordinate: CLLocationCoordinate2D, toCoordinate: CLLocationCoordinate2D) -> Double {
+        let long1 = degreesToRadians(fromCoordinate.longitude)
+        let lat1 = degreesToRadians(fromCoordinate.latitude)
+        let long2 = degreesToRadians(toCoordinate.longitude)
+        let lat2 = degreesToRadians(toCoordinate.latitude)
+        return bearing(lat1, long1: long1, lat2: lat2, long2: long2)
+    }
+    private func bearing(lat1: Double, long1: Double, lat2:Double, long2:Double) -> Double {
+        //	φ2 = asin( sin φ1 ⋅ cos δ + cos φ1 ⋅ sin δ ⋅ cos θ )
+        //  λ2 = λ1 + atan2( sin θ ⋅ sin δ ⋅ cos φ1, cos δ − sin φ1 ⋅ sin φ2 )
+        
+        // Above formula to find bearing breaks down to
+        //    var y = Math.sin(λ2-λ1) * Math.cos(φ2);
+        //    var x = Math.cos(φ1)*Math.sin(φ2) -
+        //            Math.sin(φ1)*Math.cos(φ2)*Math.cos(λ2-λ1);
+        //    var brng = Math.atan2(y, x).toDegrees();
+        
+        let y = sin(long2 - long1) * cos(lat2)
+        let x = cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(long2 - long1)
+        return atan2(y, x)
+    }
+    
     private func latLngDifference(forPath path:GMSPath, xMeters meters:Double, sideOfStreet:String) throws -> CLLocationCoordinate2D? {
         // http://www.movable-type.co.uk/scripts/latlong.html
         // first find the bearing
@@ -235,23 +264,12 @@ struct SPPolylineManager: SPInjectable {
         let long2 = degreesToRadians(toCoordinate.longitude)
         let lat2 = degreesToRadians(toCoordinate.latitude)
         
-        //	φ2 = asin( sin φ1 ⋅ cos δ + cos φ1 ⋅ sin δ ⋅ cos θ )
-        //  λ2 = λ1 + atan2( sin θ ⋅ sin δ ⋅ cos φ1, cos δ − sin φ1 ⋅ sin φ2 )
-        
-        // Above formula to find bearing breaks down to
-        //    var y = Math.sin(λ2-λ1) * Math.cos(φ2);
-        //    var x = Math.cos(φ1)*Math.sin(φ2) -
-        //            Math.sin(φ1)*Math.cos(φ2)*Math.cos(λ2-λ1);
-        //    var brng = Math.atan2(y, x).toDegrees();
-        
-        let y = sin(long2 - long1) * cos(lat2)
-        let x = cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(long2 - long1)
-        var bearing = atan2(y, x)
-        if bearing.isNaN {
+        var bearings = bearing(lat1, long1: long1, lat2: lat2, long2: long2)
+        if bearings.isNaN {
             
         }
         let side = try normalize(sideOfStreet: sideOfStreet)
-        try rotate(bearing: &bearing, direction: side)
+        try rotate(bearing: &bearings, direction: side)
         
         // Then you can find the displacement of the path
         //        var φ2 = Math.asin( Math.sin(φ1)*Math.cos(d/R) +
@@ -261,8 +279,8 @@ struct SPPolylineManager: SPInjectable {
         //
         // Angular distance = distance / radius of earth
         let angularDistance = meters / 6371000
-        let newLat = asin(sin(lat1) * cos(angularDistance) + cos(lat1) * sin(angularDistance) * cos(bearing))
-        let newLong = long1 + atan2(sin(bearing) * sin(angularDistance) * cos(lat1), cos(angularDistance) - sin(lat1) * sin(newLat))
+        let newLat = asin(sin(lat1) * cos(angularDistance) + cos(lat1) * sin(angularDistance) * cos(bearings))
+        let newLong = long1 + atan2(sin(bearings) * sin(angularDistance) * cos(lat1), cos(angularDistance) - sin(lat1) * sin(newLat))
         
         //        let fromLocation = CLLocation(latitude: fromCoordinate.latitude, longitude: fromCoordinate.longitude)
         //        let toLocation = CLLocation(latitude:radiansToDegrees(newLat), longitude:radiansToDegrees(newLong))
@@ -311,8 +329,6 @@ struct SPPolylineManager: SPInjectable {
             }
         default: throw PolylineError.unableToRotate(geographicalBearing: bearing)
         }
-        
-
     }
     
     private func degreesToRadians(degrees:Double) -> Double {

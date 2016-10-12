@@ -15,31 +15,30 @@ import DNTimeAndDay
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var window: UIWindow?
-    
+    var restored = false
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-        setupRootViewController(withDAO: SPDataAccessObject())
-        GMSServices.provideAPIKey(kSPGoogleMapsKey)
-        setupAWS()
-        
+        if !restored {
+            setupRootViewController(withDAO: SPDataAccessObject())
+            GMSServices.provideAPIKey(kSPGoogleMapsKey)
+            setupAWS()
+        }
         // Override point for customization after application launch.
         return true
     }
-    
     func application(application: UIApplication, shouldSaveApplicationState coder: NSCoder) -> Bool {
         return true
     }
     func application(application: UIApplication, shouldRestoreApplicationState coder: NSCoder) -> Bool {
+//        let hour = coder.decodeIntegerForKey(CoderKeys.hour),
+//        min = coder.decodeIntegerForKey(CoderKeys.min),
+//        day = coder.decodeIntegerForKey(CoderKeys.day)
+//        let dao = SPDataAccessObject()
+//        dao.primaryTimeAndDay = DNTimeAndDay.init(dayInt: day, hourInt: hour, minInt:min)
+        setupRootViewController(withDAO: SPDataAccessObject())
+        GMSServices.provideAPIKey(kSPGoogleMapsKey)
+        setupAWS()
+        restored = true
         return true
-    }
-    
-    
-    func application(application: UIApplication, didDecodeRestorableStateWithCoder coder: NSCoder) {
-        let hour = coder.decodeIntegerForKey(CoderKeys.hour),
-        min = coder.decodeIntegerForKey(CoderKeys.min),
-        day = coder.decodeIntegerForKey(CoderKeys.day)
-        let dao = SPDataAccessObject()
-        dao.primaryTimeAndDay = DNTimeAndDay.init(dayInt: day, hourInt: hour, minInt:min)!
-        setupRootViewController(withDAO: dao)
     }
     
     func applicationWillResignActive(application: UIApplication) {

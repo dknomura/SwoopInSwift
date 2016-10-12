@@ -29,8 +29,8 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
     //MARK: - Setup Methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        dao.primaryTimeAndDay.increaseTime()
         assertDependencies()
+        dao.primaryTimeAndDay.increaseTime()
         setupSlider()
         dao.getStreetCleaningLocationsForPrimaryTimeAndDay()
         dao.getAllStreetCleaningLocations()
@@ -139,7 +139,7 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
         delegate?.timeViewControllerDidChangeTime()
     }
     
-    private func adjustSliderToTimeChange() {
+    func adjustSliderToTimeChange() {
         sliderThumbLabel.center = centerOfSliderThumb
         let sliderValue = Int(timeSlider.value)
         if let newTime = DNTime.init(rawValue: Double(timeRange[sliderValue])) {
@@ -227,6 +227,19 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
 //        if textView === primaryDayTextView {
 //        }
 //    }
+    
+    //MARK: - UIStateRestoring Protocol
+//    override func encodeRestorableStateWithCoder(coder: NSCoder) {
+////        coder.encodeObject(searchBar.text, forKey: SPRestoreCoderKeys.searchText)
+//        super.encodeRestorableStateWithCoder(coder)
+//    }
+//    override func decodeRestorableStateWithCoder(coder: NSCoder) {
+//        if let searchText = coder.decodeObjectForKey(SPRestoreCoderKeys.searchText) as? String {
+////            searchBar.text = searchText
+//        }
+//        super.decodeRestorableStateWithCoder(coder)
+//    }
+
     //MARK: - Injectable Protocol
     
     private var dao: SPDataAccessObject!

@@ -36,7 +36,8 @@ enum SPSQLLocationQueryTypes: String {
 //    case getLocationCountForTimeAndDay
 }
 
-struct CoderKeys {
+struct SPRestoreCoderKeys {
+    
     static let hour = "hour"
     static let min = "min"
     static let day = "day"

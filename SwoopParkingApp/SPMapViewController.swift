@@ -135,7 +135,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         CATransaction.commit()
     }
     
-    private func adjustViewsToZoom() {
+    func adjustViewsToZoom() {
         let turnSwitchOn: Bool? = mapView.camera.zoom < zoomToSwitchOverlays ? false : nil
         delegate?.mapViewControllerDidZoom(switchOn: turnSwitchOn, shouldGetOverlay: true)
         if mapView.camera.zoom <= initialZoom + 1 {
@@ -174,12 +174,12 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         show(mapOverlayViews: currentGroundOverlays, shouldHideOtherOverlay: true)
     }
     func getNewPolylines() {
-        if self.currentMapPolylines.count > 0 { self.hide(mapOverlayViews: self.currentMapPolylines) }
+        if currentMapPolylines.count > 0 { hide(mapOverlayViews: currentMapPolylines) }
         var polylineManager = SPPolylineManager()
         polylineManager.inject(dao)
-        self.currentMapPolylines = polylineManager.polylines(forCurrentLocations: dao.currentMapViewLocations, zoom: Double(self.mapView.camera.zoom))
-        if self.currentMapPolylines.count > 0 &&  self.mapView.camera.zoom >= self.streetZoom {
-            self.show(mapOverlayViews: self.currentMapPolylines, shouldHideOtherOverlay: true)
+        currentMapPolylines = polylineManager.polylines(forCurrentLocations: dao.currentMapViewLocations, zoom: Double(mapView.camera.zoom))
+        if currentMapPolylines.count > 0 &&  mapView.camera.zoom >= streetZoom {
+            show(mapOverlayViews: currentMapPolylines, shouldHideOtherOverlay: true)
         }
         delegate?.mapViewControllerFinishedDrawingPolylines()
     }
@@ -329,11 +329,29 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     //MARK: Injectable protocol
     private var dao: SPDataAccessObject!
     func inject(dao: SPDataAccessObject) {
-        self.dao = dao
+        self.dao = dao 
     }
     func assertDependencies() {
         assert(dao != nil)
     }
+    
+//    //MARK: - UIStateRestoring Protocol
+//    override func encodeRestorableStateWithCoder(coder: NSCoder) {
+//        coder.encodeFloat(mapView.camera.zoom, forKey: SPRestoreCoderKeys.zoom)
+//        coder.encodeDouble(mapView.camera.target.latitude, forKey: SPRestoreCoderKeys.centerLat)
+//        coder.encodeDouble(mapView.camera.target.longitude, forKey: SPRestoreCoderKeys.centerLong)
+//        super.encodeRestorableStateWithCoder(coder)
+//    }
+//    override func decodeRestorableStateWithCoder(coder: NSCoder) {
+//        let zoom = coder.decodeFloatForKey(SPRestoreCoderKeys.zoom)
+//        let targetCoordinate = CLLocationCoordinate2D(latitude: coder.decodeDoubleForKey(SPRestoreCoderKeys.centerLat), longitude: coder.decodeDoubleForKey(SPRestoreCoderKeys.centerLong))
+//        restoredCamera = GMSCameraPosition.cameraWithTarget(targetCoordinate, zoom: zoom)
+//        super.decodeRestorableStateWithCoder(coder)
+//    }
+//    override func applicationFinishedRestoringState() {
+//        mapView.camera = restoredCamera!
+//    }
+
 }
 
 protocol SPMapViewControllerDelegate: class {
