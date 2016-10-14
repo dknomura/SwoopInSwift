@@ -9,6 +9,7 @@
 import UIKit
 import GoogleMaps
 
+private var kvoSelectedMarkerKeyPath = "selectedMarker"
 class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDelegate, UIGestureRecognizerDelegate, SPInjectable {
     
     weak var delegate: SPMapViewControllerDelegate?
@@ -25,9 +26,10 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     var animatingFromCityView = true
     var isPinchZooming = false
     var isZoomingIn = false
+    var cancelTapGesture = false
     
-    var zoomToSwitchOverlays: Float { return streetZoom - 1.5 }
-    var streetZoom: Float { return 16.0 }
+    var zoomToSwitchOverlays: Float { return streetZoom - 2.0 }
+    var streetZoom: Float { return 17.0 }
     var initialZoom: Float {
         return mapView.initialStreetCleaningZoom(forCity: .NYC)
     }
@@ -37,8 +39,8 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         super.viewDidLoad()
         setUpMap()
         setUpButtons()
-        setupGestures()
         assertDependencies()
+        setupObservers()
         dao.setUpLocationManager()
     }
     override func didReceiveMemoryWarning() {
@@ -46,12 +48,10 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     }
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
-        NSNotificationCenter.defaultCenter().removeObserver(self)
-    }    
+        removeObserver(self, forKeyPath: kvoSelectedMarkerKeyPath)
+    }
     //MARK: - Setup/breakdown methods
     //MARK: --Gestures
-    private func setupGestures() {
-    }
     @objc func zoomToDoubleTapOnMap(gesture:UITapGestureRecognizer) {
         let pointOnMap = gesture.locationInView(mapView)
         var doubleTapZoom: Float
@@ -80,6 +80,31 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
             zoomMap(toCoordinate: coordinate, zoom: zoom)
         } else { return }
         isPinchZooming = true
+    }
+    
+    //MARK: --Observers
+    private func setupObservers() {
+        mapView.addObserver(self, forKeyPath: kvoSelectedMarkerKeyPath, options: .New, context: nil)
+    }
+    
+    private var lastSelectedMarkerKVO: AnyObject?
+    override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
+        func defaultReturn() { super.observeValueForKeyPath(keyPath, ofObject: object, change: change, context: context) }
+        guard keyPath != nil && change != nil else {
+            defaultReturn()
+            return
+        }
+        switch keyPath! {
+        case kvoSelectedMarkerKeyPath:
+            let newSelectedMarker = change![NSKeyValueChangeNewKey]
+            if !(newSelectedMarker is GMSMarker) && lastSelectedMarkerKVO is GMSMarker {
+                cancelTapGesture = true
+            }
+            lastSelectedMarkerKVO = newSelectedMarker
+            print("\(kvoSelectedMarkerKeyPath) changed to \(change![NSKeyValueChangeNewKey]). will cancel tap gesture: \(cancelTapGesture)")
+        default:
+            super.observeValueForKeyPath(keyPath, ofObject: object, change: change, context: context)
+        }
     }
     
     //MARK: --Views
@@ -214,13 +239,12 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         else { userControl = false }
     }
     
-    //MARK: GMSMarker methods/delegate methods
+    //MARK: ----Methods for GMSMarker
     var signMarker: GMSMarker?
     func mapView(mapView: GMSMapView, didTapOverlay overlay: GMSOverlay) {
         if let polyline = overlay as? GMSPolyline {
             guard let coordinate = SPPolylineManager.coordinate(fromPolyline: polyline) else { return }
             if signMarker != nil { signMarker?.map = nil }
-            print("Hashed string: \(SPPolylineManager.hashedString(forPolyline: polyline)), sign value: \(dao.signForPathCoordinates[SPPolylineManager.hashedString(forPolyline: polyline)])")
             guard let sign: SPSign = dao.signForPathCoordinates[SPPolylineManager.hashedString(forPolyline: polyline)] else { return }
             signMarker = marker(withUserData: sign.signContent, atCoordinate: coordinate)
             mapView.selectedMarker = signMarker
@@ -238,17 +262,19 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         return marker
     }
     
-    func hideMarkerInfoWindow() {
-        if isMarkerSelected {
-            mapView.selectedMarker = nil
+    func hideMarkers() {
+        if signMarker?.map != nil {
+            signMarker?.map = nil
+        }
+        if searchMarker?.map != nil {
+            searchMarker?.map = nil
         }
     }
-    func hideMarkers() {
-        signMarker?.map = nil
-        searchMarker?.map = nil
-    }
     var isMarkerSelected: Bool {
-        return mapView.selectedMarker === signMarker || mapView.selectedMarker === searchMarker
+        return mapView.selectedMarker != nil
+    }
+    var areMarkersPresent: Bool {
+        return signMarker?.map != nil || searchMarker?.map != nil
     }
     
     var currentInfoWindow: SPSignInfoOverlay?
@@ -259,6 +285,12 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
             infoWindow.destinationCoordinate = marker.position
             infoWindow.signContentLabel.text = displayString
             currentInfoWindow = infoWindow
+            cancelTapGesture = true
+            if marker == searchMarker {
+                infoWindow.signImage.image = nil
+                infoWindow.signImageWidth.constant = 0
+                infoWindow.layoutIfNeeded()
+            }
             return infoWindow
         }
         return nil
@@ -334,24 +366,6 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     func assertDependencies() {
         assert(dao != nil)
     }
-    
-//    //MARK: - UIStateRestoring Protocol
-//    override func encodeRestorableStateWithCoder(coder: NSCoder) {
-//        coder.encodeFloat(mapView.camera.zoom, forKey: SPRestoreCoderKeys.zoom)
-//        coder.encodeDouble(mapView.camera.target.latitude, forKey: SPRestoreCoderKeys.centerLat)
-//        coder.encodeDouble(mapView.camera.target.longitude, forKey: SPRestoreCoderKeys.centerLong)
-//        super.encodeRestorableStateWithCoder(coder)
-//    }
-//    override func decodeRestorableStateWithCoder(coder: NSCoder) {
-//        let zoom = coder.decodeFloatForKey(SPRestoreCoderKeys.zoom)
-//        let targetCoordinate = CLLocationCoordinate2D(latitude: coder.decodeDoubleForKey(SPRestoreCoderKeys.centerLat), longitude: coder.decodeDoubleForKey(SPRestoreCoderKeys.centerLong))
-//        restoredCamera = GMSCameraPosition.cameraWithTarget(targetCoordinate, zoom: zoom)
-//        super.decodeRestorableStateWithCoder(coder)
-//    }
-//    override func applicationFinishedRestoringState() {
-//        mapView.camera = restoredCamera!
-//    }
-
 }
 
 protocol SPMapViewControllerDelegate: class {

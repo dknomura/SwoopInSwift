@@ -10,7 +10,8 @@ import Foundation
 
 
 class SPSignInfoOverlay: UIView, UITextViewDelegate {
-    
+    @IBOutlet weak var signImageWidth: NSLayoutConstraint!
+    @IBOutlet weak var signImage: UIImageView!
     @IBOutlet weak var signContentLabel: UILabel!
     var destinationCoordinate: CLLocationCoordinate2D?
 }

@@ -138,6 +138,12 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
     }
     
     @objc private func singleTapHandler(gesture: UITapGestureRecognizer) {
+        guard !mapViewController.cancelTapGesture else {
+            mapViewController.cancelTapGesture = false
+            return
+        }
+        print("Search marker is \(mapViewController.searchMarker?.map != nil ? "present" : "not present")")
+        print("Marker is selected: \(mapViewController.isMarkerSelected ? "yes" : "no")")
         if isSearchTableViewPresent {
             searchViewController.hideSearchResultsTableView()
         }
@@ -146,16 +152,19 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
             return
         }
         
-//        if mapViewController.isMarkerPresent {
-//            mapViewController.hideMarkerInfoWindow()
-//            return
-//        }
-        
-        if CGRectContainsPoint(timeAndDayContainerView.frame, gesture.locationInView(view)) || CGRectContainsPoint(bottomToolbar.frame, gesture.locationInView(view)) { return }
-        if mapViewController.currentInfoWindow != nil {
-            if CGRectContainsPoint(mapViewController.currentInfoWindow!.frame, gesture.locationInView(mapViewController.view)) { return }
+        if CGRectContainsPoint(timeAndDayContainerView.frame, gesture.locationInView(mapViewController.mapView)) || CGRectContainsPoint(bottomToolbar.frame, gesture.locationInView(mapViewController.mapView)) { return }
+        let signMarkerFrame = mapViewController.signMarker?.iconView?.frame,
+            searchMarkerFrame = mapViewController.searchMarker?.iconView?.frame,
+            infoWindowFrame = mapViewController.currentInfoWindow?.frame
+        let rects = [signMarkerFrame, searchMarkerFrame, infoWindowFrame]
+        for rect in rects {
+            if rect == nil { continue }
+            if CGRectContainsPoint(rect!, gesture.locationInView(mapViewController.mapView)) { return }
         }
-        
+        if mapViewController.areMarkersPresent {
+            mapViewController.hideMarkers()
+            return
+        }
         if toolbarsPresent {
             if isSearchBarPresent {
                 searchViewController.hideSearchBar()
@@ -244,6 +253,7 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
             searchViewController!.hideSearchResultsTableView()
         }
         if isKeyboardPresent { view.endEditing(true) }
+        if mapViewController.isMarkerSelected {        }
     }
     
     //MARK: --Blur View animation
@@ -316,11 +326,11 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
     
     func zoomAndSetMapMarker() {
         if dao.googleSearchObject.coordinate == nil { return }
-        mapViewController.zoomMap(toCoordinate: dao.googleSearchObject.coordinate!, zoom: mapViewController.streetZoom)
+        mapViewController.zoomMap(toCoordinate: dao.googleSearchObject.coordinate!, zoom: mapViewController.zoomToSwitchOverlays)
         if dao.googleSearchObject.info == nil { return }
         mapViewController.setSearchMarker(withUserData: dao.googleSearchObject.info!, atCoordinate: dao.googleSearchObject.coordinate!)
         turnStreetSwitch(on: true, shouldGetOverlays: true)
-
+        
     }
     func searchContainerHeightShouldAdjust(height: CGFloat, tableViewPresent: Bool, searchBarPresent: Bool) -> Bool {
         UIView.animateWithDuration(standardAnimationDuration) {
@@ -351,8 +361,6 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
     }
     func mapViewControllerDidZoom(switchOn on: Bool?, shouldGetOverlay: Bool) {
         turnStreetSwitch(on: on, shouldGetOverlays: shouldGetOverlay)
-        mapViewController.hideMarkerInfoWindow()
-        mapViewController.hideMarkers()
     }
     
     //MARK: - UIStateRestoring Protocol
@@ -391,8 +399,6 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
         timeAndDayViewController.adjustTimeSliderToDay()
         timeAndDayViewController.adjustSliderToTimeChange()
     }
-    
-
     
     //MARK: - Injectable protocol
     private var dao: SPDataAccessObject!

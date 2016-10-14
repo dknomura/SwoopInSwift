@@ -222,24 +222,6 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
             textView.selectAll(nil)
         }
     }
-    
-//    func textViewDidEndEditing(textView: UITextView) {
-//        if textView === primaryDayTextView {
-//        }
-//    }
-    
-    //MARK: - UIStateRestoring Protocol
-//    override func encodeRestorableStateWithCoder(coder: NSCoder) {
-////        coder.encodeObject(searchBar.text, forKey: SPRestoreCoderKeys.searchText)
-//        super.encodeRestorableStateWithCoder(coder)
-//    }
-//    override func decodeRestorableStateWithCoder(coder: NSCoder) {
-//        if let searchText = coder.decodeObjectForKey(SPRestoreCoderKeys.searchText) as? String {
-////            searchBar.text = searchText
-//        }
-//        super.decodeRestorableStateWithCoder(coder)
-//    }
-
     //MARK: - Injectable Protocol
     
     private var dao: SPDataAccessObject!

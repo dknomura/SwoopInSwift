@@ -18,9 +18,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var restored = false
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         if !restored {
-            setupRootViewController(withDAO: SPDataAccessObject())
-            GMSServices.provideAPIKey(kSPGoogleMapsKey)
-            setupAWS()
+            setupForAppLaunch()
         }
         // Override point for customization after application launch.
         return true
@@ -29,14 +27,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return true
     }
     func application(application: UIApplication, shouldRestoreApplicationState coder: NSCoder) -> Bool {
-//        let hour = coder.decodeIntegerForKey(CoderKeys.hour),
-//        min = coder.decodeIntegerForKey(CoderKeys.min),
-//        day = coder.decodeIntegerForKey(CoderKeys.day)
-//        let dao = SPDataAccessObject()
-//        dao.primaryTimeAndDay = DNTimeAndDay.init(dayInt: day, hourInt: hour, minInt:min)
-        setupRootViewController(withDAO: SPDataAccessObject())
-        GMSServices.provideAPIKey(kSPGoogleMapsKey)
-        setupAWS()
+        setupForAppLaunch()
         restored = true
         return true
     }
@@ -63,7 +54,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
-    
+    private func setupForAppLaunch() {
+        setupRootViewController(withDAO: SPDataAccessObject())
+        GMSServices.provideAPIKey(kSPGoogleMapsKey)
+        setupAWS()
+    }
     //MARK: - Setup Methods
     private func setupAWS() {
         let credentialProvider = AWSCognitoCredentialsProvider(regionType:.USEast1, identityPoolId: "us-east-1:14495a5f-65b5-4859-b8f5-4de05fbce775")

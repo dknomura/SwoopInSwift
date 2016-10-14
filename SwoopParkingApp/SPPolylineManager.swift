@@ -40,7 +40,6 @@ struct SPPolylineManager: SPInjectable {
         //Meters to separate the two sides of the road
         let metersToDisplacePolyline = metersToDisplace(byPoints: 1.8, zoom: zoom)
         dao.signForPathCoordinates.removeAll()
-        print("\n\nNew polylines")
         for location in currentLocations {
             guard let fromCoordinate = location.fromCoordinate, toCoordinate = location.toCoordinate, sideOfStreet = location.sideOfStreet, signs = location.signs else { continue }
             let path = gmsPath(forCoordinate1: fromCoordinate, coordinate2: toCoordinate)

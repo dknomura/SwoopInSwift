@@ -18,8 +18,8 @@
                         <constraint firstAttribute="width" constant="38" id="kmK-lU-IDx"/>
                     </constraints>
                 </imageView>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="7" baselineAdjustment="alignBaselines" minimumFontSize="7" translatesAutoresizingMaskIntoConstraints="NO" id="CNQ-rt-OPe">
-                    <rect key="frame" x="50" y="0.0" width="140" height="74"/>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="7" baselineAdjustment="alignBaselines" minimumFontSize="7" translatesAutoresizingMaskIntoConstraints="NO" id="CNQ-rt-OPe">
+                    <rect key="frame" x="50" y="8" width="132" height="58"/>
                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                     <nil key="highlightedColor"/>
@@ -27,13 +27,19 @@
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
             <constraints>
+                <constraint firstAttribute="trailing" secondItem="CNQ-rt-OPe" secondAttribute="trailing" constant="8" id="6si-67-zhE"/>
                 <constraint firstItem="lfz-1v-irq" firstAttribute="centerY" secondItem="rcx-VC-RnE" secondAttribute="centerY" id="PJ0-zj-Ldo"/>
+                <constraint firstItem="CNQ-rt-OPe" firstAttribute="leading" secondItem="lfz-1v-irq" secondAttribute="trailing" constant="8" id="Soi-vf-Gkr"/>
+                <constraint firstItem="CNQ-rt-OPe" firstAttribute="top" secondItem="rcx-VC-RnE" secondAttribute="top" constant="8" id="VBU-Vl-lKF"/>
                 <constraint firstItem="lfz-1v-irq" firstAttribute="leading" secondItem="rcx-VC-RnE" secondAttribute="leading" constant="4" id="bfq-E1-faJ"/>
+                <constraint firstAttribute="bottom" secondItem="CNQ-rt-OPe" secondAttribute="bottom" constant="8" id="qMr-Qq-hDh"/>
             </constraints>
             <nil key="simulatedStatusBarMetrics"/>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <connections>
                 <outlet property="signContentLabel" destination="CNQ-rt-OPe" id="zQt-Mp-mbc"/>
+                <outlet property="signImage" destination="lfz-1v-irq" id="hRs-if-CpA"/>
+                <outlet property="signImageWidth" destination="kmK-lU-IDx" id="x4B-bA-SNj"/>
             </connections>
             <point key="canvasLocation" x="68" y="344"/>
         </view>
