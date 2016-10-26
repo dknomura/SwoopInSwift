@@ -206,7 +206,6 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         if currentMapPolylines.count > 0 &&  mapView.camera.zoom >= streetZoom {
             show(mapOverlayViews: currentMapPolylines, shouldHideOtherOverlay: true)
         }
-        delegate?.mapViewControllerFinishedDrawingPolylines()
     }
     
     func hide(mapOverlayViews views:[GMSOverlay]) {
@@ -237,6 +236,10 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     func mapView(mapView: GMSMapView, willMove gesture: Bool) {
         if (gesture) { userControl = true }
         else { userControl = false }
+    }
+    
+    func mapViewSnapshotReady(mapView: GMSMapView) {
+        delegate?.mapViewControllerDidFinishDrawingPolylines()
     }
     
     //MARK: ----Methods for GMSMarker
@@ -372,7 +375,7 @@ protocol SPMapViewControllerDelegate: class {
     func mapViewControllerIsZooming()
     func mapViewControllerShouldSearchStreetCleaning(mapView: GMSMapView) -> Bool
     func mapViewControllerDidZoom(switchOn on: Bool?, shouldGetOverlay: Bool)
-    func mapViewControllerFinishedDrawingPolylines()
+    func mapViewControllerDidFinishDrawingPolylines()
 }
 
 

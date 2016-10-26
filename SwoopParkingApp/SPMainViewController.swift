@@ -346,15 +346,17 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
     }
 
     //MARK: --- Map Container Controller delegate
-    func mapViewControllerFinishedDrawingPolylines() {
-        hideWaitingView()
+    func mapViewControllerDidFinishDrawingPolylines() {
+        if streetViewSwitch.on {
+            hideWaitingView()  
+        }
     }
     func mapViewControllerIsZooming() {
         clearScreenForMapZoom()
     }
     func mapViewControllerShouldSearchStreetCleaning(mapView: GMSMapView) -> Bool {
         if streetViewSwitch.on {
-            showWaitingView(withLabel: waitingText, isStreetView: true)
+            showWaitingView(withLabel: waitingText, isStreetView: false)
             dao.getSigns(forCurrentMapView: mapView)
         }
         return streetViewSwitch.on

@@ -9,6 +9,9 @@ end
 
 target 'SwoopParkingApp' do
 	use_frameworks!
+    pod 'SwiftyJSON'
+    pod 'Alamofire', '~> 3.9'
+
     pod "DNTimeAndDay"
 	pod 'GoogleMaps'
 	pod 'AWSLambda'

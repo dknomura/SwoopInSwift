@@ -33,7 +33,7 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, SPInject
         dao.primaryTimeAndDay.increaseTime()
         setupSlider()
         dao.getStreetCleaningLocationsForPrimaryTimeAndDay()
-        dao.getAllStreetCleaningLocations()
+//        dao.getAllStreetCleaningLocations()
         setupGestures()
     }
     

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import DNTimeAndDay
 
 extension UIViewController {
     func hideKeyboardWhenTapAround() {
