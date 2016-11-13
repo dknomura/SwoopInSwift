@@ -10,7 +10,7 @@ import Foundation
 import CoreLocation
 import DNTimeAndDay
 
-enum SPSQLError: ErrorType {
+enum SPSQLError: Error {
     case unableToOpenDB
     case noResults(ErrorMessage:String)
     case invalidQuery(query:String)
@@ -39,11 +39,11 @@ struct SPSQLiteReader {
         self.delegate = delegate
     }
     var databasePath : String {
-        return NSBundle.mainBundle().pathForResource("swoop-sqlite-no-FTS", ofType: "db")!
+        return Bundle.main.path(forResource: "swoop-sqlite-no-FTS", ofType: "db")!
     }
-    func querySignsAndLocations(swCoordinate swCoordinate:CLLocationCoordinate2D, neCoordinate: CLLocationCoordinate2D) {
+    func querySignsAndLocations(swCoordinate:CLLocationCoordinate2D, neCoordinate: CLLocationCoordinate2D) {
         let query = "SELECT location_number, side_of_street, sign_content_tag, from_latitude, from_longitude, to_latitude, to_longitude, sign_content, direction_of_arrow, position_in_feet FROM locations l JOIN signs s ON l.id = s.location_id WHERE (from_latitude BETWEEN ? AND ? AND from_longitude BETWEEN ? AND ?) OR (to_latitude BETWEEN ? AND ? AND to_longitude BETWEEN ? AND ?);"
-        let values = [NSNumber(double:swCoordinate.latitude), NSNumber(double:neCoordinate.latitude), NSNumber(double:swCoordinate.longitude), NSNumber(double:neCoordinate.longitude), NSNumber(double:swCoordinate.latitude), NSNumber(double:neCoordinate.latitude), NSNumber(double:swCoordinate.longitude), NSNumber(double:neCoordinate.longitude)]
+        let values = [NSNumber(value: swCoordinate.latitude as Double), NSNumber(value: neCoordinate.latitude as Double), NSNumber(value: swCoordinate.longitude as Double), NSNumber(value: neCoordinate.longitude as Double), NSNumber(value: swCoordinate.latitude as Double), NSNumber(value: neCoordinate.latitude as Double), NSNumber(value: swCoordinate.longitude as Double), NSNumber(value: neCoordinate.longitude as Double)]
         callSQL(query: query, withValues: values, responseObject: SPSQLResponse.init(queryType: .getLocationsForCurrentMapView))
     }
     
@@ -60,9 +60,9 @@ struct SPSQLiteReader {
 //        response.timeAndDay = timeAndDay
 //        callSQL(query: query, withValues: [], responseObject: response)
 //    }
-    private func adjust(inout query: String, forTimeAndDay timeAndDay: DNTimeAndDay) {
+    fileprivate func adjust(_ query: inout String, forTimeAndDay timeAndDay: DNTimeAndDay) {
         if timeAndDay.time.hour == 14 {
-            let dayString = timeAndDay.day.stringValue(forFormat: DNTimeAndDayFormat.abbrDay()).uppercaseString
+            let dayString = timeAndDay.day.stringValue(forFormat: DNTimeAndDayFormat.abbrDay()).uppercased()
             var notLike = ""
             if timeAndDay.time.min == 0 {
                 notLike = "'%12PM\(dayString)%'"
@@ -82,26 +82,26 @@ struct SPSQLiteReader {
         callSQL(query: query, withValues: [], responseObject: SPSQLResponse.init(queryType: .getAllLocationsWithUniqueCleaningSign))
     }
     
-    private func callSQL(query query:String, withValues values:[AnyObject], responseObject:SPSQLResponse) {
-        dispatch_async(dispatch_get_global_queue(QOS_CLASS_UTILITY, 0)) {
+    fileprivate func callSQL(query:String, withValues values:[AnyObject], responseObject:SPSQLResponse) {
+        DispatchQueue.global(qos: DispatchQoS.QoSClass.utility).async {
             var response = responseObject
             response.query = query
             let database = FMDatabase.init(path: self.databasePath)
-            if !database.open() {
+            if !(database?.open())! {
                 print("Unable to open database")
                 return
             }
             defer {
-                database.close()
+                database?.close()
             }
             let pragmaStatement = "PRAGMA foreign_keys = 1;"
-            if !database.executeUpdate(pragmaStatement, withArgumentsInArray: []) {
-                print("Error with SQLite pragma statment: \(database.lastErrorMessage())")
+            if !(database?.executeUpdate(pragmaStatement, withArgumentsIn: []))! {
+                print("Error with SQLite pragma statment: \(database?.lastErrorMessage())")
             }
-            let results = database.executeQuery(query, withArgumentsInArray: values)
+            let results = database?.executeQuery(query, withArgumentsIn: values)
             if results == nil {
-                response.error = database.lastErrorMessage()
-                print("Error with query: \(query)\n\(database.lastErrorMessage())")
+                response.error = database?.lastErrorMessage()
+                print("Error with query: \(query)\n\(database?.lastErrorMessage())")
                 return
             } else {
                 response.results = results

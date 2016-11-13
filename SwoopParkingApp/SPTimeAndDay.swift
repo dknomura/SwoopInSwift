@@ -36,7 +36,7 @@ extension DNTimeAndDay: DNComparableTimeUnit {
         let dayValue = Int(rawValue)
         let timeValue = (rawValue - Double(dayValue)) * 24
         if let day = DNDay.init(rawValue: dayValue),
-            time = DNTime.init(rawValue: timeValue) {
+            let time = DNTime.init(rawValue: timeValue) {
             self.init(day: day, time: time)
         } else {
             return nil
@@ -85,10 +85,10 @@ extension DNTimeAndDay: DNComparableTimeUnit {
     var stringTupleForSQLQuery: (time: String, day: String) {
         var returnTuple: (time: String, day:String)
         let timeAndDayFormat = DNTimeAndDayFormat(time: .format12Hour, day: .abbr)
-        returnTuple.day = day.stringValue(forFormat: timeAndDayFormat).uppercaseString
-        returnTuple.time = time.stringValue(forFormat: timeAndDayFormat).uppercaseString
-        if let removeRange = returnTuple.time.rangeOfString(":00") {
-            returnTuple.time.removeRange(removeRange)
+        returnTuple.day = day.stringValue(forFormat: timeAndDayFormat).uppercased()
+        returnTuple.time = time.stringValue(forFormat: timeAndDayFormat).uppercased()
+        if let removeRange = returnTuple.time.range(of: ":00") {
+            returnTuple.time.removeSubrange(removeRange)
         }
         return returnTuple
     }
@@ -96,7 +96,7 @@ extension DNTimeAndDay: DNComparableTimeUnit {
         return "\(stringTupleForSQLQuery.time)\(stringTupleForSQLQuery.day)"
     }
     
-    static func allStreetLocationTimeAndDays(forCity:SPCities) -> [DNTimeAndDay] {
+    static func allStreetLocationTimeAndDays(_ forCity:SPCities) -> [DNTimeAndDay] {
         var returnTimeAndDays = [DNTimeAndDay]()
         for day in DNDay.allValues {
             let earliestLatestTime = day.earliestAndLatestCleaningTime
@@ -112,18 +112,18 @@ extension DNTimeAndDay: DNComparableTimeUnit {
 
 extension DNDay {
     static var allValues: [DNDay] {
-        return [Sun, Mon, Tues, Wed, Thurs, Fri, Sat]
+        return [sun, mon, tues, wed, thurs, fri, sat]
     }
     var earliestAndLatestCleaningTime: (earliest:DNTime, latest:DNTime) {
         var latestCleaningHour = 14.0
         var earliestCleaningHour = 3.0
         switch self {
-        case .Sun:
+        case .sun:
             latestCleaningHour = 9.5
             earliestCleaningHour = 6
-        case .Tues, .Fri:
+        case .tues, .fri:
             latestCleaningHour = 19
-        case .Sat:
+        case .sat:
             latestCleaningHour = 13
         default:
             break

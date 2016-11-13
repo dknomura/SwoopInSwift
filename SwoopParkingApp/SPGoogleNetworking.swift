@@ -19,7 +19,7 @@ struct SPGoogleNetworking {
     
     weak var delegate: SPGoogleNetworkingDelegate?
 
-    func autocomplete(inputText:String) {
+    func autocomplete(_ inputText:String) {
         let urlString = "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=\(inputText)&location=\(centerLat),\(centerLong)&radius=\(searchRadius)&key=\(googlePlacesAPIKey)"
         startURLGetSession(withURLString: urlString, delegateAction: .presentAutocompleteResults)
     }
@@ -29,39 +29,39 @@ struct SPGoogleNetworking {
         startURLGetSession(withURLString: queryString, delegateAction: .presentCoordinate)
     }
     
-    func searchAddress(address:String) {
+    func searchAddress(_ address:String) {
         let queryString = "https://maps.googleapis.com/maps/api/geocode/json?address=\(address)&bounds=\(minNYCCoordinate.latitude),\(minNYCCoordinate.longitude)|\(maxNYCCoordinate.latitude),\(maxNYCCoordinate.longitude)&key=\(googleGeocodingAPIKey)"
         startURLGetSession(withURLString: queryString, delegateAction: .presentAddress)
     }
 
     
-    private func startURLGetSession(withURLString urlString:String, delegateAction:SPNetworkingDelegateAction) {
-        guard let encodedURLString = urlString.stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLQueryAllowedCharacterSet()) else {
+    fileprivate func startURLGetSession(withURLString urlString:String, delegateAction:SPNetworkingDelegateAction) {
+        guard let encodedURLString = urlString.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed) else {
             print("Unable to make encoded URL string from \(urlString)")
             return
         }
-        guard let url = NSURL.init(string: encodedURLString) else {
+        guard let url = URL.init(string: encodedURLString) else {
             print("Unable to make NSURL object from string: \(encodedURLString)")
             return
         }
-        let request = NSURLRequest.init(URL: url)
-        let session = NSURLSession.sharedSession()
-        let datatask = session.dataTaskWithRequest(request) { (data, response, error) in
-            if error != nil { print("Error with google API request: \(error!.localizedDescription)\n\(error!.userInfo)") }
+        let request = URLRequest.init(url: url)
+        let session = URLSession.shared
+        let datatask = session.dataTask(with: request, completionHandler: { (data, response, error) in
+            if error != nil { print("Error with google API request: \(error!.localizedDescription)\n\(error!._userInfo)") }
             else if data != nil {
                 do {
-                    if let responseDict: NSDictionary = try NSJSONSerialization.JSONObjectWithData(data!, options:NSJSONReadingOptions.AllowFragments) as? NSDictionary {
+                    if let responseDict: NSDictionary = try JSONSerialization.jsonObject(with: data!, options:JSONSerialization.ReadingOptions.allowFragments) as? NSDictionary {
                         var returnResponse = SPGoogleObject()
                         let statusCodeString = responseDict["status"] as? String
                         returnResponse.googleStatusCode = self.statusCode(fromString: statusCodeString)
                         if returnResponse.googleStatusCode == SPGoogleStatusCodes.OK {
                             SPParser().parseGoogleAPIResponse(responseDict, delegateAction: delegateAction, returnResponse: &returnResponse)
-                            dispatch_async(dispatch_get_main_queue(), {
+                            DispatchQueue.main.async(execute: {
                                 self.delegate?.googleNetworking(self, didFinishWithResponse: returnResponse, delegateAction: delegateAction)
                             })
                         } else {
                             print("Networking error: \(returnResponse.googleStatusCode)")
-                            dispatch_async(dispatch_get_main_queue(), {
+                            DispatchQueue.main.async(execute: {
                                 self.delegate?.googleNetworking(self, didFinishWithResponse: returnResponse, delegateAction: .presentNetworkingError)
                             })
                         }
@@ -70,11 +70,11 @@ struct SPGoogleNetworking {
                     print("Unable to serialize JSON object from data")
                 }
             }
-        }
+        }) 
         datatask.resume()
     }
     
-    private func statusCode(fromString codeString:String?) -> SPGoogleStatusCodes {
+    fileprivate func statusCode(fromString codeString:String?) -> SPGoogleStatusCodes {
         for code in SPGoogleStatusCodes.allValues {
             if code.rawValue == codeString {
                 return code
@@ -85,5 +85,5 @@ struct SPGoogleNetworking {
 }
 
 protocol SPGoogleNetworkingDelegate: class {
-    func googleNetworking(googleNetwork:SPGoogleNetworking, didFinishWithResponse response:SPGoogleObject, delegateAction:SPNetworkingDelegateAction)
+    func googleNetworking(_ googleNetwork:SPGoogleNetworking, didFinishWithResponse response:SPGoogleObject, delegateAction:SPNetworkingDelegateAction)
 }

@@ -16,27 +16,27 @@ struct SPLambdaManager {
     // Change lambda function names to match SPSQLLocationQueryType.rawValues
     func upcomingStreetCleaningQuery(forDayAndTime dayAndTime:(day:Int, hour:Int, minute:Int)) {
         let parameters = ["hour": dayAndTime.hour, "day": dayAndTime.day]
-        invoke(.getAllLocationsWithUniqueCleaningSign, parameters: parameters)
+        invoke(.getAllLocationsWithUniqueCleaningSign, parameters: parameters as NSDictionary)
     }
     
-    func signsAndLocationsQuery(fromCoordinateNE: CLLocationCoordinate2D, coordinateSW: CLLocationCoordinate2D) {
+    func signsAndLocationsQuery(_ fromCoordinateNE: CLLocationCoordinate2D, coordinateSW: CLLocationCoordinate2D) {
         
         let parameters = ["northEastLatitude": fromCoordinateNE.latitude, "northEastLongitude": fromCoordinateNE.longitude, "southWestLatitude": coordinateSW.latitude, "southWestLongitude": coordinateSW.longitude]
-        invoke(.getLocationsForCurrentMapView, parameters: parameters)
+        invoke(.getLocationsForCurrentMapView, parameters: parameters as NSDictionary)
     }
     
-    private func invoke(lambdaFunction: SPSQLLocationQueryTypes, parameters:NSDictionary) {
-        let lambdaInvoker = AWSLambdaInvoker.defaultLambdaInvoker()
-        let date = NSDate()
-        lambdaInvoker.invokeFunction(lambdaFunction.rawValue, JSONObject: parameters) { (response, error) in
+    fileprivate func invoke(_ lambdaFunction: SPSQLLocationQueryTypes, parameters:NSDictionary) {
+        let lambdaInvoker = AWSLambdaInvoker.default()
+        let date = Date()
+        lambdaInvoker.invokeFunction(lambdaFunction.rawValue, jsonObject: parameters) { (response, error) in
             let timeLapse = date.timeIntervalSinceNow
             print("Time lapse for \(lambdaFunction): \(timeLapse)")
             
             if (error != nil) {
-                print("Error invoking lambda function \(lambdaFunction) \n\(error?.userInfo)\n\(error?.localizedDescription)")
+                print("Error invoking lambda function \(lambdaFunction) \n\(error?.localizedDescription)")
             }
             else if response != nil {
-                dispatch_async(dispatch_get_main_queue(), {
+                DispatchQueue.main.async(execute: {
                     guard let responseDict = response as? NSDictionary else {
                         print("Response isn't a dictionary, for lambda funcion: \(lambdaFunction)")
                         return

@@ -8,24 +8,24 @@
 
 import Foundation
 
-var GlobalMainQueue: dispatch_queue_t {
-    return dispatch_get_main_queue()
+var GlobalMainQueue: DispatchQueue {
+    return DispatchQueue.main
 }
 
-var GlobalUserInteractiveQueue : dispatch_queue_t {
-    return dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0)
+var GlobalUserInteractiveQueue : DispatchQueue {
+    return DispatchQueue.global(qos: DispatchQoS.QoSClass.userInteractive)
 }
 
-var GlobalUserInitiatedQueue: dispatch_queue_t {
-    return dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)
+var GlobalUserInitiatedQueue: DispatchQueue {
+    return DispatchQueue.global(qos: DispatchQoS.QoSClass.userInitiated)
 }
 
-var GlobalUtilityQueue: dispatch_queue_t {
-    return dispatch_get_global_queue(QOS_CLASS_UTILITY, 0)
+var GlobalUtilityQueue: DispatchQueue {
+    return DispatchQueue.global(qos: DispatchQoS.QoSClass.utility)
 }
 
-var GlobalBackgroundQueue: dispatch_queue_t {
-    return dispatch_get_global_queue(QOS_CLASS_BACKGROUND, 0)
+var GlobalBackgroundQueue: DispatchQueue {
+    return DispatchQueue.global(qos: DispatchQoS.QoSClass.background)
 }
 
-let concurrentSignDictionaryQueue = dispatch_queue_create("com.dnom.SwoopParking.daoSignAndCoordinateStringDictionary", DISPATCH_QUEUE_CONCURRENT)
+let concurrentSignDictionaryQueue = DispatchQueue(label: "com.dnom.SwoopParking.daoSignAndCoordinateStringDictionary", attributes: DispatchQueue.Attributes.concurrent)

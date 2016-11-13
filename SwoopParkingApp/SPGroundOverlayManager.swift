@@ -19,14 +19,14 @@ class SPGroundOverlayManager {
         let points = cgPoints(forMap: map, forLocations: locations)
         var groundOverlays = [GMSGroundOverlay]()
         
-        let heatMap = LFHeatMap.heatMapWithRect(map.bounds, boost: 0.1, points: points, weights: nil)
+        let heatMap = LFHeatMap.heatMap(with: map.bounds, boost: 0.1, points: points, weights: nil)
         let groundOverlay = GMSGroundOverlay.init(bounds: GMSCoordinateBounds.init(region: map.projection.visibleRegion()), icon: heatMap)
-        groundOverlay.tappable = true
+        groundOverlay.isTappable = true
         groundOverlays.append(groundOverlay)
         return groundOverlays
     }
     
-    private func cgPoints(forMap map:GMSMapView, forLocations locations:[SPLocation]) -> [NSValue] {
+    fileprivate func cgPoints(forMap map:GMSMapView, forLocations locations:[SPLocation]) -> [NSValue] {
         
         var points = [NSValue]()
         for location in locations {
@@ -34,7 +34,7 @@ class SPGroundOverlayManager {
                 print("Missing coordinate for location: \(location.locationNumber)")
                 continue
             }
-            let pointOnMap = NSValue(CGPoint:map.projection.pointForCoordinate(fromCoordinate))
+            let pointOnMap = NSValue(cgPoint:map.projection.point(for: fromCoordinate))
             points.append(pointOnMap)
         }
         return points

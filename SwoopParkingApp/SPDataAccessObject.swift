@@ -10,7 +10,7 @@ import Foundation
 import GoogleMaps
 import DNTimeAndDay
 
-enum DAOError:ErrorType {
+enum DAOError:Error {
     case noDao(forFunction: String)
 }
 
@@ -33,12 +33,12 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
     var signForPathCoordinates = [String: SPSign]()
     //MARK: - Determine if current mapView is within NYC
     
-    func isInNYC(mapView:GMSMapView) -> Bool {
+    func isInNYC(_ mapView:GMSMapView) -> Bool {
         let region = GMSCoordinateBounds.init(region: mapView.projection.visibleRegion())
         if isCoordinateWithinRegion(region.northEast, NECoordinate: maxNYCCoordinate, SWCoordinate: minNYCCoordinate) || isCoordinateWithinRegion(region.southWest, NECoordinate: maxNYCCoordinate, SWCoordinate: minNYCCoordinate) { return true }
         else { return false }
     }
-    private func isCoordinateWithinRegion (testCoordinate: CLLocationCoordinate2D, NECoordinate: CLLocationCoordinate2D, SWCoordinate: CLLocationCoordinate2D) -> Bool {
+    fileprivate func isCoordinateWithinRegion (_ testCoordinate: CLLocationCoordinate2D, NECoordinate: CLLocationCoordinate2D, SWCoordinate: CLLocationCoordinate2D) -> Bool {
         if testCoordinate.latitude < NECoordinate.latitude && testCoordinate.latitude > SWCoordinate.latitude {
             if testCoordinate.longitude < NECoordinate.longitude && testCoordinate.longitude > SWCoordinate.longitude { return true }
             else { return false }
@@ -64,7 +64,7 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
         parser.inject(self)
         parser.parseSQL(fromResults: response.results!, queryType: response.queryType)
 //            locationCountForDayValue[response.timeAndDay!.rawValue] = Int(response.results!.intForColumn("count(*)"))
-        dispatch_async(dispatch_get_main_queue()) {
+        DispatchQueue.main.async {
             self.delegate?.dataAccessObject(self, didSetLocationsForQueryType: response.queryType)
         }
     }
@@ -92,7 +92,7 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
     }
     // MARK: - CLManager delegate
     var isFirstLocationAfterAuthorization = false
-    func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if (locations.count == 0) { return }
         currentLocation = locations.last!
         if isFirstLocationAfterAuthorization {
@@ -100,10 +100,10 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
             delegate?.dataAccessObjectDidAllowLocationServicesAndSetCurrentLocation()
         }
     }
-    func locationManager(manager: CLLocationManager, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
-        if status == .AuthorizedWhenInUse {
-            if !NSUserDefaults.standardUserDefaults().boolForKey(kSPDidAllowLocationServices) {
-                NSUserDefaults.standardUserDefaults().setBool(true, forKey: kSPDidAllowLocationServices)
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        if status == .authorizedWhenInUse {
+            if !UserDefaults.standard.bool(forKey: kSPDidAllowLocationServices) {
+                UserDefaults.standard.set(true, forKey: kSPDidAllowLocationServices)
                 isFirstLocationAfterAuthorization = true
             }
         }
@@ -111,7 +111,7 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
     
     //MARK: - Networking Delegate methods
     //MARK: ---Google networking delegate
-    func googleNetworking(googleNetwork: SPGoogleNetworking, didFinishWithResponse response: SPGoogleObject, delegateAction: SPNetworkingDelegateAction) {
+    func googleNetworking(_ googleNetwork: SPGoogleNetworking, didFinishWithResponse response: SPGoogleObject, delegateAction: SPNetworkingDelegateAction) {
         switch delegateAction {
         case .presentAutocompleteResults:
             setAddressResultsForTableView(fromResponse: response)
@@ -131,7 +131,7 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
         }
     }
     
-    private func setAddressResultsForTableView(fromResponse response:SPGoogleObject) {
+    fileprivate func setAddressResultsForTableView(fromResponse response:SPGoogleObject) {
         if response.googleAPIResponse?.addressResults != nil {
             addressResults = (response.googleAPIResponse?.addressResults)!
             delegate?.dataAccessObject(self, didUpdateAddressResults: addressResults)
@@ -140,10 +140,10 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
 }
 protocol SPDataAccessObjectDelegate: class {
     //For SQL calls
-    func dataAccessObject(dao: SPDataAccessObject, didSetLocationsForQueryType:SPSQLLocationQueryTypes)
+    func dataAccessObject(_ dao: SPDataAccessObject, didSetLocationsForQueryType:SPSQLLocationQueryTypes)
     
     //For google API calls
-    func dataAccessObject(dao: SPDataAccessObject, didSetGoogleSearchObject googleSearchObject:SPGoogleCoordinateAndInfo)
-    func dataAccessObject(dao: SPDataAccessObject, didUpdateAddressResults:[SPGoogleAddressResult])
+    func dataAccessObject(_ dao: SPDataAccessObject, didSetGoogleSearchObject googleSearchObject:SPGoogleCoordinateAndInfo)
+    func dataAccessObject(_ dao: SPDataAccessObject, didUpdateAddressResults:[SPGoogleAddressResult])
     func dataAccessObjectDidAllowLocationServicesAndSetCurrentLocation()
 }

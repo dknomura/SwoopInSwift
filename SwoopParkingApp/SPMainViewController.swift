@@ -10,7 +10,7 @@ import Foundation
 import GoogleMaps
 import DNTimeAndDay
 
-class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDataAccessObjectDelegate, SPSearchResultsViewControllerDelegate, SPMapViewControllerDelegate, SPTimeViewControllerDelegate {
+class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDataAccessObjectDelegate, SPSearchResultsViewControllerDelegate, SPMapViewControllerDelegate, SPTimeViewControllerDelegate, InjectableViewController {
     @IBOutlet weak var timeAndDayContainerView: UIView!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var streetViewSwitch: UISwitch!
@@ -27,8 +27,8 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
     var searchContainerSegue: String { return "searchContainer" }
     var timeContainerSegue:String { return "timeContainer" }
     var mapContainerSegue: String { return "mapContainer" }
-    var switchLabelText: String { return streetViewSwitch.on ? "Street" : "City" }
-    var waitingText:String { return "Finding street cleaning locations..." }
+    var switchLabelText: String { return streetViewSwitch.isOn ? "Street" : "City" }
+    var waitingText:String { return "Finding street cleaning locations and rendering map..." }
 
     var isSearchTableViewPresent = false
     var toolbarsPresent = true
@@ -37,13 +37,13 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
     var shouldTapShowSearchBar = false
     var didGetLocations = false
     
-    private enum ChildViewController: String {
+    fileprivate enum ChildViewController: String {
         case timeAndDay, map, search
         var segue: String {
             switch self {
-            case timeAndDay: return "timeContainer"
-            case map: return "mapContainer"
-            case search: return "searchContainer"
+            case .timeAndDay: return "timeContainer"
+            case .map: return "mapContainer"
+            case .search: return "searchContainer"
             }
         }
     }
@@ -66,55 +66,50 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
-    override func viewWillDisappear(animated: Bool) {
+    override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        NSNotificationCenter.defaultCenter().removeObserver(self)
+        NotificationCenter.default.removeObserver(self)
     }
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // To do: Make a protocol to make a interface for child view controllers to abstract a method to set the delegate and dao for the child view controllers
+        guard let destinationViewController = segue.destination as? InjectableViewController else { return }
+        destinationViewController.inject(dao: dao, delegate: self)
         guard segue.identifier != nil else { return }
         switch segue.identifier! {
         case timeContainerSegue:
-            timeAndDayViewController = segue.destinationViewController as? SPTimeAndDayViewController
+            timeAndDayViewController = segue.destination as? SPTimeAndDayViewController
             guard timeAndDayViewController != nil else {
-                print("Destination ViewController for segue \(segue.identifier) is not a TimeAndDay view controller. It is \(segue.destinationViewController)")
+                print("Destination ViewController for segue \(segue.identifier) is not a TimeAndDay view controller. It is \(segue.destination)")
                 return
             }
-            timeAndDayViewController.inject(dao)
-            timeAndDayViewController.delegate = self
         case searchContainerSegue:
-            searchViewController = segue.destinationViewController as? SPSearchResultsViewController
+            searchViewController = segue.destination as? SPSearchResultsViewController
             guard searchViewController != nil else {
-                print("Destination ViewController for segue \(segue.identifier) is not a Search results view controller. It is \(segue.destinationViewController)")
+                print("Destination ViewController for segue \(segue.identifier) is not a Search results view controller. It is \(segue.destination)")
                 return
             }
-            searchViewController.inject(dao)
-            searchViewController.delegate = self
         case mapContainerSegue:
-            mapViewController = segue.destinationViewController as? SPMapViewController
-            guard mapViewController != nil else {
-                print("Destination ViewController for segue \(segue.identifier) is not a Map view controller. It is \(segue.destinationViewController)")
+            mapViewController = segue.destination as? SPMapViewController
+            guard let _ = mapViewController else {
+                print("Destination ViewController for segue \(segue.identifier) is not a Map view controller. It is \(segue.destination)")
                 return
             }
-            mapViewController.inject(dao)
-            mapViewController.delegate = self
         default: return
         }
     }
     
-    
     //MARK: - Setup/breakdown methods
     //MARK: --NotificationCenter
-    private func setObservers() {
-        let notificationCenter = NSNotificationCenter.defaultCenter()
-        notificationCenter.addObserver(self, selector: #selector(keyboardDidHide), name: UIKeyboardDidHideNotification, object: nil)
-        notificationCenter.addObserver(self, selector: #selector(keyboardDidShow), name: UIKeyboardDidShowNotification, object: nil)
+    fileprivate func setObservers() {
+        let notificationCenter = NotificationCenter.default
+        notificationCenter.addObserver(self, selector: #selector(keyboardDidHide), name: NSNotification.Name.UIKeyboardDidHide, object: nil)
+        notificationCenter.addObserver(self, selector: #selector(keyboardDidShow), name: NSNotification.Name.UIKeyboardDidShow, object: nil)
     }
-    @objc private func keyboardDidHide() { isKeyboardPresent = false }
-    @objc private func keyboardDidShow() { isKeyboardPresent = true }
+    @objc fileprivate func keyboardDidHide() { isKeyboardPresent = false }
+    @objc fileprivate func keyboardDidShow() { isKeyboardPresent = true }
     
     //MARK: --Gestures
-    private func setupGestures() {
+    fileprivate func setupGestures() {
         let singleTapGesture = UITapGestureRecognizer.init(target: self, action: #selector(singleTapHandler(_:)))
         singleTapGesture.numberOfTapsRequired = 1
         singleTapGesture.delegate = self
@@ -134,16 +129,16 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
         pinchGesture.cancelsTouchesInView = false
         mapViewController.mapView.addGestureRecognizer(pinchGesture)
 
-        singleTapGesture.requireGestureRecognizerToFail(doubleTapZoomGesture)
+        singleTapGesture.require(toFail: doubleTapZoomGesture)
     }
     
-    @objc private func singleTapHandler(gesture: UITapGestureRecognizer) {
+    @objc fileprivate func singleTapHandler(_ gesture: UITapGestureRecognizer) {
         guard !mapViewController.cancelTapGesture else {
             mapViewController.cancelTapGesture = false
             return
         }
-        print("Search marker is \(mapViewController.searchMarker?.map != nil ? "present" : "not present")")
-        print("Marker is selected: \(mapViewController.isMarkerSelected ? "yes" : "no")")
+//        print("Search marker is \(mapViewController.searchMarker?.map != nil ? "present" : "not present")")
+//        print("Marker is selected: \(mapViewController.isMarkerSelected ? "yes" : "no")")
         if isSearchTableViewPresent {
             searchViewController.hideSearchResultsTableView()
         }
@@ -152,14 +147,14 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
             return
         }
         
-        if CGRectContainsPoint(timeAndDayContainerView.frame, gesture.locationInView(mapViewController.mapView)) || CGRectContainsPoint(bottomToolbar.frame, gesture.locationInView(mapViewController.mapView)) { return }
+        if timeAndDayContainerView.frame.contains(gesture.location(in: mapViewController.mapView)) || bottomToolbar.frame.contains(gesture.location(in: mapViewController.mapView)) { return }
         let signMarkerFrame = mapViewController.signMarker?.iconView?.frame,
             searchMarkerFrame = mapViewController.searchMarker?.iconView?.frame,
             infoWindowFrame = mapViewController.currentInfoWindow?.frame
         let rects = [signMarkerFrame, searchMarkerFrame, infoWindowFrame]
         for rect in rects {
             if rect == nil { continue }
-            if CGRectContainsPoint(rect!, gesture.locationInView(mapViewController.mapView)) { return }
+            if rect!.contains(gesture.location(in: mapViewController.mapView)) { return }
         }
         if mapViewController.areMarkersPresent {
             mapViewController.hideMarkers()
@@ -178,12 +173,12 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
         }
     }
 
-    func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldReceiveTouch touch: UITouch) -> Bool {
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
         if touch.view != nil {
             let viewsToCancelTouch: [UIView?] = [mapViewController.zoomOutButton, searchContainerView, bottomToolbar, timeAndDayContainerView, mapViewController.currentInfoWindow, mapViewController.signMarker?.iconView, mapViewController.searchMarker?.iconView]
             for untappableView in viewsToCancelTouch {
                 if untappableView == nil { continue }
-                if touch.view!.isDescendantOfView(untappableView!) { return false }
+                if touch.view!.isDescendant(of: untappableView!) { return false }
             }
         }
         return true
@@ -192,43 +187,36 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
     //MARK: Other Views
     func setupViews() {
         showHideSearchBar(shouldShow: true, makeFirstResponder: false)
-        NSTimer.scheduledTimerWithTimeInterval(2.3, target: self, selector: #selector(hideSearchBarAfterLaunch), userInfo: nil, repeats: false)
+        Timer.scheduledTimer(timeInterval: 2.3, target: self, selector: #selector(hideSearchBarAfterLaunch), userInfo: nil, repeats: false)
         
-        searchContainerView.userInteractionEnabled = true
+        searchContainerView.isUserInteractionEnabled = true
         activityIndicator.hidesWhenStopped = true
         showWaitingView(withLabel: waitingText, isStreetView: false)
     }
-    @objc private func hideSearchBarAfterLaunch() {
-        if searchViewController.searchBar.isFirstResponder() { return }
+    @objc fileprivate func hideSearchBarAfterLaunch() {
+        if searchViewController.searchBar.isFirstResponder { return }
         showHideSearchBar(shouldShow: false, makeFirstResponder: false)
     }
 
     //MARK: --Swoop toggle
-    @IBAction func toggleOverlaySwitch(sender: UISwitch) {
-        let zoomIsLessThanSwitchOverlay = mapViewController.mapView.camera.zoom < mapViewController.zoomToSwitchOverlays
-        let zoomIsGreaterThanStreetLevel = mapViewController.mapView.camera.zoom >= mapViewController.streetZoom
-        if zoomIsGreaterThanStreetLevel && !streetViewSwitch.on {
-            mapViewController.zoomMap(toZoom: mapViewController.zoomToSwitchOverlays)
-        } else if !zoomIsLessThanSwitchOverlay {
+    @IBAction func toggleOverlaySwitch(_ sender: UISwitch) {
+        if mapViewController.mapView.camera.zoom <= mapViewController.zoomToSwitchOverlays {
             mapViewController.zoomMap(toZoom: mapViewController.streetZoom)
-            turnStreetSwitch(on: true, shouldGetOverlays: false)
+        } else {
+            mapViewController.zoomMap(toZoom: mapViewController.zoomToSwitchOverlays)
         }
-        else if mapViewController.mapView.camera.zoom < mapViewController.zoomToSwitchOverlays {
-            streetViewSwitch.setOn(false, animated: true)
-        }
-//        turnStreetSwitch(on: nil, shouldGetOverlays: true)
     }
-    private func turnStreetSwitch(on on: Bool?, shouldGetOverlays: Bool) {
+    fileprivate func turnStreetSwitch(on: Bool?, shouldGetOverlays: Bool) {
         if on != nil {
             streetViewSwitch.setOn(on!, animated: true)
         }
-        switchLabel.setTitle(switchLabelText, forState: .Normal)
+        switchLabel.setTitle(switchLabelText, for: UIControlState())
         if shouldGetOverlays {
-            streetViewSwitch.on ? mapViewController.getSignsForCurrentMapView() : mapViewController.getNewHeatMapOverlays()
+            streetViewSwitch.isOn ? mapViewController.getSignsForCurrentMapView() : mapViewController.getNewHeatMapOverlays()
         }
     }
     //MARK: --Searchbar toggle
-    @IBAction func showSearchBarButtonPressed(sender: UIBarButtonItem) {
+    @IBAction func showSearchBarButtonPressed(_ sender: UIBarButtonItem) {
         showHideSearchBar(shouldShow: !isSearchBarPresent, makeFirstResponder: !isSearchBarPresent)
     }
     func showHideSearchBar(shouldShow show: Bool, makeFirstResponder: Bool) {
@@ -237,18 +225,18 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
     }
     
     //MARK: - Animation methods
-    private func showHideToolbars(shouldShow:Bool) {
-        UIView.animateWithDuration(standardAnimationDuration, animations: {
+    fileprivate func showHideToolbars(_ shouldShow:Bool) {
+        UIView.animate(withDuration: standardAnimationDuration, animations: {
             self.heightConstraintOfTimeAndDayContainer.constant = shouldShow ? self.heightOfTimeContainer : 0
             self.timeAndDayViewController.heightConstraintOfBorderView.constant = shouldShow ? self.timeAndDayViewController.borderViewHeight : 0
             self.heightConstraintOfToolbar.constant = shouldShow ? self.standardHeightOfToolOrSearchBar : 0
             let sliderThumbCenter = self.timeAndDayViewController.centerOfSliderThumb
-            self.timeAndDayViewController.sliderThumbLabel.center = shouldShow ? sliderThumbCenter : CGPointMake(sliderThumbCenter.x, sliderThumbCenter.y - 20)
+            self.timeAndDayViewController.sliderThumbLabel.center = shouldShow ? CGPoint(x: sliderThumbCenter.x, y: sliderThumbCenter.y + 35) : CGPoint(x: sliderThumbCenter.x, y: sliderThumbCenter.y - 20)
             self.view.layoutIfNeeded()
         })
         toolbarsPresent = shouldShow
     }
-    private func clearScreenForMapZoom() {
+    fileprivate func clearScreenForMapZoom() {
         if isSearchTableViewPresent {
             searchViewController!.hideSearchResultsTableView()
         }
@@ -257,39 +245,39 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
     }
     
     //MARK: --Blur View animation
-    private func showWaitingView(withLabel labelText:String, isStreetView:Bool) {
+    fileprivate func showWaitingView(withLabel labelText:String, isStreetView:Bool) {
         if !isStreetView {
-            greyOutMapView.hidden = false
+            greyOutMapView.isHidden = false
             greyOutMapView.alpha = 0.3
         }
         activityIndicator.startAnimating()
-        waitingLabel.hidden = false
+        waitingLabel.isHidden = false
         waitingLabel.text = labelText
     }
-    private func hideWaitingView() {
-        greyOutMapView.hidden = true
-        waitingLabel.hidden = true
+    fileprivate func hideWaitingView() {
+        greyOutMapView.isHidden = true
+        waitingLabel.isHidden = true
         activityIndicator.stopAnimating()
     }
 
     //MARK: - Delegate Methods
     //MARK: -- DAO
-    func dataAccessObject(dao: SPDataAccessObject, didUpdateAddressResults: [SPGoogleAddressResult]) {
+    func dataAccessObject(_ dao: SPDataAccessObject, didUpdateAddressResults: [SPGoogleAddressResult]) {
         searchViewController?.showSearchResultsTableView()
     }
-    func dataAccessObject(dao: SPDataAccessObject, didSetGoogleSearchObject googleSearchObject: SPGoogleCoordinateAndInfo) {
+    func dataAccessObject(_ dao: SPDataAccessObject, didSetGoogleSearchObject googleSearchObject: SPGoogleCoordinateAndInfo) {
         zoomAndSetMapMarker()
     }
-    func dataAccessObject(dao: SPDataAccessObject, didSetLocationsForQueryType queryType: SPSQLLocationQueryTypes) {
+    func dataAccessObject(_ dao: SPDataAccessObject, didSetLocationsForQueryType queryType: SPSQLLocationQueryTypes) {
         switch queryType {
         case .getLocationsForCurrentMapView:
             mapViewController.getNewPolylines()
         case .getAllLocationsWithUniqueCleaningSign, .getLocationsForTimeAndDay:
-            if !streetViewSwitch.on {
+            if !streetViewSwitch.isOn {
                 mapViewController.getNewHeatMapOverlays()
             }
             if queryType == .getAllLocationsWithUniqueCleaningSign {
-                bottomToolbar.backgroundColor = UIColor.redColor()
+                bottomToolbar.backgroundColor = UIColor.red
             } else {
                 timeAndDayViewController.setNewImage()
             }
@@ -305,7 +293,7 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
     //MARK: -- Methods that interact with child view controllers
     //MARK: -----Time and Day Container Controller delegate
     func timeViewControllerDidChangeTime() {
-        if streetViewSwitch.on {
+        if streetViewSwitch.isOn {
             mapViewController.getSignsForCurrentMapView()
         } else {
             if dao.locationsForPrimaryTimeAndDay == nil {
@@ -332,11 +320,11 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
         turnStreetSwitch(on: true, shouldGetOverlays: true)
         
     }
-    func searchContainerHeightShouldAdjust(height: CGFloat, tableViewPresent: Bool, searchBarPresent: Bool) -> Bool {
-        UIView.animateWithDuration(standardAnimationDuration) {
+    func searchContainerHeightShouldAdjust(_ height: CGFloat, tableViewPresent: Bool, searchBarPresent: Bool) -> Bool {
+        UIView.animate(withDuration: standardAnimationDuration, animations: {
             self.heightConstraintOfSearchContainer.constant = height
             self.view.layoutIfNeeded()
-        }
+        }) 
         self.isSearchTableViewPresent = tableViewPresent
         self.isSearchBarPresent = searchBarPresent
         if self.isSearchTableViewPresent {
@@ -347,54 +335,53 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
 
     //MARK: --- Map Container Controller delegate
     func mapViewControllerDidFinishDrawingPolylines() {
-        if streetViewSwitch.on {
-            hideWaitingView()  
-        }
+        hideWaitingView()
     }
     func mapViewControllerIsZooming() {
         clearScreenForMapZoom()
     }
-    func mapViewControllerShouldSearchStreetCleaning(mapView: GMSMapView) -> Bool {
-        if streetViewSwitch.on {
+    func mapViewControllerShouldSearchStreetCleaning(_ mapView: GMSMapView) -> Bool {
+        if streetViewSwitch.isOn {
             showWaitingView(withLabel: waitingText, isStreetView: false)
             dao.getSigns(forCurrentMapView: mapView)
         }
-        return streetViewSwitch.on
+        return streetViewSwitch.isOn
     }
     func mapViewControllerDidZoom(switchOn on: Bool?, shouldGetOverlay: Bool) {
         turnStreetSwitch(on: on, shouldGetOverlays: shouldGetOverlay)
     }
     
     //MARK: - UIStateRestoring Protocol
-    override func encodeRestorableStateWithCoder(coder: NSCoder) {
-        coder.encodeFloat(mapViewController.mapView.camera.zoom, forKey: SPRestoreCoderKeys.zoom)
+    override func encodeRestorableState(with coder: NSCoder) {
+        coder.encode(mapViewController.mapView.camera.zoom, forKey: SPRestoreCoderKeys.zoom)
         let centerCoordinates = mapViewController.mapView.camera.target
-        coder.encodeDouble(centerCoordinates.latitude, forKey: SPRestoreCoderKeys.centerLat)
-        coder.encodeDouble(centerCoordinates.longitude, forKey: SPRestoreCoderKeys.centerLong)
-        coder.encodeObject(searchViewController.searchBar.text, forKey: SPRestoreCoderKeys.searchText)
-        coder.encodeInt(Int32(dao.primaryTimeAndDay.day.rawValue), forKey: SPRestoreCoderKeys.day)
-        coder.encodeInt(Int32(dao.primaryTimeAndDay.time.hour), forKey: SPRestoreCoderKeys.hour)
-        coder.encodeInt(Int32(dao.primaryTimeAndDay.time.min), forKey: SPRestoreCoderKeys.min)
-        super.encodeRestorableStateWithCoder(coder)
+        coder.encode(centerCoordinates.latitude, forKey: SPRestoreCoderKeys.centerLat)
+        coder.encode(centerCoordinates.longitude, forKey: SPRestoreCoderKeys.centerLong)
+        coder.encode(searchViewController.searchBar.text, forKey: SPRestoreCoderKeys.searchText)
+        coder.encodeCInt(Int32(dao.primaryTimeAndDay.day.rawValue), forKey: SPRestoreCoderKeys.day)
+        coder.encodeCInt(Int32(dao.primaryTimeAndDay.time.hour), forKey: SPRestoreCoderKeys.hour)
+        coder.encodeCInt(Int32(dao.primaryTimeAndDay.time.min), forKey: SPRestoreCoderKeys.min)
+        super.encodeRestorableState(with: coder)
     }
-    override func decodeRestorableStateWithCoder(coder: NSCoder) {
-        let zoom = coder.decodeFloatForKey(SPRestoreCoderKeys.zoom),
-            centerLat = coder.decodeDoubleForKey(SPRestoreCoderKeys.centerLat),
-            centerLong = coder.decodeDoubleForKey(SPRestoreCoderKeys.centerLong)
-        mapViewController.restoredCamera = GMSCameraPosition.cameraWithLatitude(centerLat, longitude: centerLong, zoom: zoom)
+    override func decodeRestorableState(with coder: NSCoder) {
+        let zoom = coder.decodeFloat(forKey: SPRestoreCoderKeys.zoom),
+            centerLat = coder.decodeDouble(forKey: SPRestoreCoderKeys.centerLat),
+            centerLong = coder.decodeDouble(forKey: SPRestoreCoderKeys.centerLong)
+        mapViewController.restoredCamera = GMSCameraPosition.camera(withLatitude: centerLat, longitude: centerLong, zoom: zoom)
         
-        let hour = coder.decodeIntegerForKey(SPRestoreCoderKeys.hour),
-            min = coder.decodeIntegerForKey(SPRestoreCoderKeys.min),
-            day = coder.decodeIntegerForKey(SPRestoreCoderKeys.day)
+        let hour = coder.decodeInteger(forKey: SPRestoreCoderKeys.hour),
+            min = coder.decodeInteger(forKey: SPRestoreCoderKeys.min),
+            day = coder.decodeInteger(forKey: SPRestoreCoderKeys.day)
         if let restoredTimeAndDay = DNTimeAndDay.init(dayInt: day, hourInt: hour, minInt:min) {
             dao.primaryTimeAndDay = restoredTimeAndDay
         }
-        searchViewController.searchBar.text = coder.decodeObjectForKey(SPRestoreCoderKeys.searchText) as? String
-        super.decodeRestorableStateWithCoder(coder)
+        searchViewController.searchBar.text = coder.decodeObject(forKey: SPRestoreCoderKeys.searchText) as? String
+        super.decodeRestorableState(with: coder)
     }
     override func applicationFinishedRestoringState() {
+        guard let _ = mapViewController.restoredCamera else { return }
         mapViewController.mapView.camera = mapViewController.restoredCamera!
-        let shouldTurnSwitchOn = mapViewController.restoredCamera?.zoom >= mapViewController.zoomToSwitchOverlays
+        let shouldTurnSwitchOn = (mapViewController.restoredCamera?.zoom)! >= mapViewController.zoomToSwitchOverlays
         dao.getStreetCleaningLocationsForPrimaryTimeAndDay()
         turnStreetSwitch(on: shouldTurnSwitchOn, shouldGetOverlays: false)
         mapViewController.adjustViewsToZoom()
@@ -403,8 +390,8 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
     }
     
     //MARK: - Injectable protocol
-    private var dao: SPDataAccessObject!
-    func inject(dao: SPDataAccessObject) {
+    fileprivate var dao: SPDataAccessObject!
+    func inject(dao: SPDataAccessObject, delegate: Any) {
         self.dao = dao
     }
     func assertDependencies() {

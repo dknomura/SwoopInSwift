@@ -11,7 +11,7 @@ import DNTimeAndDay
 
 extension UIViewController {
     func hideKeyboardWhenTapAround() {
-        view.userInteractionEnabled = true
+        view.isUserInteractionEnabled = true
         let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         view.addGestureRecognizer(tap)
     }
@@ -20,11 +20,3 @@ extension UIViewController {
     }
 }
 
-protocol SPChildViewController {
-    associatedtype T
-    func inject(dao: SPDataAccessObject, delegate: T)
-}
-
-extension SPChildViewController where Self: UIViewController {
-    
-}

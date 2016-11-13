@@ -15,8 +15,8 @@ import DNTimeAndDay
 struct SPParser {
     
     //MARK: Injectable protocol
-    private var dao: SPDataAccessObject!
-    mutating func inject(dao: SPDataAccessObject) {
+    fileprivate var dao: SPDataAccessObject!
+    mutating func inject(_ dao: SPDataAccessObject) {
         self.dao = dao
     }
     func assertDependencies() {
@@ -35,7 +35,7 @@ struct SPParser {
             dao.currentMapViewLocations = parseLocationsWithSigns(fromResults: results)
         }
     }
-    private func locationsForDayValue(fromResults results: FMResultSet) -> [Double: [SPLocation]] {
+    fileprivate func locationsForDayValue(fromResults results: FMResultSet) -> [Double: [SPLocation]] {
         var locationResults = [Double: [SPLocation]]()
         while results.next() {
             let location = parseLocationsWithTags(fromResults: results, includeTag: true)
@@ -50,18 +50,18 @@ struct SPParser {
         return locationResults
     }
     
-    private func dayValues(forLocation location:SPLocation) -> [Double] {
+    fileprivate func dayValues(forLocation location:SPLocation) -> [Double] {
         var returnDoubles = [Double]()
         let tags = location.signContentTag?.characters.split{$0 == " "}.map(String.init)
         for tag in tags! {
-            if tag.containsString("HOUR") { continue }
-            var mRange = tag.rangeOfString("AM")
+            if tag.contains("HOUR") { continue }
+            var mRange = tag.range(of: "AM")
             if mRange == nil {
-                mRange = tag.rangeOfString("PM")
+                mRange = tag.range(of: "PM")
                 if mRange == nil { continue }
             }
-            let timeString = tag.substringWithRange(tag.startIndex..<mRange!.endIndex)
-            let dayString = tag.substringWithRange(mRange!.endIndex..<tag.endIndex)
+            let timeString = tag.substring(with: tag.startIndex..<mRange!.upperBound)
+            let dayString = tag.substring(with: mRange!.upperBound..<tag.endIndex)
             guard let timeAndDay = DNTimeAndDay.init(dayString: dayString, timeString: timeString) else {
                 print("Error creating time and day object for location: \(location.locationNumber)/\(location.id)")
                 continue
@@ -72,7 +72,7 @@ struct SPParser {
     }
 
     
-    private func locationsWithTags(fromResults results: FMResultSet) -> [SPLocation] {
+    fileprivate func locationsWithTags(fromResults results: FMResultSet) -> [SPLocation] {
         var returnLocations = [SPLocation]()
         while results.next() {
             returnLocations.append(parseLocationsWithTags(fromResults: results, includeTag: true))
@@ -80,30 +80,31 @@ struct SPParser {
         return returnLocations
     }
     
-    private func parseLocationsWithTags(fromResults results: FMResultSet, includeTag: Bool) -> SPLocation {
-        let fromLat = results.doubleForColumn(kSPFromLatitudeSQL)
-        let fromLong = results.doubleForColumn(kSPFromLongitudeSQL)
+    fileprivate func parseLocationsWithTags(fromResults results: FMResultSet, includeTag: Bool) -> SPLocation {
+        let fromLat = results.double(forColumn: kSPFromLatitudeSQL)
+        let fromLong = results.double(forColumn: kSPFromLongitudeSQL)
         let fromCoordinate = CLLocationCoordinate2D.init(latitude: fromLat, longitude: fromLong)
-        let tag = includeTag ? results.stringForColumn(kSPSignContentTagSQL) : nil
-        return SPLocation.init(locationNumber: results.stringForColumn(kSPLocationNumberSQL), fromCoordinate: fromCoordinate, signContentTag: tag)
+        let tag = includeTag ? results.string(forColumn: kSPSignContentTagSQL) : nil
+        return SPLocation.init(locationNumber: results.string(forColumn: kSPLocationNumberSQL), fromCoordinate: fromCoordinate, signContentTag: tag)
         
     }
-    private func parseLocationsWithSigns(fromResults results: FMResultSet) -> [SPLocation] {
+    fileprivate func parseLocationsWithSigns(fromResults results: FMResultSet) -> [SPLocation] {
         var returnLocations = [SPLocation]()
         var location = SPLocation.init(locationNumber: nil, fromCoordinate: nil, signContentTag: nil)
         while results.next() {
-            if results.stringForColumn(kSPLocationNumberSQL) != location.locationNumber {
+            if results.string(forColumn: kSPLocationNumberSQL) != location.locationNumber {
                 if location.locationNumber != nil {
                     returnLocations.append(location)
                 }
                 location = parseLocationsWithTags(fromResults: results, includeTag: true)
-                let toLat = results.doubleForColumn(kSPToLatitudeSQL)
-                let toLong = results.doubleForColumn(kSPToLongitudeSQL)
+                let toLat = results.double(forColumn: kSPToLatitudeSQL)
+                let toLong = results.double(forColumn: kSPToLongitudeSQL)
                 location.toCoordinate =  CLLocationCoordinate2D.init(latitude: toLat, longitude: toLong)
-                location.sideOfStreet = results.stringForColumn(kSPSideOfStreetSQL)
+                location.sideOfStreet = results.string(forColumn: kSPSideOfStreetSQL)
                 location.signs = [SPSign]()
             }
-            let sign = SPSign.init(positionInFeet: results.doubleForColumn(kSPPositionInFeetSQL), directionOfArrow: results.stringForColumn(kSPDirectionOfArrowSQL), signContent: results.stringForColumn(kSPSignContentSQL))
+            
+            let sign = SPSign.init(positionInFeet: results.double(forColumn: kSPPositionInFeetSQL), directionOfArrow: results.string(forColumn: kSPDirectionOfArrowSQL), signContent: results.string(forColumn: kSPSignContentSQL))
             location.signs?.append(sign)
         }
         return returnLocations
@@ -155,7 +156,7 @@ struct SPParser {
 //    
     
     //MARK: - Parse Google API calls
-    func parseGoogleAPIResponse(responseDict:NSDictionary, delegateAction:SPNetworkingDelegateAction, inout returnResponse: SPGoogleObject) {
+    func parseGoogleAPIResponse(_ responseDict:NSDictionary, delegateAction:SPNetworkingDelegateAction, returnResponse: inout SPGoogleObject) {
         returnResponse.googleAPIResponse = SPGoogleAPIResponse()
         guard let dictKey = key(forDelegateAction:delegateAction) else {
             print("No key for delegateAction: \(delegateAction)")
@@ -171,7 +172,7 @@ struct SPParser {
     }
     
     //MARK: --Individual API parsers
-    private func parseGoogleAutocomplete(responseArray:[NSDictionary], inout returnResponse:SPGoogleObject) {
+    fileprivate func parseGoogleAutocomplete(_ responseArray:[NSDictionary], returnResponse:inout SPGoogleObject) {
         var addressResults = [SPGoogleAddressResult]()
         for response in responseArray {
             if let prediction = response["description"] as? String,
@@ -184,7 +185,7 @@ struct SPParser {
         returnResponse.googleAPIResponse?.addressResults = addressResults
     }
     
-    private func parseGoogleAddress(responseDict:[NSDictionary], inout returnResponse:SPGoogleObject) {
+    fileprivate func parseGoogleAddress(_ responseDict:[NSDictionary], returnResponse:inout SPGoogleObject) {
         var addressResults = [SPGoogleAddressResult]()
         for response in responseDict {
             let addressKey = "formatted_address", placeIDKey = "place_id"
@@ -202,9 +203,9 @@ struct SPParser {
         returnResponse.googleAPIResponse?.addressResults = addressResults
     }
 
-    private func parseGooglePlaceID(responseDict:NSDictionary, inout returnResponse:SPGoogleObject) {
+    fileprivate func parseGooglePlaceID(_ responseDict:NSDictionary, returnResponse:inout SPGoogleObject) {
         if let coordinate = coordinate(fromDictionary: responseDict),
-            address = responseDict["formatted_address"] as? String {
+            let address = responseDict["formatted_address"] as? String {
             returnResponse.googleAPIResponse?.placeIDCoordinate = coordinate
             returnResponse.googleAPIResponse?.formattedAddress = address
         } else {
@@ -212,7 +213,7 @@ struct SPParser {
         }
     }
     
-    private func coordinate(fromDictionary responseDict:NSDictionary) -> CLLocationCoordinate2D? {
+    fileprivate func coordinate(fromDictionary responseDict:NSDictionary) -> CLLocationCoordinate2D? {
         var key = "geometry"
         guard let geometryDict = (responseDict[key] as? NSDictionary) else {
             print("No key: \(key) in dict: \(responseDict)")
@@ -235,7 +236,7 @@ struct SPParser {
     }
     
     //MARK: ---Get JSON key from delegate action
-    private func key(forDelegateAction delegateAction: SPNetworkingDelegateAction) -> String? {
+    fileprivate func key(forDelegateAction delegateAction: SPNetworkingDelegateAction) -> String? {
         switch delegateAction {
         case .presentAddress:
             return "results"
@@ -247,12 +248,12 @@ struct SPParser {
             return nil
         }
     }
-    private func isAddressInNYC(address:String) -> Bool {
+    fileprivate func isAddressInNYC(_ address:String) -> Bool {
         //This method checks whether the response contains New York, or one of the 5 boroughs to filter out other results
         //The terms values in the JSON response has an offset and value property, which shows the string position and the string value of the autocomplete prediction.
         let searchTerms = ["manhattan", "brooklyn", "queens", "bronx", "staten island", "new york"]
         for term in searchTerms {
-            if address.lowercaseString.rangeOfString(term) != nil{
+            if address.lowercased().range(of: term) != nil{
                 return true
             }
         }

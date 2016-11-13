@@ -9,14 +9,25 @@
 import Foundation
 
 
-class SPSign {
+struct SPSign {
     var positionInFeet: Double!
     var directionOfArrow: String!
-    var signContent: String!
+    var signContent: String! {
+        didSet {
+            setMarkerContent()
+        }
+    }
     init(positionInFeet: Double?, directionOfArrow:String?, signContent:String?) {
         self.positionInFeet = positionInFeet
         self.directionOfArrow = directionOfArrow
         self.signContent = signContent
+        setMarkerContent()
+    }
+    var markerContent: String!
+    mutating func setMarkerContent() {
+        guard let symbolRange = signContent.range(of: "BOL)") else { return }
+        let cleaningTime = signContent.substring(from: symbolRange.upperBound).localizedCapitalized
+        markerContent = "Street cleaning " + cleaningTime + " Tap for directions"
     }
 }
 
@@ -53,25 +64,25 @@ struct SPLocation {
     }
     
     init(sqlResultSet results:FMResultSet, queryType: SPSQLLocationQueryTypes) {
-        let fromLat = results.doubleForColumn(kSPFromLatitudeSQL)
-        let fromLong = results.doubleForColumn(kSPFromLongitudeSQL)
+        let fromLat = results.double(forColumn: kSPFromLatitudeSQL)
+        let fromLong = results.double(forColumn: kSPFromLongitudeSQL)
         let fromCoordinate = CLLocationCoordinate2D.init(latitude: fromLat, longitude: fromLong)
-        var loc = SPLocation.init(locationNumber: results.stringForColumn(kSPLocationNumberSQL), fromCoordinate: fromCoordinate, signContentTag: results.stringForColumn(kSPSignContentTagSQL))
+        var loc = SPLocation.init(locationNumber: results.string(forColumn: kSPLocationNumberSQL), fromCoordinate: fromCoordinate, signContentTag: results.string(forColumn: kSPSignContentTagSQL))
         if queryType == .getAllLocationsWithUniqueCleaningSign || queryType == .getLocationsForTimeAndDay {
-            while results.stringForColumn(kSPLocationNumberSQL) == loc.locationNumber {
+            while results.string(forColumn: kSPLocationNumberSQL) == loc.locationNumber {
                 results.next()
             }
         }else if queryType == .getLocationsForCurrentMapView {
-            let toLat = results.doubleForColumn(kSPToLatitudeSQL)
-            let toLong = results.doubleForColumn(kSPToLongitudeSQL)
+            let toLat = results.double(forColumn: kSPToLatitudeSQL)
+            let toLong = results.double(forColumn: kSPToLongitudeSQL)
             loc.toCoordinate = CLLocationCoordinate2D.init(latitude: toLat, longitude: toLong)
-            loc.sideOfStreet = results.stringForColumn(kSPSideOfStreetSQL)
+            loc.sideOfStreet = results.string(forColumn: kSPSideOfStreetSQL)
             loc.signs = [SPSign]()
-            while results.stringForColumn(kSPLocationNumberSQL) == loc.locationNumber {
+            while results.string(forColumn: kSPLocationNumberSQL) == loc.locationNumber {
                 results.next()
-                let signContent = results.stringForColumn(kSPSignContentSQL)
-                let positionInFeet = results.doubleForColumn(kSPPositionInFeetSQL)
-                let directionOfArrow = results.stringForColumn(kSPDirectionOfArrowSQL)
+                let signContent = results.string(forColumn: kSPSignContentSQL)
+                let positionInFeet = results.double(forColumn: kSPPositionInFeetSQL)
+                let directionOfArrow = results.string(forColumn: kSPDirectionOfArrowSQL)
                 loc.signs!.append(SPSign.init(positionInFeet: positionInFeet, directionOfArrow: directionOfArrow, signContent: signContent))
             }
         }

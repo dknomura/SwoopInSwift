@@ -21,7 +21,7 @@ class SPTileLayerManager: GMSTileLayer {
     //https://developers.google.com/maps/documentation/ios-sdk/tiles
     // n x n, tiles for world. where n = 2 ^ zoom 
     // 2 ^ 10.6233 = 1577.36410238, 1577.36410238 x 1577.36410238. 360/1577.36410238 = 0.22822885309 degrees x 0.087890625 degrees
-    override func requestTileForX(x: UInt, y: UInt, zoom: UInt, receiver: GMSTileReceiver) {
+    override func requestTileFor(x: UInt, y: UInt, zoom: UInt, receiver: GMSTileReceiver) {
         
     }
 }

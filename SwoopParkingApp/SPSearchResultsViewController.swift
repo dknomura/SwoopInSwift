@@ -8,7 +8,7 @@
 
 import Foundation
 
-class SPSearchResultsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate, SPInjectable {
+class SPSearchResultsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate, InjectableViewController {
     
     @IBOutlet weak var searchBar: UISearchBar!
     @IBOutlet weak var searchResultsTableView: UITableView!
@@ -21,9 +21,10 @@ class SPSearchResultsViewController: UIViewController, UITableViewDelegate, UITa
     var standardHeightOfToolOrSearchBar: CGFloat { return CGFloat(44.0) }
     
     //MARK: Injectable protocol
-    private var dao: SPDataAccessObject!
-    func inject(dao: SPDataAccessObject) {
+    fileprivate var dao: SPDataAccessObject!
+    func inject(dao: SPDataAccessObject, delegate: Any) {
         self.dao = dao
+        self.delegate = delegate as? SPSearchResultsViewControllerDelegate
     }
     func assertDependencies() {
         assert(dao != nil)
@@ -32,14 +33,14 @@ class SPSearchResultsViewController: UIViewController, UITableViewDelegate, UITa
     //MARK: Setup ViewController
     override func viewDidLoad() {
         super.viewDidLoad()
-        searchResultsTableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: cellReuseIdentifier)
-        searchResultsTableView.userInteractionEnabled = true
+        searchResultsTableView.register(UITableViewCell.self, forCellReuseIdentifier: cellReuseIdentifier)
+        searchResultsTableView.isUserInteractionEnabled = true
         assertDependencies()
     }
     
     
     //MARK: - Search bar
-    func searchBarTextDidBeginEditing(searchBar: UISearchBar) {
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
 //        if searchBar.text?.characters.count == 0 {
 //            hideSearchResultsTableView()
 //        } else 
@@ -47,8 +48,8 @@ class SPSearchResultsViewController: UIViewController, UITableViewDelegate, UITa
             showSearchResultsTableView()
         }
     }
-    func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
-        if searchBar.text?.characters.count > 0 {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if (searchBar.text?.characters.count)! > 0 {
             var googleNetworking = SPGoogleNetworking()
             googleNetworking.delegate = dao
             googleNetworking.autocomplete(searchBar.text!)
@@ -57,8 +58,8 @@ class SPSearchResultsViewController: UIViewController, UITableViewDelegate, UITa
         }
     }
  
-    func searchBarSearchButtonClicked(searchBar: UISearchBar) {
-        if searchBar.text?.characters.count > 0 {
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        if (searchBar.text?.characters.count)! > 0 {
             var googleNetworking = SPGoogleNetworking()
             googleNetworking.delegate = dao
             googleNetworking.searchAddress(searchBar.text!)
@@ -67,19 +68,19 @@ class SPSearchResultsViewController: UIViewController, UITableViewDelegate, UITa
     
     
     //MARK: - TableView Delegate/Datasource
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return dao.addressResults.count
     }
-    func numberOfSectionsInTableView(tableView: UITableView) -> Int { return 1 }
+    func numberOfSections(in tableView: UITableView) -> Int { return 1 }
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        var cell = tableView.dequeueReusableCellWithIdentifier(cellReuseIdentifier)
-        if cell != nil { cell = UITableViewCell.init(style: .Default, reuseIdentifier: cellReuseIdentifier) }
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        var cell = tableView.dequeueReusableCell(withIdentifier: cellReuseIdentifier)
+        if cell != nil { cell = UITableViewCell.init(style: .default, reuseIdentifier: cellReuseIdentifier) }
         cell?.textLabel!.text = dao.addressResults[indexPath.row].address
-        cell?.userInteractionEnabled = true
+        cell?.isUserInteractionEnabled = true
         return cell!
     }
-    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let addressResult = dao.addressResults[indexPath.row]
         searchBar.text = addressResult.address
         if addressResult.coordinate != nil {
@@ -99,25 +100,25 @@ class SPSearchResultsViewController: UIViewController, UITableViewDelegate, UITa
         let multipler = self.dao.addressResults.count < 4 ? self.dao.addressResults.count : 3
         let heightOfTableView = standardHeightOfToolOrSearchBar * CGFloat(multipler)
         if delegate!.searchContainerHeightShouldAdjust(standardHeightOfToolOrSearchBar + heightOfTableView, tableViewPresent: true, searchBarPresent: true) {
-            UIView.animateWithDuration(standardAnimationDuration) {
+            UIView.animate(withDuration: standardAnimationDuration, animations: {
                 self.heightConstraintOfTableView.constant = heightOfTableView
                 self.view.layoutIfNeeded()
-            }
+            }) 
         }
     }
     func hideSearchResultsTableView() {
         if delegate!.searchContainerHeightShouldAdjust(standardHeightOfToolOrSearchBar, tableViewPresent: false, searchBarPresent: true) {
-            UIView.animateWithDuration(standardAnimationDuration) {
+            UIView.animate(withDuration: standardAnimationDuration, animations: {
                 self.heightConstraintOfTableView.constant = 0
                 self.view.layoutIfNeeded()
-            }
+            }) 
         }
     }
     //MARK: - SearchBar animation
-    func showSearchBar(makeFirstResponder makeFirstResponder: Bool) {
+    func showSearchBar(makeFirstResponder: Bool) {
         let height = standardHeightOfToolOrSearchBar
         if delegate!.searchContainerHeightShouldAdjust(height, tableViewPresent: false, searchBarPresent: true) {
-            UIView.animateWithDuration(standardAnimationDuration, animations: {
+            UIView.animate(withDuration: standardAnimationDuration, animations: {
                 self.heightConstraintOfSearchBar.constant = height
                 self.view.layoutIfNeeded()
             })
@@ -129,7 +130,7 @@ class SPSearchResultsViewController: UIViewController, UITableViewDelegate, UITa
     func hideSearchBar() {
         let height = CGFloat(0)
         if delegate!.searchContainerHeightShouldAdjust(height, tableViewPresent: false, searchBarPresent: false) {
-            UIView.animateWithDuration(standardAnimationDuration, animations: {
+            UIView.animate(withDuration: standardAnimationDuration, animations: {
                 self.heightConstraintOfSearchBar.constant = height
                 self.view.layoutIfNeeded()
                 if self.heightConstraintOfTableView.constant > 0 {
@@ -143,5 +144,5 @@ class SPSearchResultsViewController: UIViewController, UITableViewDelegate, UITa
 
 protocol SPSearchResultsViewControllerDelegate: class {
     func searchContainer(toPerformDelegateAction delegateAction:SPNetworkingDelegateAction, withInfo: String)
-    func searchContainerHeightShouldAdjust(height:CGFloat, tableViewPresent:Bool, searchBarPresent:Bool) -> Bool
+    func searchContainerHeightShouldAdjust(_ height:CGFloat, tableViewPresent:Bool, searchBarPresent:Bool) -> Bool
 }
