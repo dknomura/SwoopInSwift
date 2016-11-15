@@ -16,10 +16,10 @@
         </array>
     </customFonts>
     <scenes>
-        <!--Swoop Parking-->
+        <!--Swoop!-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController storyboardIdentifier="SPMainViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="BYZ-38-t0r" customClass="SPMainViewController" customModule="SwoopParkingApp" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="SPMainViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="BYZ-38-t0r" customClass="SPMainViewController" customModule="Swoop_" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
                         <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
@@ -43,13 +43,14 @@
                                     <constraint firstAttribute="height" constant="44" id="ujL-Xb-6pP"/>
                                 </constraints>
                                 <items>
-                                    <barButtonItem style="plain" id="Goq-d2-crx">
+                                    <barButtonItem title="Item" style="plain" id="Goq-d2-crx">
                                         <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="DJv-Ap-5OW">
                                             <rect key="frame" x="16" y="7" width="56" height="30"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <accessibility key="accessibilityConfiguration">
                                                 <accessibilityTraits key="traits" notEnabled="YES"/>
                                             </accessibility>
+                                            <fontDescription key="fontDescription" name="Christopherhand" family="Christopherhand" pointSize="30"/>
                                             <state key="normal" title="City">
                                                 <color key="titleColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             </state>
@@ -71,7 +72,8 @@
                                         <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="abk-gV-4hZ">
                                             <rect key="frame" x="304" y="7" width="64" height="30"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                            <state key="normal" title="More"/>
+                                            <fontDescription key="fontDescription" name="Christopherhand" family="Christopherhand" pointSize="24"/>
+                                            <state key="normal" title="MORE"/>
                                             <connections>
                                                 <segue destination="zfA-Uk-d2D" kind="show" id="onQ-5u-n8A"/>
                                             </connections>
@@ -150,7 +152,7 @@
                             </mask>
                         </variation>
                     </view>
-                    <navigationItem key="navigationItem" title="Swoop Parking" id="ujr-Pz-LeK">
+                    <navigationItem key="navigationItem" title="Swoop!" id="ujr-Pz-LeK">
                         <barButtonItem key="leftBarButtonItem" image="SearchIcon" id="kTj-VH-MfJ">
                             <connections>
                                 <action selector="showSearchBarButtonPressed:" destination="BYZ-38-t0r" id="YNV-ge-q6m"/>
@@ -182,12 +184,12 @@
                     </connections>
                 </searchDisplayController>
             </objects>
-            <point key="canvasLocation" x="1186" y="549"/>
+            <point key="canvasLocation" x="1185" y="548.76760563380287"/>
         </scene>
         <!--More-->
         <scene sceneID="eJr-0h-hmF">
             <objects>
-                <viewController id="zfA-Uk-d2D" customClass="MoreViewController" customModule="SwoopParkingApp" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="zfA-Uk-d2D" customClass="MoreViewController" customModule="Swoop_" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="zSZ-kH-lYH"/>
                         <viewControllerLayoutGuide type="bottom" id="guZ-wJ-I4s"/>
@@ -228,13 +230,13 @@
                                     <action selector="openDonate:" destination="zfA-Uk-d2D" eventType="touchUpInside" id="7r4-v1-hOl"/>
                                 </connections>
                             </button>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" textAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="ZME-bD-kuM">
-                                <rect key="frame" x="24" y="499" width="336" height="100"/>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" pagingEnabled="YES" editable="NO" textAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="ZME-bD-kuM">
+                                <rect key="frame" x="24" y="454" width="336" height="145"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="100" id="idG-Mw-lgO"/>
+                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="100" id="idG-Mw-lgO"/>
                                 </constraints>
-                                <string key="text">If I have helped you find parking, please leave a review or donate. I plan to continue to update this app and add more cities so any feedback would help motivate me to continue to work on this project. </string>
+                                <string key="text">If this app has been useful to you, please leave a review or donate. I plan to continue to update this app and add more cities so any feedback would help motivate me to continue to work on this project. </string>
                                 <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
@@ -262,10 +264,14 @@
                                     <action selector="openReview:" destination="zfA-Uk-d2D" eventType="touchUpInside" id="SLq-Rw-AiU"/>
                                 </connections>
                             </button>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="b20-aT-Iqw">
+                                <rect key="frame" x="182" y="248.5" width="20" height="20"/>
+                            </activityIndicatorView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="7RD-Sd-gCI" firstAttribute="leading" secondItem="wsg-c8-LFJ" secondAttribute="trailing" constant="8" id="0yZ-yf-yff"/>
+                            <constraint firstItem="b20-aT-Iqw" firstAttribute="centerY" secondItem="CbQ-df-i5M" secondAttribute="centerY" constant="-75" id="12P-lC-b8L"/>
                             <constraint firstItem="ZME-bD-kuM" firstAttribute="centerX" secondItem="CbQ-df-i5M" secondAttribute="centerX" id="1XI-1l-NGz"/>
                             <constraint firstItem="ocz-Ta-TOJ" firstAttribute="top" secondItem="ZME-bD-kuM" secondAttribute="bottom" constant="10" id="2eU-4E-gTk"/>
                             <constraint firstItem="ZME-bD-kuM" firstAttribute="top" relation="greaterThanOrEqual" secondItem="O2e-uo-Nee" secondAttribute="bottom" constant="10" id="5Nc-ZV-mGZ"/>
@@ -279,6 +285,7 @@
                             <constraint firstAttribute="trailingMargin" secondItem="RE4-Tx-V5x" secondAttribute="trailing" id="Mkh-iu-xeH"/>
                             <constraint firstItem="ZME-bD-kuM" firstAttribute="leading" secondItem="CbQ-df-i5M" secondAttribute="leadingMargin" constant="8" id="O6F-CG-45K"/>
                             <constraint firstAttribute="trailingMargin" secondItem="ocz-Ta-TOJ" secondAttribute="trailing" id="ab6-NN-Lur"/>
+                            <constraint firstItem="b20-aT-Iqw" firstAttribute="centerX" secondItem="CbQ-df-i5M" secondAttribute="centerX" id="c3N-9k-uzn"/>
                             <constraint firstItem="ZME-bD-kuM" firstAttribute="top" relation="greaterThanOrEqual" secondItem="kqw-gF-PJE" secondAttribute="bottom" constant="10" id="dn6-M8-11M"/>
                             <constraint firstItem="5vS-KN-pBO" firstAttribute="leading" secondItem="CbQ-df-i5M" secondAttribute="leadingMargin" id="gaL-JQ-9AO"/>
                             <constraint firstItem="5vS-KN-pBO" firstAttribute="top" secondItem="zSZ-kH-lYH" secondAttribute="bottom" constant="10" id="gm6-Xm-Ggk"/>
@@ -296,6 +303,7 @@
                     </view>
                     <navigationItem key="navigationItem" title="More" id="2so-ak-idD"/>
                     <connections>
+                        <outlet property="activityIndicator" destination="b20-aT-Iqw" id="Yz7-4V-ahv"/>
                         <outlet property="disclaimerButton" destination="kqw-gF-PJE" id="Vxu-Wg-b4a"/>
                         <outlet property="donateButton" destination="ocz-Ta-TOJ" id="qiR-QK-vvS"/>
                         <outlet property="holidaysButton" destination="O2e-uo-Nee" id="JU5-Wk-eLS"/>
@@ -312,7 +320,7 @@
         <!--Web View Controller-->
         <scene sceneID="gQq-LW-OCW">
             <objects>
-                <viewController storyboardIdentifier="webViewController" id="N9w-4P-bUJ" customClass="WebViewController" customModule="SwoopParkingApp" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="webViewController" id="N9w-4P-bUJ" customClass="WebViewController" customModule="Swoop_" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="T1I-nr-SpL"/>
                         <viewControllerLayoutGuide type="bottom" id="ygU-OH-lf0"/>
@@ -387,7 +395,7 @@
         <!--Time And Day View Controller-->
         <scene sceneID="ovt-kO-zka">
             <objects>
-                <viewController storyboardIdentifier="timeAndDayController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="Ygi-5r-sqb" customClass="SPTimeAndDayViewController" customModule="SwoopParkingApp" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="timeAndDayController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="Ygi-5r-sqb" customClass="SPTimeAndDayViewController" customModule="Swoop_" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="lLr-sC-nbn"/>
                         <viewControllerLayoutGuide type="bottom" id="SRn-Yb-lCN"/>
@@ -439,8 +447,8 @@
                                                 </connections>
                                             </button>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" restorationIdentifier="dayLabel" text="Thurs" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7Sj-W5-WbZ">
-                                                <rect key="frame" x="8" y="25" width="42" height="20"/>
-                                                <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                                <rect key="frame" x="21" y="22" width="29" height="27"/>
+                                                <fontDescription key="fontDescription" name="Christopherhand" family="Christopherhand" pointSize="24"/>
                                                 <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
@@ -479,8 +487,8 @@
                                         </variation>
                                     </view>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="E2y-r6-dmi">
-                                        <rect key="frame" x="103" y="50" width="33" height="16"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                                        <rect key="frame" x="103" y="44" width="30" height="22"/>
+                                        <fontDescription key="fontDescription" name="Christopherhand" family="Christopherhand" pointSize="19"/>
                                         <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
@@ -491,8 +499,8 @@
                                         </connections>
                                     </slider>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="k1n-dd-TQB">
-                                        <rect key="frame" x="341" y="50" width="33" height="16"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                                        <rect key="frame" x="345" y="45" width="29" height="21"/>
+                                        <fontDescription key="fontDescription" name="Christopherhand" family="Christopherhand" pointSize="18"/>
                                         <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
@@ -578,7 +586,7 @@
         <!--Search Results View Controller-->
         <scene sceneID="M46-4k-2wP">
             <objects>
-                <viewController id="9cI-Ye-8Fz" customClass="SPSearchResultsViewController" customModule="SwoopParkingApp" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="9cI-Ye-8Fz" customClass="SPSearchResultsViewController" customModule="Swoop_" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="cFq-Qa-Y0I"/>
                         <viewControllerLayoutGuide type="bottom" id="yCp-II-xAy"/>
@@ -652,7 +660,7 @@
         <!--Map View Controller-->
         <scene sceneID="DcG-OM-yXn">
             <objects>
-                <viewController storyboardIdentifier="mapViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="tF9-3D-TiD" customClass="SPMapViewController" customModule="SwoopParkingApp" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="mapViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="tF9-3D-TiD" customClass="SPMapViewController" customModule="Swoop_" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="Upa-dP-sz1"/>
                         <viewControllerLayoutGuide type="bottom" id="ddR-V9-5bI"/>

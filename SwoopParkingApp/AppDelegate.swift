@@ -68,6 +68,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     fileprivate func setupRootViewController(withDAO dao: SPDataAccessObject) {
         guard let navController = window?.rootViewController as? UINavigationController else { return }
+        
+        let backButton = navController.navigationItem.backBarButtonItem
+        backButton?.setTitleTextAttributes([UIFontDescriptorNameAttribute: "Christopherhand", UIFontDescriptorSizeAttribute: 30], for: .normal)
         guard let mainController = navController.topViewController as? SPMainViewController else { return }
         
         let sqliteReader = SPSQLiteReader(delegate: dao)

@@ -107,7 +107,7 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, Injectab
         sliderThumbLabel = UILabel.init(frame: CGRect(x: 0, y: 0, width: 55, height: 20))
         sliderThumbLabel!.backgroundColor = UIColor.clear
         sliderThumbLabel!.textAlignment = .center
-        sliderThumbLabel.font = UIFont.systemFont(ofSize: 12)
+        sliderThumbLabel.font = UIFont.init(name: "Christopherhand", size: 19)
         view.addSubview(sliderThumbLabel)
         originalThumbWidth = Float(thumbRect.size.width)
         timeSlider.isContinuous = true

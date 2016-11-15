@@ -8,7 +8,7 @@
 
 import Foundation
 
-class WebViewController: UIViewController {
+class WebViewController: UIViewController, UIWebViewDelegate {
     @IBOutlet weak var webView: UIWebView!
     var url: URL!
     
@@ -16,7 +16,8 @@ class WebViewController: UIViewController {
         super.viewDidLoad()
         webView.loadRequest(URLRequest(url: url))
         webView.scalesPageToFit = true
-        webView.scrollView.setContentOffset(CGPoint.zero, animated: false)
+        webView.scrollView.scrollsToTop = true
+        webView.delegate = self
     }
 
     
@@ -25,5 +26,9 @@ class WebViewController: UIViewController {
     }
     @IBAction func navigateForwardWebView(_ sender: Any) {
         webView.goForward()
+    }
+    
+    func webViewDidFinishLoad(_ webView: UIWebView) {
+        webView.scrollView.setContentOffset(CGPoint.zero, animated: false)
     }
 }

@@ -29,14 +29,13 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     var isZoomingIn = false
     var cancelTapGesture = false
     
-    var zoomToSwitchOverlays: Float { return streetZoom - 1.5 }
+    var zoomToSwitchOverlays: Float { return streetZoom - 2.5 }
     var streetZoom: Float { return 16.7 }
     var initialZoom: Float {
         return mapView.initialStreetCleaningZoom(forCity: .NYC)
     }
     var restoredCamera: GMSCameraPosition?
     
-    var currentLocationMarker: GMSMarker?
     var signMarker: GMSMarker?
     var searchMarker: GMSMarker?
     fileprivate var lastSelectedMarkerKVO: AnyObject?
@@ -135,28 +134,34 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         mapView.settings.tiltGestures = false
         mapView.delegate = self
         mapView.settings.consumesGesturesInView = false
-        currentLocationMarker = GMSMarker(position: CLLocationCoordinate2D(latitude: 0, longitude: 0))
-        currentLocationMarker?.icon = UIImage(named: "smart-car-icon")
+        if UserDefaults.standard.bool(forKey: kSPDidAllowLocationServices) {
+            mapView.isMyLocationEnabled = true
+
+        }
     }
+    
     fileprivate func setUpButtons() {
         zoomOutButton.setTitle("Zoom Out", for: UIControlState())
+        zoomOutButton.titleLabel?.font = UIFont(name: "Christopherhand", size: 25)
         let buttonSize = zoomOutButton.intrinsicContentSize
         zoomOutButton.frame = CGRect(x:8, y:8, width: buttonSize.width, height: buttonSize.height)
         zoomOutButton.backgroundColor = UIColor.white
+        zoomOutButton.alpha = 0.8
         zoomOutButton.isHidden = true
         zoomOutButton.addTarget(self, action: #selector(zoomOut(_:)), for: .touchUpInside)
         mapView.addSubview(zoomOutButton)
         
         guard let locationImage = UIImage.init(named: "location-icon") else { return }
-        print("mapview bounds: \(mapView.bounds). mapView frame: \(mapView.frame)")
-        myLocationButton.frame = CGRect(x: 0, y: 0, width: 34, height: 34)
         myLocationButton.imageView?.contentMode = .scaleAspectFit
         myLocationButton.setImage(locationImage, for: .normal)
+        myLocationButton.translatesAutoresizingMaskIntoConstraints = false
         myLocationButton.addTarget(self, action: #selector(moveCameraToUserLocation), for: .touchUpInside)
         mapView.addSubview(myLocationButton)
-        mapView.addConstraint(NSLayoutConstraint(item: myLocationButton, attribute: .bottom, relatedBy: .equal, toItem: mapView, attribute: .bottomMargin, multiplier: 1, constant: 8))
-        mapView.addConstraint(NSLayoutConstraint(item: myLocationButton, attribute: .trailing, relatedBy: .equal, toItem: mapView, attribute: .trailing, multiplier: 1, constant: 8))
-        mapView.layoutIfNeeded()
+        let rightConstraint = NSLayoutConstraint(item: mapView, attribute: .rightMargin, relatedBy: .equal, toItem: myLocationButton, attribute: .right, multiplier: 1, constant: 8)
+        let bottomConstraint = NSLayoutConstraint(item: mapView, attribute: .bottomMargin, relatedBy: .equal, toItem: myLocationButton, attribute: .bottom, multiplier: 1, constant: 8)
+        let heightConstraint = NSLayoutConstraint(item: myLocationButton, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 40)
+        let widthConstraint = NSLayoutConstraint(item: myLocationButton, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 40)
+        NSLayoutConstraint.activate([rightConstraint, bottomConstraint, heightConstraint, widthConstraint])
     }
     
     //MARK: - Button Methods
@@ -164,19 +169,15 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     @objc fileprivate func zoomOut(_ sender:UIButton) {
         zoomMap(toCamera: initialMapViewCamera)
     }
-    @IBAction func centerOnUserLocation(_ sender: UIButton) {
-        userControl = false
-        moveCameraToUserLocation()
-    }
     @objc fileprivate func moveCameraToUserLocation() {
         if UserDefaults.standard.bool(forKey: kSPDidAllowLocationServices) {
             if let currentCoordinate = dao.currentLocation?.coordinate {
-                let camera = GMSCameraPosition.camera(withTarget: currentCoordinate, zoom: streetZoom)
+                let zoomTo = mapView.camera.zoom <= zoomToSwitchOverlays ? zoomToSwitchOverlays : streetZoom
+                let camera = GMSCameraPosition.camera(withTarget: currentCoordinate, zoom: zoomTo)
                 animateMap(toCameraPosition: camera, duration: 0.6)
             }
         } else {
             dao.locationManager.requestWhenInUseAuthorization()
-            mapView.isMyLocationEnabled = true
         }
     }
     

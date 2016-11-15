@@ -21,6 +21,7 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
     @IBOutlet weak var waitingLabel: UILabel!
     @IBOutlet weak var searchContainerView: UIView!
     @IBOutlet weak var switchLabel: UIButton!
+    
     @IBOutlet weak var greyOutMapView: UIView!
     @IBOutlet weak var bottomToolbar: UIToolbar!
 
@@ -295,13 +296,11 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
     func dataAccessObjectDidAllowLocationServicesAndSetCurrentLocation() {
         if let endCoordinate = mapViewController.endCoordinateBeforeLocationRequest {
             mapViewController.presentAlertControllerForDirections(forCoordinate: endCoordinate)
+            mapViewController.mapView.isMyLocationEnabled = true
         }
     }
     
     func dataAccessObjectDidUpdateCurrentLocation() {
-        guard let currentLocation = dao.currentLocation?.coordinate else { return }
-        mapViewController.currentLocationMarker?.position = currentLocation
-        mapViewController.currentLocationMarker?.map = mapViewController.mapView
     }
     //MARK: -- Methods that interact with child view controllers
     //MARK: -----Time and Day Container Controller delegate

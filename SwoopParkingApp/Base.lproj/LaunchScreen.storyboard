@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11542" systemVersion="15G1108" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11542" systemVersion="15G1108" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -11,47 +11,65 @@
     </dependencies>
     <scenes>
         <!--View Controller-->
-        <scene sceneID="EHf-IW-A2E">
+        <scene sceneID="aVn-Mu-l2b">
             <objects>
-                <viewController id="01J-lp-oVM" sceneMemberID="viewController">
+                <viewController id="2L8-nl-YsQ" sceneMemberID="viewController">
                     <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="Llm-lL-Icb"/>
-                        <viewControllerLayoutGuide type="bottom" id="xb3-aO-Qok"/>
+                        <viewControllerLayoutGuide type="top" id="PpX-kx-d6X"/>
+                        <viewControllerLayoutGuide type="bottom" id="EDN-AV-e11"/>
                     </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="Ze5-6b-2t3">
+                    <view key="view" contentMode="scaleToFill" id="K9J-Zy-2WG">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="Find parking by knowing when and where street cleaning is going to finish. " textAlignment="center" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5CE-C1-W6O">
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="A tool to help you find parking by showing you when and where street cleaning will be finished. " textAlignment="center" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GXh-H6-3uW">
                                 <rect key="frame" x="24" y="508" width="327" height="149"/>
                                 <color key="backgroundColor" red="0.66666666669999997" green="0.35193515079999999" blue="0.34661367329999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <color key="textColor" cocoaTouchSystemColor="tableCellGroupedBackgroundColor"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="20"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="logo" translatesAutoresizingMaskIntoConstraints="NO" id="rZD-EJ-nth">
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="logo" translatesAutoresizingMaskIntoConstraints="NO" id="EOm-Sa-Z1A">
                                 <rect key="frame" x="10" y="20" width="355" height="448"/>
                                 <color key="backgroundColor" red="0.66666666669999997" green="0.35193515079999999" blue="0.34661367329999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             </imageView>
                         </subviews>
                         <color key="backgroundColor" red="0.66666666669999997" green="0.35193515079999999" blue="0.34661367329999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
-                            <constraint firstItem="rZD-EJ-nth" firstAttribute="leading" secondItem="Ze5-6b-2t3" secondAttribute="leading" constant="10" id="54V-4v-KsR"/>
-                            <constraint firstAttribute="trailing" secondItem="rZD-EJ-nth" secondAttribute="trailing" constant="10" id="HQM-tV-cpM"/>
-                            <constraint firstItem="xb3-aO-Qok" firstAttribute="top" secondItem="5CE-C1-W6O" secondAttribute="bottom" constant="10" id="OMf-mF-rBO"/>
-                            <constraint firstItem="5CE-C1-W6O" firstAttribute="top" secondItem="rZD-EJ-nth" secondAttribute="bottom" constant="40" id="OdY-B9-vEX"/>
-                            <constraint firstAttribute="trailingMargin" secondItem="5CE-C1-W6O" secondAttribute="trailing" constant="8" id="Wy2-mr-gBU"/>
-                            <constraint firstItem="5CE-C1-W6O" firstAttribute="leading" secondItem="Ze5-6b-2t3" secondAttribute="leadingMargin" constant="8" id="XS5-yP-0fV"/>
-                            <constraint firstItem="rZD-EJ-nth" firstAttribute="top" secondItem="Llm-lL-Icb" secondAttribute="bottom" id="ZpU-lB-b2A"/>
+                            <constraint firstItem="EDN-AV-e11" firstAttribute="top" secondItem="GXh-H6-3uW" secondAttribute="bottom" constant="10" id="1Uw-aA-sYe"/>
+                            <constraint firstItem="GXh-H6-3uW" firstAttribute="top" secondItem="EOm-Sa-Z1A" secondAttribute="bottom" constant="40" id="9lA-F9-a2h"/>
+                            <constraint firstItem="EOm-Sa-Z1A" firstAttribute="leading" secondItem="K9J-Zy-2WG" secondAttribute="leading" constant="10" id="Dag-UJ-EPR"/>
+                            <constraint firstAttribute="trailing" secondItem="EOm-Sa-Z1A" secondAttribute="trailing" constant="10" id="Ie0-Ue-o2v"/>
+                            <constraint firstItem="EOm-Sa-Z1A" firstAttribute="top" secondItem="PpX-kx-d6X" secondAttribute="bottom" id="Lge-GJ-IKP"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="GXh-H6-3uW" secondAttribute="trailing" constant="8" id="lBl-Kl-ieg"/>
+                            <constraint firstItem="GXh-H6-3uW" firstAttribute="leading" secondItem="K9J-Zy-2WG" secondAttribute="leadingMargin" constant="8" id="oKk-O6-oy1"/>
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="textView" destination="5CE-C1-W6O" id="RWF-Ya-Ymc"/>
+                        <outlet property="textView" destination="GXh-H6-3uW" id="RWM-yp-hGz"/>
                     </connections>
                 </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="iYj-Kq-Ea1" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="09G-IL-xq1" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-714.39999999999998" y="283.80809595202402"/>
+        </scene>
+        <!--View Controller-->
+        <scene sceneID="DWP-IY-hQC">
+            <objects>
+                <viewController id="vng-oy-SJQ" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="fk4-RO-g2O"/>
+                        <viewControllerLayoutGuide type="bottom" id="BZa-0T-v6c"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="qS6-tA-2XB">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="wEV-by-b1b" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="18" y="257"/>
         </scene>
     </scenes>
     <resources>
