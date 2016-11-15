@@ -31,6 +31,8 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
         return allLocationsForDayValue[primaryTimeAndDay.rawValue]
     }
     var signForPathCoordinates = [String: SPSign]()
+    var isFirstLocationAfterAuthorization = false
+
     //MARK: - Determine if current mapView is within NYC
     
     func isInNYC(_ mapView:GMSMapView) -> Bool {
@@ -91,7 +93,6 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
         locationManager.startUpdatingLocation()
     }
     // MARK: - CLManager delegate
-    var isFirstLocationAfterAuthorization = false
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if (locations.count == 0) { return }
         currentLocation = locations.last!
@@ -146,4 +147,5 @@ protocol SPDataAccessObjectDelegate: class {
     func dataAccessObject(_ dao: SPDataAccessObject, didSetGoogleSearchObject googleSearchObject:SPGoogleCoordinateAndInfo)
     func dataAccessObject(_ dao: SPDataAccessObject, didUpdateAddressResults:[SPGoogleAddressResult])
     func dataAccessObjectDidAllowLocationServicesAndSetCurrentLocation()
+    func dataAccessObjectDidUpdateCurrentLocation()
 }

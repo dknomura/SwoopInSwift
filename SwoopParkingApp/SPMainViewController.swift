@@ -128,17 +128,22 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
         let pinchGesture = UIPinchGestureRecognizer.init(target: mapViewController, action: #selector(mapViewController.pinchZoom(_:)))
         pinchGesture.cancelsTouchesInView = false
         mapViewController.mapView.addGestureRecognizer(pinchGesture)
+        
+        let longPress = UILongPressGestureRecognizer.init(target: mapViewController, action: #selector(mapViewController.longPressZoom(_:)))
+        longPress.minimumPressDuration = 0.3
+        longPress.allowableMovement = 2
+        mapViewController.mapView.addGestureRecognizer(longPress)
 
         singleTapGesture.require(toFail: doubleTapZoomGesture)
     }
+    
+    
     
     @objc fileprivate func singleTapHandler(_ gesture: UITapGestureRecognizer) {
         guard !mapViewController.cancelTapGesture else {
             mapViewController.cancelTapGesture = false
             return
         }
-//        print("Search marker is \(mapViewController.searchMarker?.map != nil ? "present" : "not present")")
-//        print("Marker is selected: \(mapViewController.isMarkerSelected ? "yes" : "no")")
         if isSearchTableViewPresent {
             searchViewController.hideSearchResultsTableView()
         }
@@ -146,8 +151,8 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
             view.endEditing(true)
             return
         }
-        
-        if timeAndDayContainerView.frame.contains(gesture.location(in: mapViewController.mapView)) || bottomToolbar.frame.contains(gesture.location(in: mapViewController.mapView)) { return }
+        let tapLocation = gesture.location(in: mapViewController.mapView)
+        if timeAndDayContainerView.frame.contains(tapLocation) || bottomToolbar.frame.contains(tapLocation) { return }
         let signMarkerFrame = mapViewController.signMarker?.iconView?.frame,
             searchMarkerFrame = mapViewController.searchMarker?.iconView?.frame,
             infoWindowFrame = mapViewController.currentInfoWindow?.frame
@@ -175,7 +180,7 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
 
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
         if touch.view != nil {
-            let viewsToCancelTouch: [UIView?] = [mapViewController.zoomOutButton, searchContainerView, bottomToolbar, timeAndDayContainerView, mapViewController.currentInfoWindow, mapViewController.signMarker?.iconView, mapViewController.searchMarker?.iconView]
+            let viewsToCancelTouch: [UIView?] = [mapViewController.zoomOutButton, mapViewController.myLocationButton, searchContainerView, bottomToolbar, timeAndDayContainerView, mapViewController.currentInfoWindow, mapViewController.signMarker?.iconView, mapViewController.searchMarker?.iconView]
             for untappableView in viewsToCancelTouch {
                 if untappableView == nil { continue }
                 if touch.view!.isDescendant(of: untappableView!) { return false }
@@ -201,8 +206,10 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
     //MARK: --Swoop toggle
     @IBAction func toggleOverlaySwitch(_ sender: UISwitch) {
         if mapViewController.mapView.camera.zoom <= mapViewController.zoomToSwitchOverlays {
+            if !sender.isOn { return }
             mapViewController.zoomMap(toZoom: mapViewController.streetZoom)
         } else {
+            if sender.isOn { return }
             mapViewController.zoomMap(toZoom: mapViewController.zoomToSwitchOverlays)
         }
     }
@@ -290,18 +297,23 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
             mapViewController.presentAlertControllerForDirections(forCoordinate: endCoordinate)
         }
     }
+    
+    func dataAccessObjectDidUpdateCurrentLocation() {
+        guard let currentLocation = dao.currentLocation?.coordinate else { return }
+        mapViewController.currentLocationMarker?.position = currentLocation
+        mapViewController.currentLocationMarker?.map = mapViewController.mapView
+    }
     //MARK: -- Methods that interact with child view controllers
     //MARK: -----Time and Day Container Controller delegate
     func timeViewControllerDidChangeTime() {
         if streetViewSwitch.isOn {
             mapViewController.getSignsForCurrentMapView()
+        }
+        if dao.locationsForPrimaryTimeAndDay == nil {
+            dao.getStreetCleaningLocationsForPrimaryTimeAndDay()
+            activityIndicator.startAnimating()
         } else {
-            if dao.locationsForPrimaryTimeAndDay == nil {
-                dao.getStreetCleaningLocationsForPrimaryTimeAndDay()
-                activityIndicator.startAnimating()
-            } else {
-                mapViewController.getNewHeatMapOverlays()
-            }
+            mapViewController.getNewHeatMapOverlays()
         }
     }
     

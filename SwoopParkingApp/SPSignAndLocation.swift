@@ -12,22 +12,33 @@ import Foundation
 struct SPSign {
     var positionInFeet: Double!
     var directionOfArrow: String!
-    var signContent: String! {
-        didSet {
-            setMarkerContent()
-        }
-    }
+    var signContent: String!
+    var markerContent: String!
+
     init(positionInFeet: Double?, directionOfArrow:String?, signContent:String?) {
         self.positionInFeet = positionInFeet
         self.directionOfArrow = directionOfArrow
         self.signContent = signContent
         setMarkerContent()
     }
-    var markerContent: String!
+    
     mutating func setMarkerContent() {
         guard let symbolRange = signContent.range(of: "BOL)") else { return }
-        let cleaningTime = signContent.substring(from: symbolRange.upperBound).localizedCapitalized
-        markerContent = "Street cleaning " + cleaningTime + " Tap for directions"
+        if #available(iOS 9.0, *) {
+            let cleaningTime = signContent.substring(from: symbolRange.upperBound).localizedCapitalized
+            markerContent = "Street cleaning " + cleaningTime + " Tap for directions"
+        } else {
+            markerContent = "Street cleaning " + signContent.substring(from: symbolRange.upperBound).lowercased() + ". Tap for directions"
+        }
+    }
+}
+
+extension String {
+    mutating func removeParenthesisAndContent() {
+        if let startParenthesis = self.range(of: "("),
+            let endParenthesis = self.range(of: ")") {
+            self.removeSubrange(startParenthesis.lowerBound..<endParenthesis.upperBound)
+        }
     }
 }
 

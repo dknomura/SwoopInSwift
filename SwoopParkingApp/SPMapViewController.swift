@@ -15,6 +15,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     weak var delegate: SPMapViewControllerDelegate?
     @IBOutlet weak var mapView: GMSMapView!
     var zoomOutButton = UIButton.init(type:.roundedRect)
+    var myLocationButton = UIButton(type: .roundedRect)
     
     var initialMapViewCamera: GMSCameraPosition {
         return GMSCameraPosition.camera(withTarget: CLLocationCoordinate2DMake(40.7193748839769, -73.9289110153913), zoom: initialZoom)
@@ -28,12 +29,28 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     var isZoomingIn = false
     var cancelTapGesture = false
     
-    var zoomToSwitchOverlays: Float { return streetZoom - 2.0 }
-    var streetZoom: Float { return 17.0 }
+    var zoomToSwitchOverlays: Float { return streetZoom - 1.5 }
+    var streetZoom: Float { return 16.7 }
     var initialZoom: Float {
         return mapView.initialStreetCleaningZoom(forCity: .NYC)
     }
     var restoredCamera: GMSCameraPosition?
+    
+    var currentLocationMarker: GMSMarker?
+    var signMarker: GMSMarker?
+    var searchMarker: GMSMarker?
+    fileprivate var lastSelectedMarkerKVO: AnyObject?
+    var endCoordinateBeforeLocationRequest:CLLocationCoordinate2D?
+    fileprivate var dao: SPDataAccessObject!
+    var isMarkerSelected: Bool {
+        return mapView.selectedMarker != nil
+    }
+    var areMarkersPresent: Bool {
+        return signMarker?.map != nil || searchMarker?.map != nil
+    }
+    
+    var currentInfoWindow: SPSignInfoOverlay?
+
     //MARK: - Override methods
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -46,10 +63,6 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        removeObserver(self, forKeyPath: kvoSelectedMarkerKeyPath)
-    }
     //MARK: - Setup/breakdown methods
     //MARK: --Gestures
     @objc func zoomToDoubleTapOnMap(_ gesture:UITapGestureRecognizer) {
@@ -59,7 +72,6 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
             doubleTapZoom = zoomToSwitchOverlays
         } else if mapView.camera.zoom < streetZoom {
             doubleTapZoom = streetZoom
-            delegate?.mapViewControllerDidZoom(switchOn: true, shouldGetOverlay: false)
         } else {
             doubleTapZoom = mapView.camera.zoom + 1
         }
@@ -82,12 +94,21 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         isPinchZooming = true
     }
     
+    @objc func longPressZoom(_ gesture: UILongPressGestureRecognizer) {
+        if mapView.camera.zoom < streetZoom {
+            let pointOnMap = gesture.location(in: mapView)
+            let camera = GMSCameraPosition.camera(withTarget: mapView.projection.coordinate(for: pointOnMap), zoom: streetZoom)
+            isZoomingIn = true
+            animateMap(toCameraPosition: camera, duration: 0.7)
+//            delegate?.mapViewControllerDidZoom(switchOn: true, shouldGetOverlay: false)
+        }
+    }
+    
     //MARK: --Observers
     fileprivate func setupObservers() {
         mapView.addObserver(self, forKeyPath: kvoSelectedMarkerKeyPath, options: .new, context: nil)
     }
     
-    fileprivate var lastSelectedMarkerKVO: AnyObject?
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         func defaultReturn() { super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context) }
         guard keyPath != nil && change != nil else {
@@ -101,7 +122,6 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
                 cancelTapGesture = true
             }
             lastSelectedMarkerKVO = newSelectedMarker as AnyObject?
-            print("\(kvoSelectedMarkerKeyPath) changed to \(change![NSKeyValueChangeKey.newKey]). will cancel tap gesture: \(cancelTapGesture)")
         default:
             super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
         }
@@ -110,25 +130,37 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     //MARK: --Views
     fileprivate func setUpMap() {
         mapView.camera = restoredCamera != nil ? restoredCamera! : initialMapViewCamera
-        mapView.settings.myLocationButton = true
         mapView.settings.rotateGestures = false
         mapView.settings.zoomGestures = false
         mapView.settings.tiltGestures = false
         mapView.delegate = self
         mapView.settings.consumesGesturesInView = false
+        currentLocationMarker = GMSMarker(position: CLLocationCoordinate2D(latitude: 0, longitude: 0))
+        currentLocationMarker?.icon = UIImage(named: "smart-car-icon")
     }
     fileprivate func setUpButtons() {
         zoomOutButton.setTitle("Zoom Out", for: UIControlState())
         let buttonSize = zoomOutButton.intrinsicContentSize
-        zoomOutButton.frame = CGRect(x: mapView.bounds.origin.x + 8.0, y: mapView.bounds.origin.y + 8, width: buttonSize.width, height: buttonSize.height)
+        zoomOutButton.frame = CGRect(x:8, y:8, width: buttonSize.width, height: buttonSize.height)
         zoomOutButton.backgroundColor = UIColor.white
         zoomOutButton.isHidden = true
         zoomOutButton.addTarget(self, action: #selector(zoomOut(_:)), for: .touchUpInside)
         mapView.addSubview(zoomOutButton)
+        
+        guard let locationImage = UIImage.init(named: "location-icon") else { return }
+        print("mapview bounds: \(mapView.bounds). mapView frame: \(mapView.frame)")
+        myLocationButton.frame = CGRect(x: 0, y: 0, width: 34, height: 34)
+        myLocationButton.imageView?.contentMode = .scaleAspectFit
+        myLocationButton.setImage(locationImage, for: .normal)
+        myLocationButton.addTarget(self, action: #selector(moveCameraToUserLocation), for: .touchUpInside)
+        mapView.addSubview(myLocationButton)
+        mapView.addConstraint(NSLayoutConstraint(item: myLocationButton, attribute: .bottom, relatedBy: .equal, toItem: mapView, attribute: .bottomMargin, multiplier: 1, constant: 8))
+        mapView.addConstraint(NSLayoutConstraint(item: myLocationButton, attribute: .trailing, relatedBy: .equal, toItem: mapView, attribute: .trailing, multiplier: 1, constant: 8))
+        mapView.layoutIfNeeded()
     }
     
     //MARK: - Button Methods
-    //MARK: --Other buttons
+    //MARK: -- Other buttons
     @objc fileprivate func zoomOut(_ sender:UIButton) {
         zoomMap(toCamera: initialMapViewCamera)
     }
@@ -136,14 +168,15 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         userControl = false
         moveCameraToUserLocation()
     }
-    func didTapMyLocationButton(for mapView: GMSMapView) -> Bool {
-        userControl = false
-        return true
-    }
-    fileprivate func moveCameraToUserLocation() {
-        if let currentCoordinate = dao.currentLocation?.coordinate {
-            let camera = GMSCameraPosition.camera(withTarget: currentCoordinate, zoom: streetZoom)
-            zoomMap(toCamera: camera)
+    @objc fileprivate func moveCameraToUserLocation() {
+        if UserDefaults.standard.bool(forKey: kSPDidAllowLocationServices) {
+            if let currentCoordinate = dao.currentLocation?.coordinate {
+                let camera = GMSCameraPosition.camera(withTarget: currentCoordinate, zoom: streetZoom)
+                animateMap(toCameraPosition: camera, duration: 0.6)
+            }
+        } else {
+            dao.locationManager.requestWhenInUseAuthorization()
+            mapView.isMyLocationEnabled = true
         }
     }
     
@@ -162,13 +195,10 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     }
     
     func adjustViewsToZoom() {
-        let turnSwitchOn: Bool? = mapView.camera.zoom < zoomToSwitchOverlays ? false : nil
+//        let turnSwitchOn: Bool? = mapView.camera.zoom < streetZoom ? false : nil
+        let turnSwitchOn = mapView.camera.zoom >= streetZoom
         delegate?.mapViewControllerDidZoom(switchOn: turnSwitchOn, shouldGetOverlay: true)
-        if mapView.camera.zoom < initialZoom {
-            zoomOutButton.isHidden = true
-        } else {
-            zoomOutButton.isHidden = false
-        }
+        zoomOutButton.isHidden = mapView.camera.zoom <= initialZoom
     }
     func zoomMap(toCoordinate coordinate:CLLocationCoordinate2D?, zoom:Float) {
         if coordinate != nil {
@@ -244,7 +274,6 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     }
     
     //MARK: ----Methods for GMSMarker
-    var signMarker: GMSMarker?
     func mapView(_ mapView: GMSMapView, didTap overlay: GMSOverlay) {
         if let polyline = overlay as? GMSPolyline {
             guard let coordinate = SPPolylineManager.coordinate(fromPolyline: polyline) else { return }
@@ -254,7 +283,6 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
             mapView.selectedMarker = signMarker
         }
     }
-    var searchMarker: GMSMarker?
     func setSearchMarker(withUserData userData:String, atCoordinate coordinate: CLLocationCoordinate2D) {
         if searchMarker != nil { searchMarker?.map = nil }
         searchMarker = marker(withUserData: userData, atCoordinate: coordinate)
@@ -274,20 +302,12 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
             searchMarker?.map = nil
         }
     }
-    var isMarkerSelected: Bool {
-        return mapView.selectedMarker != nil
-    }
-    var areMarkersPresent: Bool {
-        return signMarker?.map != nil || searchMarker?.map != nil
-    }
-    
-    var currentInfoWindow: SPSignInfoOverlay?
     func mapView(_ mapView: GMSMapView, markerInfoWindow marker: GMSMarker) -> UIView? {
         if marker === signMarker || marker === searchMarker {
             guard let displayString = marker.userData as? String else { return nil }
             guard let infoWindow = Bundle.main.loadNibNamed("SPSignInfoOverlay", owner: self, options: nil)?[0] as? SPSignInfoOverlay else { return nil }
             infoWindow.destinationCoordinate = marker.position
-            infoWindow.signContentLabel.text = displayString
+            infoWindow.signContentLabel.text = displayString + ". Tap for directions"
             currentInfoWindow = infoWindow
             cancelTapGesture = true
             if marker == searchMarker {
@@ -300,7 +320,6 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         return nil
     }
     
-    var endCoordinateBeforeLocationRequest:CLLocationCoordinate2D?
     func mapView(_ mapView: GMSMapView, didTapInfoWindowOf marker: GMSMarker) {
         if UserDefaults.standard.bool(forKey: kSPDidAllowLocationServices) {
             presentAlertControllerForDirections(forCoordinate: marker.position)
@@ -310,6 +329,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
             endCoordinateBeforeLocationRequest = marker.position
         }
     }
+
     
     //MARK: - Open map app
     func presentAlertControllerForDirections(forCoordinate coordinate: CLLocationCoordinate2D) {
@@ -363,7 +383,6 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
 
     
     //MARK: Injectable protocol
-    fileprivate var dao: SPDataAccessObject!
     func inject(dao: SPDataAccessObject, delegate: Any) {
         self.dao = dao
         self.delegate = delegate as? SPMapViewControllerDelegate
