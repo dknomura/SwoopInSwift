@@ -16,7 +16,6 @@ class WebViewController: UIViewController, UIWebViewDelegate {
         super.viewDidLoad()
         webView.loadRequest(URLRequest(url: url))
         webView.scalesPageToFit = true
-        webView.scrollView.scrollsToTop = true
         webView.delegate = self
     }
 
@@ -29,6 +28,7 @@ class WebViewController: UIViewController, UIWebViewDelegate {
     }
     
     func webViewDidFinishLoad(_ webView: UIWebView) {
-        webView.scrollView.setContentOffset(CGPoint.zero, animated: false)
+//        webView.scrollView.contentOffset = CGPoint.zero
+        webView.scrollView.scrollRectToVisible(CGRect(x: 0, y: webView.frame.height, width: 1, height: 1), animated: false)
     }
 }

@@ -31,6 +31,10 @@
 		9C1CA5A31DA83FB800EB875F /* SPGoogleNetworkingObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C1CA5A21DA83FB800EB875F /* SPGoogleNetworkingObject.swift */; };
 		9C215D9C1D6652D9006C1E3E /* SPTimeAndDayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C215D9B1D6652D9006C1E3E /* SPTimeAndDayViewController.swift */; };
 		9C42DAB31D5A589E004ECA97 /* SPDataAccessObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C42DAB21D5A589E004ECA97 /* SPDataAccessObject.swift */; };
+		9C431BAC1DE4C1E1000B9C66 /* How it works.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9C431BA81DE4C1E1000B9C66 /* How it works.pdf */; };
+		9C431BAD1DE4C1E1000B9C66 /* Parking holidays.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9C431BA91DE4C1E1000B9C66 /* Parking holidays.pdf */; };
+		9C431BAE1DE4C1E1000B9C66 /* Parking tips.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9C431BAA1DE4C1E1000B9C66 /* Parking tips.pdf */; };
+		9C431BB41DEFACFC000B9C66 /* Disclaimer.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9C431BB31DEFACFC000B9C66 /* Disclaimer.pdf */; };
 		9C4503031DD8D6420047B708 /* comesinhandy.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9C4503021DD8D6420047B708 /* comesinhandy.ttf */; };
 		9C4503081DD936D60047B708 /* MoreViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C4503071DD936D60047B708 /* MoreViewController.swift */; };
 		9C45030B1DDA1AE70047B708 /* ViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C45030A1DDA1AE70047B708 /* ViewExtensions.swift */; };
@@ -41,7 +45,6 @@
 		9C61F0B11D7496DC00BA524C /* SPGoogleNetworking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C61F0B01D7496DB00BA524C /* SPGoogleNetworking.swift */; };
 		9C61F0B51D7608CC00BA524C /* SPSearchResultsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C61F0B41D7608CC00BA524C /* SPSearchResultsViewController.swift */; };
 		9C6A8D5D1DDABA180030545F /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C6A8D5C1DDABA180030545F /* StoreKit.framework */; };
-		9C6A8D5F1DDABB5D0030545F /* InAppPurchase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C6A8D5E1DDABB5D0030545F /* InAppPurchase.swift */; };
 		9C96EE901D625EC4007C4EC8 /* SPViewControllerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C96EE8F1D625EC4007C4EC8 /* SPViewControllerExtension.swift */; };
 		9CA64D9B1DD7821E0015A8F2 /* InjectableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CA64D9A1DD7821E0015A8F2 /* InjectableViewController.swift */; };
 		9CA7DDC11D57EAB50050B75D /* LFHeatMap-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CA7DDBC1D57EAB50050B75D /* LFHeatMap-dummy.m */; };
@@ -134,6 +137,10 @@
 		9C1CA5A21DA83FB800EB875F /* SPGoogleNetworkingObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPGoogleNetworkingObject.swift; sourceTree = "<group>"; };
 		9C215D9B1D6652D9006C1E3E /* SPTimeAndDayViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPTimeAndDayViewController.swift; sourceTree = "<group>"; };
 		9C42DAB21D5A589E004ECA97 /* SPDataAccessObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPDataAccessObject.swift; sourceTree = "<group>"; };
+		9C431BA81DE4C1E1000B9C66 /* How it works.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "How it works.pdf"; sourceTree = "<group>"; };
+		9C431BA91DE4C1E1000B9C66 /* Parking holidays.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "Parking holidays.pdf"; sourceTree = "<group>"; };
+		9C431BAA1DE4C1E1000B9C66 /* Parking tips.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "Parking tips.pdf"; sourceTree = "<group>"; };
+		9C431BB31DEFACFC000B9C66 /* Disclaimer.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = Disclaimer.pdf; sourceTree = "<group>"; };
 		9C4503021DD8D6420047B708 /* comesinhandy.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = comesinhandy.ttf; sourceTree = "<group>"; };
 		9C4503071DD936D60047B708 /* MoreViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MoreViewController.swift; sourceTree = "<group>"; };
 		9C45030A1DDA1AE70047B708 /* ViewExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewExtensions.swift; sourceTree = "<group>"; };
@@ -144,7 +151,6 @@
 		9C61F0B01D7496DB00BA524C /* SPGoogleNetworking.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPGoogleNetworking.swift; sourceTree = "<group>"; };
 		9C61F0B41D7608CC00BA524C /* SPSearchResultsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPSearchResultsViewController.swift; sourceTree = "<group>"; };
 		9C6A8D5C1DDABA180030545F /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
-		9C6A8D5E1DDABB5D0030545F /* InAppPurchase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InAppPurchase.swift; sourceTree = "<group>"; };
 		9C96EE8F1D625EC4007C4EC8 /* SPViewControllerExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPViewControllerExtension.swift; sourceTree = "<group>"; };
 		9CA64D9A1DD7821E0015A8F2 /* InjectableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InjectableViewController.swift; sourceTree = "<group>"; };
 		9CA7DDBC1D57EAB50050B75D /* LFHeatMap-dummy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "LFHeatMap-dummy.m"; sourceTree = "<group>"; };
@@ -362,7 +368,6 @@
 				9C4503071DD936D60047B708 /* MoreViewController.swift */,
 				9C45030A1DDA1AE70047B708 /* ViewExtensions.swift */,
 				9C45031D1DDA3FAC0047B708 /* WebViewController.swift */,
-				9C6A8D5E1DDABB5D0030545F /* InAppPurchase.swift */,
 			);
 			name = Settings;
 			sourceTree = "<group>";
@@ -370,16 +375,12 @@
 		9C45030C1DDA390F0047B708 /* ParkingGuidelines */ = {
 			isa = PBXGroup;
 			children = (
+				9C431BB31DEFACFC000B9C66 /* Disclaimer.pdf */,
+				9C431BA81DE4C1E1000B9C66 /* How it works.pdf */,
+				9C431BA91DE4C1E1000B9C66 /* Parking holidays.pdf */,
+				9C431BAA1DE4C1E1000B9C66 /* Parking tips.pdf */,
 			);
 			name = ParkingGuidelines;
-			sourceTree = "<group>";
-		};
-		9C45031F1DDA4CEB0047B708 /* LaunchScreen */ = {
-			isa = PBXGroup;
-			children = (
-				9CFEE3821CDA6D7A00CE5D53 /* LaunchScreen.storyboard */,
-			);
-			name = LaunchScreen;
 			sourceTree = "<group>";
 		};
 		9C61F0AF1D7496C100BA524C /* Networking */ = {
@@ -466,7 +467,7 @@
 				9CFEE3801CDA6D7A00CE5D53 /* Assets.xcassets */,
 				9C45030C1DDA390F0047B708 /* ParkingGuidelines */,
 				9C1A86CA1DA586C900DAD930 /* Main.storyboard */,
-				9C45031F1DDA4CEB0047B708 /* LaunchScreen */,
+				9CFEE3821CDA6D7A00CE5D53 /* LaunchScreen.storyboard */,
 				9CFEE3851CDA6D7A00CE5D53 /* Info.plist */,
 				9CBE25BC1D552BFA00B5384B /* SwoopParkingApp-Bridging-Header.h */,
 				9C4503041DD8D6480047B708 /* Resources */,
@@ -618,8 +619,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				9CFEE3841CDA6D7A00CE5D53 /* LaunchScreen.storyboard in Resources */,
+				9C431BAC1DE4C1E1000B9C66 /* How it works.pdf in Resources */,
+				9C431BAD1DE4C1E1000B9C66 /* Parking holidays.pdf in Resources */,
+				9C431BB41DEFACFC000B9C66 /* Disclaimer.pdf in Resources */,
 				9C170D321DAD325D006CA0E2 /* swoop-sqlite-no-FTS.db in Resources */,
 				9C4503031DD8D6420047B708 /* comesinhandy.ttf in Resources */,
+				9C431BAE1DE4C1E1000B9C66 /* Parking tips.pdf in Resources */,
 				9CFEE3811CDA6D7A00CE5D53 /* Assets.xcassets in Resources */,
 				9C1A86C81DA586C900DAD930 /* Main.storyboard in Resources */,
 				9C1CA59F1DA8125B00EB875F /* SPSignInfoOverlay.xib in Resources */,
@@ -790,7 +795,6 @@
 				9CFEE37C1CDA6D7900CE5D53 /* SPMapViewController.swift in Sources */,
 				9C04E2831D948C520012EAE0 /* FMDatabasePool.m in Sources */,
 				9C04E2811D948C520012EAE0 /* FMDatabase.m in Sources */,
-				9C6A8D5F1DDABB5D0030545F /* InAppPurchase.swift in Sources */,
 				9C215D9C1D6652D9006C1E3E /* SPTimeAndDayViewController.swift in Sources */,
 				9C96EE901D625EC4007C4EC8 /* SPViewControllerExtension.swift in Sources */,
 				9C1CA5A11DA8130D00EB875F /* SPSignInfoOverlay.swift in Sources */,
@@ -983,7 +987,7 @@
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				"FRAMEWORK_SEARCH_PATHS[arch=*]" = "$(inherited)";
 				INFOPLIST_FILE = SwoopParkingApp/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.dnom.SwoopParkingApp;
@@ -1010,7 +1014,7 @@
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				"FRAMEWORK_SEARCH_PATHS[arch=*]" = "$(inherited)";
 				INFOPLIST_FILE = SwoopParkingApp/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.dnom.SwoopParkingApp;

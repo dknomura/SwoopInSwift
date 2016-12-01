@@ -164,7 +164,6 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
         }
         if mapViewController.areMarkersPresent {
             mapViewController.hideMarkers()
-            return
         }
         if toolbarsPresent {
             if isSearchBarPresent {
@@ -184,7 +183,10 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
             let viewsToCancelTouch: [UIView?] = [mapViewController.zoomOutButton, mapViewController.myLocationButton, searchContainerView, bottomToolbar, timeAndDayContainerView, mapViewController.currentInfoWindow, mapViewController.signMarker?.iconView, mapViewController.searchMarker?.iconView]
             for untappableView in viewsToCancelTouch {
                 if untappableView == nil { continue }
-                if touch.view!.isDescendant(of: untappableView!) { return false }
+                if touch.view!.isDescendant(of: untappableView!) {
+                    print("\(untappableView) is canceling tap gesture recognizer")
+                    return false
+                }
             }
         }
         return true
@@ -231,6 +233,18 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
         show ? searchViewController.showSearchBar(makeFirstResponder: makeFirstResponder) : searchViewController.hideSearchBar()
         shouldTapShowSearchBar = show
     }
+    
+    //MARK: Button methods
+    
+    @IBAction func setToCurrentTime(_ sender: UIBarButtonItem) {
+        if !toolbarsPresent {
+            showHideToolbars(true)
+        }
+        dao.primaryTimeAndDay = DNTimeAndDay.currentTimeAndDay()
+        timeAndDayViewController.adjustTimeSliderToDay()
+        
+    }
+    
     
     //MARK: - Animation methods
     fileprivate func showHideToolbars(_ shouldShow:Bool) {

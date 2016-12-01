@@ -67,16 +67,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     fileprivate func setupRootViewController(withDAO dao: SPDataAccessObject) {
-        guard let navController = window?.rootViewController as? UINavigationController else { return }
-        
-        let backButton = navController.navigationItem.backBarButtonItem
-        backButton?.setTitleTextAttributes([UIFontDescriptorNameAttribute: "Christopherhand", UIFontDescriptorSizeAttribute: 30], for: .normal)
-        guard let mainController = navController.topViewController as? SPMainViewController else { return }
-        
+        guard let navController = window?.rootViewController as? UINavigationController,
+            let mainController = navController.topViewController as? SPMainViewController else { return }
+        setupBarButtonFont()
         let sqliteReader = SPSQLiteReader(delegate: dao)
         dao.sqlReader = sqliteReader
         dao.delegate = mainController
         mainController.inject(dao: dao, delegate: dao)
+    }
+    
+    
+    fileprivate func setupBarButtonFont() {
+        guard let christopherhandFont = UIFont.init(name: "Christopherhand", size: 25) else {
+            print("Christopherhand font not available")
+            return
+        }
+        UIBarButtonItem.appearance().setTitleTextAttributes([NSFontAttributeName: christopherhandFont], for: .normal)
     }
 }
 

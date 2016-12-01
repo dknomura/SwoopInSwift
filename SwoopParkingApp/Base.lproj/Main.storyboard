@@ -50,7 +50,7 @@
                                             <accessibility key="accessibilityConfiguration">
                                                 <accessibilityTraits key="traits" notEnabled="YES"/>
                                             </accessibility>
-                                            <fontDescription key="fontDescription" name="Christopherhand" family="Christopherhand" pointSize="30"/>
+                                            <fontDescription key="fontDescription" name="Christopherhand" family="Christopherhand" pointSize="25"/>
                                             <state key="normal" title="City">
                                                 <color key="titleColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             </state>
@@ -153,7 +153,12 @@
                         </variation>
                     </view>
                     <navigationItem key="navigationItem" title="Swoop!" id="ujr-Pz-LeK">
-                        <barButtonItem key="leftBarButtonItem" image="SearchIcon" id="kTj-VH-MfJ">
+                        <barButtonItem key="leftBarButtonItem" title="Current" id="01z-qs-99d">
+                            <connections>
+                                <action selector="setToCurrentTime:" destination="BYZ-38-t0r" id="Ak0-Gf-hEN"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" image="SearchIcon" id="kTj-VH-MfJ">
                             <connections>
                                 <action selector="showSearchBarButtonPressed:" destination="BYZ-38-t0r" id="YNV-ge-q6m"/>
                             </connections>
@@ -231,12 +236,12 @@
                                 </connections>
                             </button>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" pagingEnabled="YES" editable="NO" textAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="ZME-bD-kuM">
-                                <rect key="frame" x="24" y="454" width="336" height="145"/>
+                                <rect key="frame" x="24" y="497" width="336" height="102"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <constraints>
                                     <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="100" id="idG-Mw-lgO"/>
                                 </constraints>
-                                <string key="text">If this app has been useful to you, please leave a review or donate. I plan to continue to update this app and add more cities so any feedback would help motivate me to continue to work on this project. </string>
+                                <string key="text">If this app has been useful to you, please leave a review or donate. I plan to improve this app and add more cities and any feedback is very helpful. </string>
                                 <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
@@ -265,7 +270,7 @@
                                 </connections>
                             </button>
                             <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="b20-aT-Iqw">
-                                <rect key="frame" x="182" y="248.5" width="20" height="20"/>
+                                <rect key="frame" x="182" y="249" width="20" height="20"/>
                             </activityIndicatorView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>

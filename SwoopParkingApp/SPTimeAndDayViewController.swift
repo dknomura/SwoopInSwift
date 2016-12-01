@@ -26,6 +26,14 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, Injectab
     var sliderThumbLabel: UILabel!
     var originalThumbWidth: Float!
     
+    var thumbRect: CGRect {
+        let trackRect = timeSlider.trackRect(forBounds: timeSlider.bounds)
+        return timeSlider.thumbRect(forBounds: timeSlider.bounds, trackRect: trackRect, value: timeSlider.value)
+    }
+    var centerOfSliderThumb: CGPoint {
+        return CGPoint(x: thumbRect.origin.x + thumbRect.size.width/2 + timeSlider.frame.origin.x, y: thumbRect.origin.y + thumbRect.size.height/2 + timeSlider.frame.origin.y - 20)
+    }
+    
     //MARK: - Setup Methods
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -44,36 +52,40 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, Injectab
         timeSliderGestureView.addGestureRecognizer(tapGesture)
         let sliderPanGesture = UIPanGestureRecognizer.init(target: self, action: #selector(panTimeSlider(_:)))
         timeSliderGestureView.addGestureRecognizer(sliderPanGesture)
-        let dayPanGesture = UIPanGestureRecognizer.init(target: self, action: #selector(panToChangeDay(_:)))
-        dayView.addGestureRecognizer(dayPanGesture)
+//        let dayPanGesture = UIPanGestureRecognizer.init(target: self, action: #selector(panToChangeDay(_:)))
+//        dayView.addGestureRecognizer(dayPanGesture)
     }
     
-    var pointForDay0:CGFloat = 0
-    @objc func panToChangeDay(_ recognizer: UIPanGestureRecognizer) {
-        switch recognizer.state {
-        case .began:
-            pointForDay0 = recognizer.location(in: view).y
-        case .changed, .ended:
-            let newPanLocation = recognizer.location(in: view).y
-            let change = Int(newPanLocation * 21 / (view.frame.height - pointForDay0))
-            if recognizer.state == .changed {
-                if change % 8 != 0 { return }
-                var tempDay = DNDay.init(stringValue: dayLabel.text!)
-                tempDay?.increase(by: change)
-                dayLabel.text = tempDay?.stringValue(forFormat: DNTimeAndDayFormat.abbrDay())
-                pointForDay0 = newPanLocation
-            } else {
-                dao.primaryTimeAndDay.day.increase(by: change)
-                let tempTime = dao.primaryTimeAndDay
-                adjustTimeSliderToDay()
-                if tempTime != dao.primaryTimeAndDay {
-                    delegate?.timeViewControllerDidChangeTime()
-                }
-            }
-        default:
-            break
-        }
-    }
+//    var pointForDay0:CGFloat = 0
+//    var startDay: DNDay = DNDay.mon
+//    @objc func panToChangeDay(_ recognizer: UIPanGestureRecognizer) {
+//        switch recognizer.state {
+//        case .began:
+//            pointForDay0 = recognizer.location(in: view).y
+//            startDay = dao.primaryTimeAndDay.day
+//        case .changed, .ended:
+//            let newPanLocation = recognizer.location(in: view).y
+//            let panScale = (newPanLocation - pointForDay0) / pointForDay0
+//
+//            
+//            let change = panScale / 10 + 1
+//            if recognizer.state == .changed {
+//                if change % 8 != 0 { return }
+//                startDay.increase(by: change)
+//                dayLabel.text = startDay.stringValue(forFormat: DNTimeAndDayFormat.abbrDay())
+//                pointForDay0 = newPanLocation
+//            } else {
+//                dao.primaryTimeAndDay.day.increase(by: change)
+//                let tempTime = dao.primaryTimeAndDay
+//                adjustTimeSliderToDay()
+//                if tempTime != dao.primaryTimeAndDay {
+//                    delegate?.timeViewControllerDidChangeTime()
+//                }
+//            }
+//        default:
+//            break
+//        }
+//    }
     
     @objc func panTimeSlider(_ recognizer: UIPanGestureRecognizer) {
         if recognizer.state == .began || recognizer.state == .changed || recognizer.state == .ended {
@@ -95,14 +107,6 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, Injectab
         adjustSliderToTimeChange()
     }
     
-    
-    var thumbRect: CGRect {
-        let trackRect = timeSlider.trackRect(forBounds: timeSlider.bounds)
-        return timeSlider.thumbRect(forBounds: timeSlider.bounds, trackRect: trackRect, value: timeSlider.value)
-    }
-    var centerOfSliderThumb: CGPoint {
-        return CGPoint(x: thumbRect.origin.x + thumbRect.size.width/2 + timeSlider.frame.origin.x, y: thumbRect.origin.y + thumbRect.size.height/2 + timeSlider.frame.origin.y - 20)
-    }
     fileprivate func setupSlider() {
         sliderThumbLabel = UILabel.init(frame: CGRect(x: 0, y: 0, width: 55, height: 20))
         sliderThumbLabel!.backgroundColor = UIColor.clear

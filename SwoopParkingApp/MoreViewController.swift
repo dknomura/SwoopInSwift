@@ -35,6 +35,7 @@ class MoreViewController: UIViewController, SKProductsRequestDelegate, SKPayment
             button.createBorder()
         }
         SKPaymentQueue.default().add(self)
+        activityIndicator.hidesWhenStopped = true
     }
     
     
@@ -75,7 +76,7 @@ class MoreViewController: UIViewController, SKProductsRequestDelegate, SKPayment
     func requestDidFinish(_ request: SKRequest) {
         guard let _ = allDonationOptions else { return }
         allDonationOptions = allDonationOptions?.sorted { return $0.0.price.compare($0.1.price) == .orderedAscending }
-        let actionController = UIAlertController(title: "Donate?", message: "Honestly surprised you clicked this far", preferredStyle: .actionSheet)
+        let actionController = UIAlertController(title: "Wow, you clicked", message: "Donate? Will code for...", preferredStyle: .actionSheet)
         for donation in allDonationOptions! {
             let action = UIAlertAction(title: "$" + donation.price.stringValue + ". \(donation.localizedTitle)", style: .default, handler: { [unowned self] _ in
                 self.purchase(donation: donation)

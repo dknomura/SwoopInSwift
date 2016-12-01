@@ -80,6 +80,9 @@ extension DNTimeAndDay: DNComparableTimeUnit {
         return didChangeTime
     }
     
+    var stringValue: String {
+        return "\(time.stringValue(forFormat: .format12Hour())) \(day.stringValue(forFormat: .abbrDay()))"
+    }
     
     // MARK: timeAndDay for SQL
     var stringTupleForSQLQuery: (time: String, day: String) {
