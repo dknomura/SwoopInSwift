@@ -152,8 +152,8 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
             view.endEditing(true)
             return
         }
-        let tapLocation = gesture.location(in: mapViewController.mapView)
-        if timeAndDayContainerView.frame.contains(tapLocation) || bottomToolbar.frame.contains(tapLocation) { return }
+//        let tapLocation = gesture.location(in: mapViewController.mapView)
+//        if timeAndDayContainerView.frame.contains(tapLocation) || bottomToolbar.frame.contains(tapLocation) { return }
         let signMarkerFrame = mapViewController.signMarker?.iconView?.frame,
             searchMarkerFrame = mapViewController.searchMarker?.iconView?.frame,
             infoWindowFrame = mapViewController.currentInfoWindow?.frame
@@ -184,7 +184,6 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
             for untappableView in viewsToCancelTouch {
                 if untappableView == nil { continue }
                 if touch.view!.isDescendant(of: untappableView!) {
-                    print("\(untappableView) is canceling tap gesture recognizer")
                     return false
                 }
             }
@@ -240,9 +239,7 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
         if !toolbarsPresent {
             showHideToolbars(true)
         }
-        dao.primaryTimeAndDay = DNTimeAndDay.currentTimeAndDay()
-        timeAndDayViewController.adjustTimeSliderToDay()
-        
+        timeAndDayViewController.adjustToCurrentTime()
     }
     
     

@@ -12,7 +12,7 @@ import Foundation
 //MARK: - In app purchase
 public let InAppDonationProduct = "com.dnom.SwoopParkingApp.Donation"
 
-var standardAnimationDuration:Double { return 0.2 }
+var standardAnimationDuration:Double { return 0.1 }
 
 let kSPGoogleMapsKey = "AIzaSyCGKTmya_bbd5_S9hJOzO9eKf4pDckrffQ"
 

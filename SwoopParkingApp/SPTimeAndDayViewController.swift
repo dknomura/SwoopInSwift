@@ -52,40 +52,37 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, Injectab
         timeSliderGestureView.addGestureRecognizer(tapGesture)
         let sliderPanGesture = UIPanGestureRecognizer.init(target: self, action: #selector(panTimeSlider(_:)))
         timeSliderGestureView.addGestureRecognizer(sliderPanGesture)
-//        let dayPanGesture = UIPanGestureRecognizer.init(target: self, action: #selector(panToChangeDay(_:)))
-//        dayView.addGestureRecognizer(dayPanGesture)
+        let dayPanGesture = UIPanGestureRecognizer.init(target: self, action: #selector(panToChangeDay(_:)))
+        dayView.addGestureRecognizer(dayPanGesture)
     }
     
-//    var pointForDay0:CGFloat = 0
-//    var startDay: DNDay = DNDay.mon
-//    @objc func panToChangeDay(_ recognizer: UIPanGestureRecognizer) {
-//        switch recognizer.state {
-//        case .began:
-//            pointForDay0 = recognizer.location(in: view).y
-//            startDay = dao.primaryTimeAndDay.day
-//        case .changed, .ended:
-//            let newPanLocation = recognizer.location(in: view).y
-//            let panScale = (newPanLocation - pointForDay0) / pointForDay0
-//
-//            
-//            let change = panScale / 10 + 1
-//            if recognizer.state == .changed {
-//                if change % 8 != 0 { return }
-//                startDay.increase(by: change)
-//                dayLabel.text = startDay.stringValue(forFormat: DNTimeAndDayFormat.abbrDay())
-//                pointForDay0 = newPanLocation
-//            } else {
-//                dao.primaryTimeAndDay.day.increase(by: change)
-//                let tempTime = dao.primaryTimeAndDay
-//                adjustTimeSliderToDay()
-//                if tempTime != dao.primaryTimeAndDay {
-//                    delegate?.timeViewControllerDidChangeTime()
-//                }
-//            }
-//        default:
-//            break
-//        }
-//    }
+    var pointForDay0:CGFloat = 0
+    var startDay: DNDay = DNDay.mon
+    @objc func panToChangeDay(_ recognizer: UIPanGestureRecognizer) {
+        switch recognizer.state {
+        case .began:
+            pointForDay0 = recognizer.location(in: view).y
+            startDay = dao.primaryTimeAndDay.day
+        case .changed, .ended:
+            let newPanLocation = recognizer.location(in: view).y
+            let change = Int((newPanLocation - pointForDay0) / 40)
+            print("Start of day pan = \(pointForDay0). New point = \(newPanLocation). Difference = \(newPanLocation - pointForDay0). change = \(change)")
+            print()
+            if recognizer.state == .changed {
+                if change == 0 { return }
+                let originalStartDay = startDay
+                startDay.increase(by: change)
+                dayLabel.text = startDay.stringValue(forFormat: DNTimeAndDayFormat.abbrDay())
+                startDay = originalStartDay
+            } else {
+                dao.primaryTimeAndDay.day.increase(by: change)
+                adjustTimeSliderToDay()
+                delegate?.timeViewControllerDidChangeTime()
+            }
+        default:
+            break
+        }
+    }
     
     @objc func panTimeSlider(_ recognizer: UIPanGestureRecognizer) {
         if recognizer.state == .began || recognizer.state == .changed || recognizer.state == .ended {
@@ -143,6 +140,13 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, Injectab
         delegate?.timeViewControllerDidChangeTime()
     }
     
+    func adjustToCurrentTime() {
+        dao.primaryTimeAndDay = DNTimeAndDay.currentTimeAndDay()
+        dao.primaryTimeAndDay.increaseTime()
+        adjustTimeSliderToDay()
+        
+    }
+    
     func adjustSliderToTimeChange() {
         sliderThumbLabel.center = centerOfSliderThumb
         let sliderValue = Int(timeSlider.value)
@@ -151,14 +155,14 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, Injectab
             dao.primaryTimeAndDay.time = newTime
         }
         setNewImage()
-        sliderThumbLabel.text = dao.primaryTimeAndDay.time.stringValue(forFormat: DNTimeAndDayFormat.format12Hour())
+        sliderThumbLabel.text = dao.primaryTimeAndDay.time.stringValue(forFormat: .format12Hour())
     }
     func adjustTimeSliderToDay() {
         setTimeRangeForDay()
-        _ = dao.primaryTimeAndDay.adjustTimeToValidStreetCleaningTime()
+        dao.primaryTimeAndDay.adjustTimeToValidStreetCleaningTime()
         timeSlider.maximumValue = Float(timeRange.count - 1)
         if let currentTimeValue = timeRange.index(of: Float(dao.primaryTimeAndDay.time.rawValue)) {
-            timeSlider.setValue(Float(currentTimeValue), animated: true)
+            timeSlider.setValue(Float(currentTimeValue), animated: false)
         }
         sliderThumbLabel.center = centerOfSliderThumb
         dayLabel.text = dao.primaryTimeAndDay.day.stringValue(forFormat: timeAndDayFormat)
@@ -170,7 +174,8 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, Injectab
         let minMaxTime = dao.primaryTimeAndDay.day.earliestAndLatestCleaningTime
         minTimeLabel.text = minMaxTime.earliest.stringValue(forFormat: DNTimeAndDayFormat.format12Hour())
         maxTimeLabel.text = minMaxTime.latest.stringValue(forFormat: DNTimeAndDayFormat.format12Hour())
-        sliderThumbLabel.text = dao.primaryTimeAndDay.time.stringValue(forFormat: DNTimeAndDayFormat.format12Hour())
+        let currentTime = dao.primaryTimeAndDay.time.stringValue(forFormat: DNTimeAndDayFormat.format12Hour())
+        sliderThumbLabel.text = currentTime
     }
     //MARK: Image processing
     let thumbImage: UIImage! = UIImage(named:"smart-car-icon")
@@ -185,12 +190,7 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, Injectab
         if locationsCount == 0 {
             newImage = noParkingImage
         } else {
-            let thumbSizeSide: CGFloat
-            if locationsCount < 200 {
-                thumbSizeSide = 15
-            } else {
-                thumbSizeSide = CGFloat((self.originalThumbWidth - 15) * Float(locationsCount) / 2000 + 20)
-            }
+            let thumbSizeSide = locationsCount < 200 ? 15 : CGFloat((self.originalThumbWidth - 15) * Float(locationsCount) / 2000 + 20)
             newImage = self.imageWith(image: self.thumbImage, scaledToSize: CGSize(width: thumbSizeSide, height: thumbSizeSide))
         }
         self.timeSlider.setThumbImage(newImage, for: UIControlState())

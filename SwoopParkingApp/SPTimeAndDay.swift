@@ -67,17 +67,13 @@ extension DNTimeAndDay: DNComparableTimeUnit {
             return false
         }
     }
-    mutating func adjustTimeToValidStreetCleaningTime() -> Bool {
+    mutating func adjustTimeToValidStreetCleaningTime() {
         let cleaningHour = day.earliestAndLatestCleaningTime
-        var didChangeTime = true
         if time >= cleaningHour.latest {
             time = cleaningHour.latest
         } else if time <= cleaningHour.earliest {
             time = cleaningHour.earliest
-        } else {
-            didChangeTime = false
         }
-        return didChangeTime
     }
     
     var stringValue: String {

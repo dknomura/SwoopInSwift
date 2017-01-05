@@ -62,6 +62,26 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
+    
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        func defaultReturn() { super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context) }
+        guard keyPath != nil && change != nil else {
+            defaultReturn()
+            return
+        }
+        switch keyPath! {
+        case kvoSelectedMarkerKeyPath:
+            let newSelectedMarker = change![NSKeyValueChangeKey.newKey]
+            if !(newSelectedMarker is GMSMarker) && lastSelectedMarkerKVO is GMSMarker {
+                cancelTapGesture = true
+            }
+            lastSelectedMarkerKVO = newSelectedMarker as AnyObject?
+        default:
+            defaultReturn()
+        }
+    }
+    
+
     //MARK: - Setup/breakdown methods
     //MARK: --Gestures
     @objc func zoomToDoubleTapOnMap(_ gesture:UITapGestureRecognizer) {
@@ -106,24 +126,6 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     //MARK: --Observers
     fileprivate func setupObservers() {
         mapView.addObserver(self, forKeyPath: kvoSelectedMarkerKeyPath, options: .new, context: nil)
-    }
-    
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        func defaultReturn() { super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context) }
-        guard keyPath != nil && change != nil else {
-            defaultReturn()
-            return
-        }
-        switch keyPath! {
-        case kvoSelectedMarkerKeyPath:
-            let newSelectedMarker = change![NSKeyValueChangeKey.newKey]
-            if !(newSelectedMarker is GMSMarker) && lastSelectedMarkerKVO is GMSMarker {
-                cancelTapGesture = true
-            }
-            lastSelectedMarkerKVO = newSelectedMarker as AnyObject?
-        default:
-            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
-        }
     }
     
     //MARK: --Views
