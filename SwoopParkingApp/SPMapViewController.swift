@@ -199,8 +199,8 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     
     func adjustViewsToZoom() {
 //        let turnSwitchOn: Bool? = mapView.camera.zoom < streetZoom ? false : nil
-        let turnSwitchOn = mapView.camera.zoom >= streetZoom
-        delegate?.mapViewControllerDidZoom(switchOn: turnSwitchOn, shouldGetOverlay: true)
+//        let turnSwitchOn = mapView.camera.zoom >= streetZoom
+        delegate?.mapViewControllerDidZoom(switchOn: nil, shouldGetOverlay: true)
         zoomOutButton.isHidden = mapView.camera.zoom <= initialZoom
     }
     func zoomMap(toCoordinate coordinate:CLLocationCoordinate2D?, zoom:Float) {
@@ -222,8 +222,14 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     
     //MARK: -----Draw on map methods
     func getSignsForCurrentMapView() {
-        if mapView.camera.zoom >= streetZoom && dao.isInNYC(mapView) {
+        guard dao.isInNYC(mapView) else {
+            print("Current mapview is not in nyc, \(mapView)")
+            return
+        }
+        if mapView.camera.zoom >= streetZoom {
             _ = delegate?.mapViewControllerShouldSearchStreetCleaning(mapView)
+        } else {
+            getNewHeatMapOverlays()
         }
     }
     func getNewHeatMapOverlays() {

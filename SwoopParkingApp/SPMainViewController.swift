@@ -207,13 +207,20 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
 
     //MARK: --Swoop toggle
     @IBAction func toggleOverlaySwitch(_ sender: UISwitch) {
-        if mapViewController.mapView.camera.zoom <= mapViewController.zoomToSwitchOverlays {
-            if !sender.isOn { return }
-            mapViewController.zoomMap(toZoom: mapViewController.streetZoom)
+        if sender.isOn {
+            showHideSearchBar(shouldShow: true, makeFirstResponder: true)
+            turnStreetSwitch(on: false, shouldGetOverlays: false)
         } else {
-            if sender.isOn { return }
-            mapViewController.zoomMap(toZoom: mapViewController.zoomToSwitchOverlays)
+            mapViewController.zoomMap(toCamera: mapViewController.initialMapViewCamera)
+
         }
+//        if mapViewController.mapView.camera.zoom <= mapViewController.zoomToSwitchOverlays {
+//            if !sender.isOn { return }
+//            mapViewController.zoomMap(toZoom: mapViewController.streetZoom)
+//        } else {
+//            if sender.isOn { return }
+//            mapViewController.zoomMap(toZoom: mapViewController.zoomToSwitchOverlays)
+//        }
     }
     fileprivate func turnStreetSwitch(on: Bool?, shouldGetOverlays: Bool) {
         if on != nil {
@@ -221,8 +228,9 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
         }
         switchLabel.setTitle(switchLabelText, for: UIControlState())
         if shouldGetOverlays {
-            streetViewSwitch.isOn ? mapViewController.getSignsForCurrentMapView() : mapViewController.getNewHeatMapOverlays()
+            mapViewController.getSignsForCurrentMapView()
         }
+        print("Switch is \(streetViewSwitch.isOn)")
     }
     //MARK: --Searchbar toggle
     @IBAction func showSearchBarButtonPressed(_ sender: UIBarButtonItem) {
@@ -334,13 +342,13 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
         }
     }
     
+    //TODO: Call method to show collection view in bottom toolbar
     func zoomAndSetMapMarker() {
         if dao.googleSearchObject.coordinate == nil { return }
         mapViewController.zoomMap(toCoordinate: dao.googleSearchObject.coordinate!, zoom: mapViewController.zoomToSwitchOverlays)
         if dao.googleSearchObject.info == nil { return }
         mapViewController.setSearchMarker(withUserData: dao.googleSearchObject.info!, atCoordinate: dao.googleSearchObject.coordinate!)
         turnStreetSwitch(on: true, shouldGetOverlays: true)
-        
     }
     func searchContainerHeightShouldAdjust(_ height: CGFloat, tableViewPresent: Bool, searchBarPresent: Bool) -> Bool {
         UIView.animate(withDuration: standardAnimationDuration, animations: {
