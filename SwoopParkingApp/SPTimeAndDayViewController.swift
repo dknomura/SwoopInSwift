@@ -66,8 +66,6 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, Injectab
         case .changed, .ended:
             let newPanLocation = recognizer.location(in: view).y
             let change = Int((newPanLocation - pointForDay0) / 40)
-            print("Start of day pan = \(pointForDay0). New point = \(newPanLocation). Difference = \(newPanLocation - pointForDay0). change = \(change)")
-            print()
             if recognizer.state == .changed {
                 if change == 0 { return }
                 let originalStartDay = startDay

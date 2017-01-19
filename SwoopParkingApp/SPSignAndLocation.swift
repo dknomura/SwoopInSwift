@@ -23,12 +23,14 @@ struct SPSign {
     }
     
     mutating func setMarkerContent() {
+        // Get the range of a string that will isolate the time and day. .
+        // In this case, after "SYMBOL)". There are a few variations of symbol 
         guard let symbolRange = signContent.range(of: "BOL)") else { return }
         if #available(iOS 9.0, *) {
             let cleaningTime = signContent.substring(from: symbolRange.upperBound).localizedCapitalized
-            markerContent = "Street cleaning " + cleaningTime + " Tap for directions"
+            markerContent = "Street cleaning " + cleaningTime + ". Tap for directions."
         } else {
-            markerContent = "Street cleaning " + signContent.substring(from: symbolRange.upperBound).lowercased() + ". Tap for directions"
+            markerContent = "Street cleaning " + signContent.substring(from: symbolRange.upperBound).lowercased() + ". Tap for directions."
         }
     }
 }

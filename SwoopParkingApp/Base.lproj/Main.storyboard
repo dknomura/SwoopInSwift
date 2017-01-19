@@ -27,6 +27,15 @@
                         <rect key="frame" x="0.0" y="0.0" width="384" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="XbN-vU-f1X">
+                                <rect key="frame" x="0.0" y="623" width="384" height="44"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="44" id="qFr-YB-oou"/>
+                                </constraints>
+                                <connections>
+                                    <segue destination="UUw-iM-biU" kind="embed" id="Y0P-w5-kfm"/>
+                                </connections>
+                            </containerView>
                             <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="4Q6-5w-0gr">
                                 <rect key="frame" x="0.0" y="108" width="384" height="70"/>
                                 <constraints>
@@ -108,15 +117,6 @@
                                 </constraints>
                                 <connections>
                                     <segue destination="9cI-Ye-8Fz" kind="embed" identifier="searchContainer" id="Kn8-ey-aw6"/>
-                                </connections>
-                            </containerView>
-                            <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="XbN-vU-f1X">
-                                <rect key="frame" x="0.0" y="623" width="384" height="44"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="44" id="qFr-YB-oou"/>
-                                </constraints>
-                                <connections>
-                                    <segue destination="UUw-iM-biU" kind="embed" id="Y0P-w5-kfm"/>
                                 </connections>
                             </containerView>
                         </subviews>
@@ -516,7 +516,7 @@
                                         </connections>
                                     </slider>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="k1n-dd-TQB">
-                                        <rect key="frame" x="345" y="45" width="29" height="21"/>
+                                        <rect key="frame" x="345.5" y="45" width="28.5" height="21"/>
                                         <fontDescription key="fontDescription" name="Christopherhand" family="Christopherhand" pointSize="18"/>
                                         <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <nil key="highlightedColor"/>
@@ -623,11 +623,11 @@
                                         <rect key="frame" x="0.0" y="28" width="384" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Htt-Bb-jei" id="gnZ-cY-RlI">
-                                            <rect key="frame" x="0.0" y="0.0" width="384" height="44"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="384" height="43"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="cpP-X4-xxm">
-                                                    <rect key="frame" x="15" y="0.0" width="354" height="43.5"/>
+                                                    <rect key="frame" x="15" y="0.0" width="354" height="43"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -715,69 +715,69 @@
             </objects>
             <point key="canvasLocation" x="2219" y="203"/>
         </scene>
-        <!--View Controller-->
+        <!--City And Street Toolbar-->
         <scene sceneID="Qpr-dQ-cII">
             <objects>
-                <viewController id="UUw-iM-biU" sceneMemberID="viewController">
+                <viewController id="UUw-iM-biU" customClass="CityAndStreetToolbar" customModule="Swoop_" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="1cm-aO-yOP"/>
+                        <viewControllerLayoutGuide type="bottom" id="QKy-Pd-eeC"/>
+                    </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="97Y-tT-fg3">
                         <rect key="frame" x="0.0" y="0.0" width="384" height="44"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="pQZ-EC-dmg">
-                                <rect key="frame" x="0.0" y="0.0" width="384" height="44"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="44" id="7D6-p0-Jzd"/>
-                                </constraints>
-                                <items>
-                                    <barButtonItem title="Item" style="plain" id="byg-jp-rAA">
-                                        <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="lPA-tP-una">
-                                            <rect key="frame" x="16" y="7" width="56" height="30"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                            <accessibility key="accessibilityConfiguration">
-                                                <accessibilityTraits key="traits" notEnabled="YES"/>
-                                            </accessibility>
-                                            <fontDescription key="fontDescription" name="Christopherhand" family="Christopherhand" pointSize="25"/>
-                                            <state key="normal" title="City">
-                                                <color key="titleColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                            </state>
-                                        </button>
-                                    </barButtonItem>
-                                    <barButtonItem style="plain" id="S2N-XP-PVr">
-                                        <switch key="customView" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" restorationIdentifier="streetViewSwitch" contentHorizontalAlignment="center" contentVerticalAlignment="center" id="tXX-im-AgV">
-                                            <rect key="frame" x="82" y="7" width="51" height="31"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                            <color key="onTintColor" red="0.1498290823" green="0.66666666669999997" blue="0.26254776260000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                            <color key="thumbTintColor" red="0.16339006510000001" green="0.17756032369999999" blue="0.3035301513" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                            <connections>
-                                                <action selector="toggleOverlaySwitch:" destination="BYZ-38-t0r" eventType="valueChanged" id="HQ9-8e-nJ7"/>
-                                            </connections>
-                                        </switch>
-                                    </barButtonItem>
-                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="1VK-8N-YJ7"/>
-                                    <barButtonItem style="plain" id="EuI-dC-lok">
-                                        <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="VuL-Yn-uuo">
-                                            <rect key="frame" x="304" y="7" width="64" height="30"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                            <fontDescription key="fontDescription" name="Christopherhand" family="Christopherhand" pointSize="24"/>
-                                            <state key="normal" title="MORE"/>
-                                        </button>
-                                    </barButtonItem>
-                                </items>
+                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1dD-O9-3bb">
+                                <rect key="frame" x="53.5" y="8" width="51" height="31"/>
                                 <connections>
-                                    <outlet property="delegate" destination="1VK-8N-YJ7" id="vw8-Jk-azw"/>
+                                    <action selector="switchCityStreetMode:" destination="UUw-iM-biU" eventType="valueChanged" id="GUN-wa-nBf"/>
                                 </connections>
-                            </toolbar>
+                            </switch>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="d38-Px-enX">
+                                <rect key="frame" x="329" y="0.0" width="39" height="43"/>
+                                <fontDescription key="fontDescription" name="Christopherhand" family="Christopherhand" pointSize="27"/>
+                                <state key="normal" title="More">
+                                    <color key="titleColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="goToMorePage:" destination="UUw-iM-biU" eventType="touchUpInside" id="5eL-AI-w7H"/>
+                                </connections>
+                            </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="City" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LD7-vG-nbz">
+                                <rect key="frame" x="16" y="8" width="33.5" height="31"/>
+                                <fontDescription key="fontDescription" name="Christopherhand" family="Christopherhand" pointSize="27"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="sli-zp-lID">
+                                <rect key="frame" x="180" y="8" width="25" height="30"/>
+                                <nil key="textColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstAttribute="trailing" secondItem="pQZ-EC-dmg" secondAttribute="trailing" id="7pR-Tv-gHT"/>
-                            <constraint firstItem="pQZ-EC-dmg" firstAttribute="top" secondItem="97Y-tT-fg3" secondAttribute="top" id="fOT-rK-CP7"/>
-                            <constraint firstItem="pQZ-EC-dmg" firstAttribute="leading" secondItem="97Y-tT-fg3" secondAttribute="leading" id="o6e-tC-Tk3"/>
+                            <constraint firstItem="LD7-vG-nbz" firstAttribute="top" secondItem="97Y-tT-fg3" secondAttribute="topMargin" constant="8" id="5nm-XI-xPZ"/>
+                            <constraint firstItem="1dD-O9-3bb" firstAttribute="centerY" secondItem="LD7-vG-nbz" secondAttribute="centerY" id="6vF-YU-4j0"/>
+                            <constraint firstItem="d38-Px-enX" firstAttribute="top" secondItem="97Y-tT-fg3" secondAttribute="topMargin" id="Ld3-um-f5h"/>
+                            <constraint firstItem="1dD-O9-3bb" firstAttribute="leading" secondItem="LD7-vG-nbz" secondAttribute="trailing" constant="4" id="WH3-iD-VVF"/>
+                            <constraint firstItem="LD7-vG-nbz" firstAttribute="leading" secondItem="97Y-tT-fg3" secondAttribute="leadingMargin" id="X2C-py-i4r"/>
+                            <constraint firstItem="d38-Px-enX" firstAttribute="trailing" secondItem="97Y-tT-fg3" secondAttribute="trailingMargin" id="mWm-Pk-aY3"/>
+                            <constraint firstItem="sli-zp-lID" firstAttribute="centerX" secondItem="97Y-tT-fg3" secondAttribute="centerX" id="nwU-ZV-LsL"/>
+                            <constraint firstItem="sli-zp-lID" firstAttribute="top" secondItem="1cm-aO-yOP" secondAttribute="bottom" constant="8" id="ySt-y5-PuR"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="cityStreetLabel" destination="LD7-vG-nbz" id="0pb-3c-3pT"/>
+                        <outlet property="cityStreetSwitch" destination="1dD-O9-3bb" id="Xps-rI-rQh"/>
+                        <outlet property="moreButton" destination="d38-Px-enX" id="pwd-Ah-ivL"/>
+                        <outlet property="radiusTextField" destination="sli-zp-lID" id="Szp-Is-yZp"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="d5h-Kd-HZB" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="1161" y="1138"/>
         </scene>
     </scenes>
     <resources>

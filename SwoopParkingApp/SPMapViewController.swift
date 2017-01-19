@@ -253,7 +253,14 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     }
     func show<MapOverlayType: GMSOverlay>(mapOverlayViews views:[MapOverlayType], shouldHideOtherOverlay:Bool) {
         if views.count > 0 {
-            for view in views {  view.map = mapView }
+            CATransaction.begin()
+            CATransaction.setCompletionBlock({ [unowned self] in
+                self.delegate?.mapViewControllerDidFinishDrawingPolylines()
+            })
+            for view in views {
+                view.map = mapView
+            }
+            CATransaction.commit()
             if shouldHideOtherOverlay {
                 if MapOverlayType() is GMSPolyline { hide(mapOverlayViews: currentGroundOverlays) }
                 else if MapOverlayType() is GMSGroundOverlay { hide(mapOverlayViews: currentMapPolylines) }
@@ -276,10 +283,6 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     func mapView(_ mapView: GMSMapView, willMove gesture: Bool) {
         if (gesture) { userControl = true }
         else { userControl = false }
-    }
-    
-    func mapViewSnapshotReady(_ mapView: GMSMapView) {
-        delegate?.mapViewControllerDidFinishDrawingPolylines()
     }
     
     //MARK: ----Methods for GMSMarker
@@ -316,7 +319,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
             guard let displayString = marker.userData as? String else { return nil }
             guard let infoWindow = Bundle.main.loadNibNamed("SPSignInfoOverlay", owner: self, options: nil)?[0] as? SPSignInfoOverlay else { return nil }
             infoWindow.destinationCoordinate = marker.position
-            infoWindow.signContentLabel.text = displayString + ". Tap for directions"
+            infoWindow.signContentLabel.text = displayString
             currentInfoWindow = infoWindow
             cancelTapGesture = true
             if marker == searchMarker {

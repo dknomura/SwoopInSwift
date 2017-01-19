@@ -230,7 +230,6 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
         if shouldGetOverlays {
             mapViewController.getSignsForCurrentMapView()
         }
-        print("Switch is \(streetViewSwitch.isOn)")
     }
     //MARK: --Searchbar toggle
     @IBAction func showSearchBarButtonPressed(_ sender: UIBarButtonItem) {
@@ -371,10 +370,8 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
         clearScreenForMapZoom()
     }
     func mapViewControllerShouldSearchStreetCleaning(_ mapView: GMSMapView) -> Bool {
-        if streetViewSwitch.isOn {
-            showWaitingView(withLabel: waitingText, isStreetView: false)
-            dao.getSigns(forCurrentMapView: mapView)
-        }
+        showWaitingView(withLabel: waitingText, isStreetView: false)
+        dao.getSigns(forCurrentMapView: mapView)
         return streetViewSwitch.isOn
     }
     func mapViewControllerDidZoom(switchOn on: Bool?, shouldGetOverlay: Bool) {
