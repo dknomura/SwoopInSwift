@@ -41,7 +41,10 @@ struct SPPolylineManager: SPInjectable {
         let metersToDisplacePolyline = metersToDisplace(byPoints: 1.8, zoom: zoom)
         dao.signForPathCoordinates.removeAll()
         for location in currentLocations {
-            guard let fromCoordinate = location.fromCoordinate, let toCoordinate = location.toCoordinate, let sideOfStreet = location.sideOfStreet, let signs = location.signs else { continue }
+            guard let fromCoordinate = location.fromCoordinate,
+                let toCoordinate = location.toCoordinate,
+                let sideOfStreet = location.sideOfStreet,
+                let signs = location.signs else { continue }
             let path = gmsPath(forCoordinate1: fromCoordinate, coordinate2: toCoordinate)
             guard let deltaCoordinates = try? latLngDifference(forPath: path, xMeters: metersToDisplacePolyline, sideOfStreet: sideOfStreet) else {
                 continue
@@ -281,6 +284,7 @@ struct SPPolylineManager: SPInjectable {
         let newLat = asin(sin(lat1) * cos(angularDistance) + cos(lat1) * sin(angularDistance) * cos(bearings))
         let newLong = long1 + atan2(sin(bearings) * sin(angularDistance) * cos(lat1), cos(angularDistance) - sin(lat1) * sin(newLat))
         
+        // Uncomment to print the actual distance, and the margin of error between the actual and expected distance
         //        let fromLocation = CLLocation(latitude: fromCoordinate.latitude, longitude: fromCoordinate.longitude)
         //        let toLocation = CLLocation(latitude:radiansToDegrees(newLat), longitude:radiansToDegrees(newLong))
         //        let distance = fromLocation.distanceFromLocation(toLocation)
