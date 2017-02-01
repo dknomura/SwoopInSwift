@@ -113,11 +113,33 @@ struct SPPolylineManager: SPInjectable {
     
     fileprivate func isStreetCleaningSign(_ signContent: String) -> Bool {
         if signContent.range(of: SPSignTypes.meteredParking.identifier) != nil { return false }
+        
         let stringTuple = dao.primaryTimeAndDay.stringTupleForSQLQuery
-        if signContent.range(of: stringTuple.time) != nil && signContent.range(of: stringTuple.day) != nil {
+        guard let endOfStreetCleaning = endTime(ofSign: signContent) else { return false }
+        if endOfStreetCleaning.range(of: stringTuple.time) != nil && signContent.range(of: stringTuple.day) != nil {
             return true
         }
         return false
+    }
+    
+    fileprivate func endTime(ofSign signContent: String) -> String? {
+        let rangeOfTimeSeparator: Range<String.Index>
+        if let toRange = signContent.range(of: "TO") {
+            rangeOfTimeSeparator = toRange
+        } else if let dashRange = signContent.range(of: "-") {
+            rangeOfTimeSeparator = dashRange
+        } else {
+            return nil
+        }
+        let afterTo = signContent.substring(from: rangeOfTimeSeparator.upperBound)
+        var timeString: String? = nil
+        if let startOfEndTime = afterTo.rangeOfCharacter(from: CharacterSet.decimalDigits),
+            let endOfEndTime = afterTo.range(of: "M") {
+            guard startOfEndTime.lowerBound < endOfEndTime.lowerBound else { return nil }
+            guard afterTo.distance(from: startOfEndTime.lowerBound, to: endOfEndTime.upperBound) < 10 else { return nil }
+            timeString = afterTo.substring(with: Range(uncheckedBounds: (lower: startOfEndTime.lowerBound, upper: endOfEndTime.upperBound)))
+        }
+        return timeString
     }
     
     static func hashedString(forPolyline polyline: GMSPolyline) -> String {

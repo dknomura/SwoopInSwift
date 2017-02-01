@@ -47,6 +47,7 @@
 		9C6A8D5D1DDABA180030545F /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C6A8D5C1DDABA180030545F /* StoreKit.framework */; };
 		9C96EE901D625EC4007C4EC8 /* SPViewControllerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C96EE8F1D625EC4007C4EC8 /* SPViewControllerExtension.swift */; };
 		9C9D62791E24DEA20019261E /* CityAndStreetToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C9D62781E24DEA10019261E /* CityAndStreetToolbar.swift */; };
+		9CA1E3361E41ACBD001106F9 /* MapViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CA1E3351E41ACBD001106F9 /* MapViewExtensions.swift */; };
 		9CA64D9B1DD7821E0015A8F2 /* InjectableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CA64D9A1DD7821E0015A8F2 /* InjectableViewController.swift */; };
 		9CA7DDC11D57EAB50050B75D /* LFHeatMap-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CA7DDBC1D57EAB50050B75D /* LFHeatMap-dummy.m */; };
 		9CA7DDC21D57EAB50050B75D /* LFHeatMap.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CA7DDBF1D57EAB50050B75D /* LFHeatMap.m */; };
@@ -154,6 +155,7 @@
 		9C6A8D5C1DDABA180030545F /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		9C96EE8F1D625EC4007C4EC8 /* SPViewControllerExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPViewControllerExtension.swift; sourceTree = "<group>"; };
 		9C9D62781E24DEA10019261E /* CityAndStreetToolbar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CityAndStreetToolbar.swift; sourceTree = "<group>"; };
+		9CA1E3351E41ACBD001106F9 /* MapViewExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapViewExtensions.swift; sourceTree = "<group>"; };
 		9CA64D9A1DD7821E0015A8F2 /* InjectableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InjectableViewController.swift; sourceTree = "<group>"; };
 		9CA7DDBC1D57EAB50050B75D /* LFHeatMap-dummy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "LFHeatMap-dummy.m"; sourceTree = "<group>"; };
 		9CA7DDBD1D57EAB50050B75D /* LFHeatMap-umbrella.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "LFHeatMap-umbrella.h"; sourceTree = "<group>"; };
@@ -430,6 +432,7 @@
 			children = (
 				9CFEE3A71CDA6E6600CE5D53 /* SPConstants.swift */,
 				9C5279C71CEB62B900AF88FF /* SPQuickGCD.swift */,
+				9CA1E3351E41ACBD001106F9 /* MapViewExtensions.swift */,
 			);
 			name = Utils;
 			sourceTree = "<group>";
@@ -571,7 +574,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0730;
-				LastUpgradeCheck = 0810;
+				LastUpgradeCheck = 0820;
 				ORGANIZATIONNAME = "Daniel Nomura";
 				TargetAttributes = {
 					9CFEE3751CDA6D7900CE5D53 = {
@@ -811,6 +814,7 @@
 				9CFEE37A1CDA6D7900CE5D53 /* AppDelegate.swift in Sources */,
 				9C61F0B11D7496DC00BA524C /* SPGoogleNetworking.swift in Sources */,
 				9C45031E1DDA3FAC0047B708 /* WebViewController.swift in Sources */,
+				9CA1E3361E41ACBD001106F9 /* MapViewExtensions.swift in Sources */,
 				9CA7DDC21D57EAB50050B75D /* LFHeatMap.m in Sources */,
 				9C5279C81CEB62B900AF88FF /* SPQuickGCD.swift in Sources */,
 				9C1A86C71DA5517E00DAD930 /* SPMainViewController.swift in Sources */,
@@ -982,7 +986,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5ACFCA4B78275422A004D327 /* Pods-SwoopParkingApp.debug.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -992,7 +996,7 @@
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				"FRAMEWORK_SEARCH_PATHS[arch=*]" = "$(inherited)";
 				INFOPLIST_FILE = SwoopParkingApp/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.dnom.SwoopParkingApp;
@@ -1011,7 +1015,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 417B93AEFD2458765145BA97 /* Pods-SwoopParkingApp.release.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -1021,7 +1025,7 @@
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				"FRAMEWORK_SEARCH_PATHS[arch=*]" = "$(inherited)";
 				INFOPLIST_FILE = SwoopParkingApp/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.dnom.SwoopParkingApp;

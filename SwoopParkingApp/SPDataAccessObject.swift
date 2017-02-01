@@ -33,19 +33,6 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
     var signForPathCoordinates = [String: SPSign]()
     var isFirstLocationAfterAuthorization = false
 
-    //MARK: - Determine if current mapView is within NYC
-    
-    func isInNYC(_ mapView:GMSMapView) -> Bool {
-        let region = GMSCoordinateBounds.init(region: mapView.projection.visibleRegion())
-        if isCoordinateWithinRegion(region.northEast, NECoordinate: maxNYCCoordinate, SWCoordinate: minNYCCoordinate) || isCoordinateWithinRegion(region.southWest, NECoordinate: maxNYCCoordinate, SWCoordinate: minNYCCoordinate) { return true }
-        else { return false }
-    }
-    fileprivate func isCoordinateWithinRegion (_ testCoordinate: CLLocationCoordinate2D, NECoordinate: CLLocationCoordinate2D, SWCoordinate: CLLocationCoordinate2D) -> Bool {
-        if testCoordinate.latitude < NECoordinate.latitude && testCoordinate.latitude > SWCoordinate.latitude {
-            if testCoordinate.longitude < NECoordinate.longitude && testCoordinate.longitude > SWCoordinate.longitude { return true }
-            else { return false }
-        } else { return false }
-    }
     // MARK: - SQLite methods
     func getAllStreetCleaningLocations() {
         sqlReader.queryAllStreetCleaningLocations()
@@ -147,5 +134,4 @@ protocol SPDataAccessObjectDelegate: class {
     func dataAccessObject(_ dao: SPDataAccessObject, didSetGoogleSearchObject googleSearchObject:SPGoogleCoordinateAndInfo)
     func dataAccessObject(_ dao: SPDataAccessObject, didUpdateAddressResults:[SPGoogleAddressResult])
     func dataAccessObjectDidAllowLocationServicesAndSetCurrentLocation()
-    func dataAccessObjectDidUpdateCurrentLocation()
 }

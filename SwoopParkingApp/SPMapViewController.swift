@@ -30,7 +30,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     var cancelTapGesture = false
     
     var zoomToSwitchOverlays: Float { return streetZoom - 2.5 }
-    var streetZoom: Float { return 16.7 }
+    var streetZoom: Float { return 16 }
     var initialZoom: Float {
         return mapView.initialStreetCleaningZoom(forCity: .NYC)
     }
@@ -119,7 +119,6 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
             let camera = GMSCameraPosition.camera(withTarget: mapView.projection.coordinate(for: pointOnMap), zoom: streetZoom)
             isZoomingIn = true
             animateMap(toCameraPosition: camera, duration: 0.7)
-//            delegate?.mapViewControllerDidZoom(switchOn: true, shouldGetOverlay: false)
         }
     }
     
@@ -190,7 +189,6 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         CATransaction.begin()
         CATransaction.setCompletionBlock { 
             self.adjustViewsToZoom()
-            let _ = self.delegate?.mapViewControllerShouldSearchStreetCleaning(self.mapView)
         }
         CATransaction.setValue(duration, forKey: kCATransactionAnimationDuration)
         zoomMap(toCamera: cameraPosition)
@@ -198,10 +196,24 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     }
     
     func adjustViewsToZoom() {
-//        let turnSwitchOn: Bool? = mapView.camera.zoom < streetZoom ? false : nil
-//        let turnSwitchOn = mapView.camera.zoom >= streetZoom
-        delegate?.mapViewControllerDidZoom(switchOn: nil, shouldGetOverlay: true)
-        zoomOutButton.isHidden = mapView.camera.zoom <= initialZoom
+        if mapView.camera.zoom >= streetZoom {
+            guard mapView.isInNYC else {
+                print("Current mapview is not in nyc, \(mapView)")
+                return
+            }
+            _ = delegate?.mapViewControllerShouldSearchStreetCleaning(mapView)
+        } else {
+            if dao.locationsForPrimaryTimeAndDay == nil {
+                delegate?.mapViewControllerShouldSearchLocationsForTimeAndDay()
+            } else {
+                getNewHeatMapOverlays()
+            }
+        }
+        if mapView.camera.zoom > initialZoom || !mapView.isInNYC {
+            zoomOutButton.isHidden = false
+        } else {
+            zoomOutButton.isHidden = true
+        }
     }
     func zoomMap(toCoordinate coordinate:CLLocationCoordinate2D?, zoom:Float) {
         if coordinate != nil {
@@ -221,17 +233,6 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     }
     
     //MARK: -----Draw on map methods
-    func getSignsForCurrentMapView() {
-        guard dao.isInNYC(mapView) else {
-            print("Current mapview is not in nyc, \(mapView)")
-            return
-        }
-        if mapView.camera.zoom >= streetZoom {
-            _ = delegate?.mapViewControllerShouldSearchStreetCleaning(mapView)
-        } else {
-            getNewHeatMapOverlays()
-        }
-    }
     func getNewHeatMapOverlays() {
         hide(mapOverlayViews: currentGroundOverlays)
         guard dao.locationsForPrimaryTimeAndDay != nil else { return }
@@ -239,6 +240,10 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         show(mapOverlayViews: currentGroundOverlays, shouldHideOtherOverlay: true)
     }
     func getNewPolylines() {
+        if dao.currentMapViewLocations.count == 0 {
+            delegate?.mapViewControllerDidFinishDrawingPolylines()
+            return
+        }
         if currentMapPolylines.count > 0 { hide(mapOverlayViews: currentMapPolylines) }
         var polylineManager = SPPolylineManager()
         polylineManager.inject(dao)
@@ -350,20 +355,21 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         let startAddress = "\(startCoordinate.latitude),\(startCoordinate.longitude)"
         let endAddress = "\(coordinate.latitude),\(coordinate.longitude)"
         let alertController = UIAlertController.init(title: "Get Directions", message: nil, preferredStyle: .actionSheet)
-        for map in SPMapApp.appsForThisDevice {
+        for mapApp in SPMapApp.appsForThisDevice {
             let parameters: String
-            switch map {
+            switch mapApp {
             case .Apple:
                 parameters = "?saddr=\(startAddress)&daddr=\(endAddress)&dirflg=d"
             case .Google: parameters = "?saddr=\(startAddress)&daddr=\(endAddress)&directionsmode=driving"
             case .Waze: parameters = "?ll=\(endAddress)&navigate=yes"
             }
-            guard let mapURL = URL(string: map.scheme + parameters) else {continue}
-            let action = UIAlertAction.init(title: map.rawValue, style: .default, handler: { (_) in
+            guard let mapURL = URL(string: mapApp.scheme + parameters) else {continue}
+            let action = UIAlertAction.init(title: mapApp.rawValue, style: .default, handler: { (_) in
                 UIApplication.shared.openURL(mapURL)
             })
             alertController.addAction(action)
         }
+        if alertController.actions.count == 0 { return }
         alertController.addAction(UIAlertAction.init(title: "Cancel", style: .destructive, handler: nil))
         present(alertController, animated: true, completion: nil)
     }
@@ -383,10 +389,10 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         }
         static var appsForThisDevice: [SPMapApp] {
             var mapOptions = [SPMapApp]()
-            for map in SPMapApp.allMaps {
-                guard let scheme = URL(string:map.scheme) else { continue }
+            for mapApp in SPMapApp.allMaps {
+                guard let scheme = URL(string:mapApp.scheme) else { continue }
                 if UIApplication.shared.canOpenURL(scheme) {
-                    mapOptions.append(map)
+                    mapOptions.append(mapApp)
                 }
             }
             return mapOptions
@@ -407,8 +413,8 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
 protocol SPMapViewControllerDelegate: class {
     func mapViewControllerIsZooming()
     func mapViewControllerShouldSearchStreetCleaning(_ mapView: GMSMapView) -> Bool
-    func mapViewControllerDidZoom(switchOn on: Bool?, shouldGetOverlay: Bool)
     func mapViewControllerDidFinishDrawingPolylines()
+    func mapViewControllerShouldSearchLocationsForTimeAndDay()
 }
 
 

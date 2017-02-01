@@ -13,22 +13,18 @@ import DNTimeAndDay
 class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDataAccessObjectDelegate, SPSearchResultsViewControllerDelegate, SPMapViewControllerDelegate, SPTimeViewControllerDelegate, InjectableViewController {
     @IBOutlet weak var timeAndDayContainerView: UIView!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
-    @IBOutlet weak var streetViewSwitch: UISwitch!
 
     @IBOutlet weak var heightConstraintOfSearchContainer: NSLayoutConstraint!
     @IBOutlet weak var heightConstraintOfTimeAndDayContainer: NSLayoutConstraint!
     @IBOutlet weak var heightConstraintOfToolbar: NSLayoutConstraint!
     @IBOutlet weak var waitingLabel: UILabel!
     @IBOutlet weak var searchContainerView: UIView!
-    @IBOutlet weak var switchLabel: UIButton!
     
     @IBOutlet weak var greyOutMapView: UIView!
-    @IBOutlet weak var bottomToolbar: UIToolbar!
 
     var searchContainerSegue: String { return "searchContainer" }
     var timeContainerSegue:String { return "timeContainer" }
     var mapContainerSegue: String { return "mapContainer" }
-    var switchLabelText: String { return streetViewSwitch.isOn ? "Street" : "City" }
     var waitingText:String { return "Finding street cleaning locations and rendering map..." }
 
     var isSearchTableViewPresent = false
@@ -38,15 +34,8 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
     var shouldTapShowSearchBar = false
     var didGetLocations = false
     
-    fileprivate enum ChildViewController: String {
-        case timeAndDay, map, search
-        var segue: String {
-            switch self {
-            case .timeAndDay: return "timeContainer"
-            case .map: return "mapContainer"
-            case .search: return "searchContainer"
-            }
-        }
+    fileprivate var shouldGetCurrentLocations: Bool {
+        return mapViewController.mapView.camera.zoom < mapViewController.zoomToSwitchOverlays
     }
     var timeAndDayViewController: SPTimeAndDayViewController!
     var searchViewController: SPSearchResultsViewController!
@@ -180,7 +169,7 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
 
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
         if touch.view != nil {
-            let viewsToCancelTouch: [UIView?] = [mapViewController.zoomOutButton, mapViewController.myLocationButton, searchContainerView, bottomToolbar, timeAndDayContainerView, mapViewController.currentInfoWindow, mapViewController.signMarker?.iconView, mapViewController.searchMarker?.iconView]
+            let viewsToCancelTouch: [UIView?] = [mapViewController.zoomOutButton, mapViewController.myLocationButton, searchContainerView,  timeAndDayContainerView, mapViewController.currentInfoWindow, mapViewController.signMarker?.iconView, mapViewController.searchMarker?.iconView]
             for untappableView in viewsToCancelTouch {
                 if untappableView == nil { continue }
                 if touch.view!.isDescendant(of: untappableView!) {
@@ -206,31 +195,6 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
     }
 
     //MARK: --Swoop toggle
-    @IBAction func toggleOverlaySwitch(_ sender: UISwitch) {
-        if sender.isOn {
-            showHideSearchBar(shouldShow: true, makeFirstResponder: true)
-            turnStreetSwitch(on: false, shouldGetOverlays: false)
-        } else {
-            mapViewController.zoomMap(toCamera: mapViewController.initialMapViewCamera)
-
-        }
-//        if mapViewController.mapView.camera.zoom <= mapViewController.zoomToSwitchOverlays {
-//            if !sender.isOn { return }
-//            mapViewController.zoomMap(toZoom: mapViewController.streetZoom)
-//        } else {
-//            if sender.isOn { return }
-//            mapViewController.zoomMap(toZoom: mapViewController.zoomToSwitchOverlays)
-//        }
-    }
-    fileprivate func turnStreetSwitch(on: Bool?, shouldGetOverlays: Bool) {
-        if on != nil {
-            streetViewSwitch.setOn(on!, animated: true)
-        }
-        switchLabel.setTitle(switchLabelText, for: UIControlState())
-        if shouldGetOverlays {
-            mapViewController.getSignsForCurrentMapView()
-        }
-    }
     //MARK: --Searchbar toggle
     @IBAction func showSearchBarButtonPressed(_ sender: UIBarButtonItem) {
         showHideSearchBar(shouldShow: !isSearchBarPresent, makeFirstResponder: !isSearchBarPresent)
@@ -299,12 +263,8 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
         case .getLocationsForCurrentMapView:
             mapViewController.getNewPolylines()
         case .getAllLocationsWithUniqueCleaningSign, .getLocationsForTimeAndDay:
-            if !streetViewSwitch.isOn {
-                mapViewController.getNewHeatMapOverlays()
-            }
-            if queryType == .getAllLocationsWithUniqueCleaningSign {
-                bottomToolbar.backgroundColor = UIColor.red
-            } else {
+            mapViewController.getNewHeatMapOverlays()
+            if queryType == .getLocationsForTimeAndDay {
                 timeAndDayViewController.setNewImage()
             }
             hideWaitingView()
@@ -317,21 +277,10 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
             mapViewController.mapView.isMyLocationEnabled = true
         }
     }
-    
-    func dataAccessObjectDidUpdateCurrentLocation() {
-    }
     //MARK: -- Methods that interact with child view controllers
     //MARK: -----Time and Day Container Controller delegate
     func timeViewControllerDidChangeTime() {
-        if streetViewSwitch.isOn {
-            mapViewController.getSignsForCurrentMapView()
-        }
-        if dao.locationsForPrimaryTimeAndDay == nil {
-            dao.getStreetCleaningLocationsForPrimaryTimeAndDay()
-            activityIndicator.startAnimating()
-        } else {
-            mapViewController.getNewHeatMapOverlays()
-        }
+        mapViewController.adjustViewsToZoom()
     }
     
     //MARK: -----Search container controller delegate
@@ -347,7 +296,6 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
         mapViewController.zoomMap(toCoordinate: dao.googleSearchObject.coordinate!, zoom: mapViewController.zoomToSwitchOverlays)
         if dao.googleSearchObject.info == nil { return }
         mapViewController.setSearchMarker(withUserData: dao.googleSearchObject.info!, atCoordinate: dao.googleSearchObject.coordinate!)
-        turnStreetSwitch(on: true, shouldGetOverlays: true)
     }
     func searchContainerHeightShouldAdjust(_ height: CGFloat, tableViewPresent: Bool, searchBarPresent: Bool) -> Bool {
         UIView.animate(withDuration: standardAnimationDuration, animations: {
@@ -372,12 +320,13 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
     func mapViewControllerShouldSearchStreetCleaning(_ mapView: GMSMapView) -> Bool {
         showWaitingView(withLabel: waitingText, isStreetView: false)
         dao.getSigns(forCurrentMapView: mapView)
-        return streetViewSwitch.isOn
-    }
-    func mapViewControllerDidZoom(switchOn on: Bool?, shouldGetOverlay: Bool) {
-        turnStreetSwitch(on: on, shouldGetOverlays: shouldGetOverlay)
+        return shouldGetCurrentLocations
     }
     
+    func mapViewControllerShouldSearchLocationsForTimeAndDay() {
+        activityIndicator.startAnimating()
+        dao.getStreetCleaningLocationsForPrimaryTimeAndDay()
+    }
     //MARK: - UIStateRestoring Protocol
     override func encodeRestorableState(with coder: NSCoder) {
         coder.encode(mapViewController.mapView.camera.zoom, forKey: SPRestoreCoderKeys.zoom)
@@ -408,9 +357,7 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
     override func applicationFinishedRestoringState() {
         guard let _ = mapViewController.restoredCamera else { return }
         mapViewController.mapView.camera = mapViewController.restoredCamera!
-        let shouldTurnSwitchOn = (mapViewController.restoredCamera?.zoom)! >= mapViewController.zoomToSwitchOverlays
         dao.getStreetCleaningLocationsForPrimaryTimeAndDay()
-        turnStreetSwitch(on: shouldTurnSwitchOn, shouldGetOverlays: false)
         mapViewController.adjustViewsToZoom()
         timeAndDayViewController.adjustTimeSliderToDay()
         timeAndDayViewController.adjustSliderToTimeChange()
