@@ -32,6 +32,8 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
     }
     var signForPathCoordinates = [String: SPSign]()
     var isFirstLocationAfterAuthorization = false
+    
+    var currentCity: SPCity = .NYC
 
     // MARK: - SQLite methods
     func getAllStreetCleaningLocations() {

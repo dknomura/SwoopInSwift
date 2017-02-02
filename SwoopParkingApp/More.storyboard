@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="15G1217" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="0TU-lI-CBw">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <customFonts key="customFonts">
+        <array key="comesinhandy.ttf">
+            <string>Christopherhand</string>
+        </array>
+    </customFonts>
+    <scenes>
+        <!--More-->
+        <scene sceneID="ts8-B0-H1s">
+            <objects>
+                <viewController storyboardIdentifier="MoreViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="0TU-lI-CBw" customClass="MoreViewController" customModule="Swoop_" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="DQf-qU-G5v"/>
+                        <viewControllerLayoutGuide type="bottom" id="9h2-Q0-2F0"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="SkT-lL-8hO">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fFg-HH-DFZ">
+                                <rect key="frame" x="198" y="30" width="161" height="42"/>
+                                <fontDescription key="fontDescription" name="Christopherhand" family="Christopherhand" pointSize="26"/>
+                                <state key="normal" title="Parking tips"/>
+                                <connections>
+                                    <action selector="openAppInstructions:" destination="0TU-lI-CBw" eventType="touchUpInside" id="trs-pY-cBw"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="HlS-XD-7gP">
+                                <rect key="frame" x="198" y="82" width="161" height="42"/>
+                                <fontDescription key="fontDescription" name="Christopherhand" family="Christopherhand" pointSize="26"/>
+                                <state key="normal" title="Disclaimer"/>
+                                <connections>
+                                    <action selector="openAppInstructions:" destination="0TU-lI-CBw" eventType="touchUpInside" id="wZV-ph-6bX"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="249" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4oy-tC-8sC">
+                                <rect key="frame" x="16" y="30" width="162" height="42"/>
+                                <fontDescription key="fontDescription" name="Christopherhand" family="Christopherhand" pointSize="26"/>
+                                <state key="normal" title="How it works"/>
+                                <connections>
+                                    <action selector="openAppInstructions:" destination="0TU-lI-CBw" eventType="touchUpInside" id="bPe-wm-YNt"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gcu-IO-iq0">
+                                <rect key="frame" x="198" y="609" width="161" height="48"/>
+                                <fontDescription key="fontDescription" name="Christopherhand" family="Christopherhand" pointSize="32"/>
+                                <state key="normal" title="Donate"/>
+                                <connections>
+                                    <action selector="openDonate:" destination="0TU-lI-CBw" eventType="touchUpInside" id="loi-xv-3ok"/>
+                                </connections>
+                            </button>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" pagingEnabled="YES" editable="NO" textAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="ndf-Tv-6IC">
+                                <rect key="frame" x="24" y="497" width="327" height="102"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="100" id="udw-yF-rjo"/>
+                                </constraints>
+                                <string key="text">If this app has been useful to you, please leave a review or donate. I plan to improve this app and add more cities and any feedback is very helpful. </string>
+                                <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MGP-NI-GuN">
+                                <rect key="frame" x="16" y="82" width="162" height="42"/>
+                                <fontDescription key="fontDescription" name="Christopherhand" family="Christopherhand" pointSize="26"/>
+                                <state key="normal" title="Parking holidays"/>
+                                <connections>
+                                    <action selector="openAppInstructions:" destination="0TU-lI-CBw" eventType="touchUpInside" id="qiD-PX-71z"/>
+                                </connections>
+                            </button>
+                            <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="AWD-fU-mI1">
+                                <rect key="frame" x="186" y="30" width="4" height="128"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="128" id="VWw-at-raI"/>
+                                    <constraint firstAttribute="width" constant="4" id="zmK-Dc-L6z"/>
+                                </constraints>
+                            </view>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Fb7-gd-je5">
+                                <rect key="frame" x="16" y="609" width="162" height="48"/>
+                                <fontDescription key="fontDescription" name="Christopherhand" family="Christopherhand" pointSize="32"/>
+                                <state key="normal" title="Review"/>
+                                <connections>
+                                    <action selector="openReview:" destination="0TU-lI-CBw" eventType="touchUpInside" id="LiQ-v2-76d"/>
+                                </connections>
+                            </button>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="60R-3V-eXy">
+                                <rect key="frame" x="178" y="249" width="20" height="20"/>
+                            </activityIndicatorView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="Fb7-gd-je5" firstAttribute="leading" secondItem="SkT-lL-8hO" secondAttribute="leadingMargin" id="FIv-gl-yri"/>
+                            <constraint firstItem="gcu-IO-iq0" firstAttribute="top" secondItem="ndf-Tv-6IC" secondAttribute="bottom" constant="10" id="GL7-l4-GcN"/>
+                            <constraint firstItem="AWD-fU-mI1" firstAttribute="leading" secondItem="MGP-NI-GuN" secondAttribute="trailing" constant="8" id="Mwz-U1-dVV"/>
+                            <constraint firstItem="HlS-XD-7gP" firstAttribute="leading" secondItem="AWD-fU-mI1" secondAttribute="trailing" constant="8" id="O8n-qO-m3u"/>
+                            <constraint firstItem="ndf-Tv-6IC" firstAttribute="centerX" secondItem="SkT-lL-8hO" secondAttribute="centerX" id="OOe-Yu-WrZ"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="ndf-Tv-6IC" secondAttribute="trailing" constant="8" id="QFf-im-zD6"/>
+                            <constraint firstItem="9h2-Q0-2F0" firstAttribute="top" secondItem="gcu-IO-iq0" secondAttribute="bottom" constant="10" id="QjP-HD-h5v"/>
+                            <constraint firstItem="60R-3V-eXy" firstAttribute="centerX" secondItem="SkT-lL-8hO" secondAttribute="centerX" id="ULR-ZQ-BCv"/>
+                            <constraint firstItem="Fb7-gd-je5" firstAttribute="top" secondItem="ndf-Tv-6IC" secondAttribute="bottom" constant="10" id="UUX-gG-1HY"/>
+                            <constraint firstItem="ndf-Tv-6IC" firstAttribute="top" relation="greaterThanOrEqual" secondItem="MGP-NI-GuN" secondAttribute="bottom" constant="10" id="Uu7-ew-LCk"/>
+                            <constraint firstItem="ndf-Tv-6IC" firstAttribute="top" relation="greaterThanOrEqual" secondItem="HlS-XD-7gP" secondAttribute="bottom" constant="10" id="VTj-Sz-hlh"/>
+                            <constraint firstItem="HlS-XD-7gP" firstAttribute="top" secondItem="fFg-HH-DFZ" secondAttribute="bottom" constant="10" id="Vgh-xb-bLK"/>
+                            <constraint firstItem="AWD-fU-mI1" firstAttribute="leading" secondItem="4oy-tC-8sC" secondAttribute="trailing" constant="8" id="WaX-Rh-qPp"/>
+                            <constraint firstItem="AWD-fU-mI1" firstAttribute="leading" secondItem="Fb7-gd-je5" secondAttribute="trailing" constant="8" id="X8A-gu-zav"/>
+                            <constraint firstItem="MGP-NI-GuN" firstAttribute="leading" secondItem="SkT-lL-8hO" secondAttribute="leadingMargin" id="XDu-6d-Z58"/>
+                            <constraint firstItem="fFg-HH-DFZ" firstAttribute="top" secondItem="DQf-qU-G5v" secondAttribute="bottom" constant="10" id="XSb-YA-2jk"/>
+                            <constraint firstItem="gcu-IO-iq0" firstAttribute="leading" secondItem="AWD-fU-mI1" secondAttribute="trailing" constant="8" id="Zlb-Rz-Yhd"/>
+                            <constraint firstItem="4oy-tC-8sC" firstAttribute="top" secondItem="DQf-qU-G5v" secondAttribute="bottom" constant="10" id="ZsG-3f-27O"/>
+                            <constraint firstItem="60R-3V-eXy" firstAttribute="centerY" secondItem="SkT-lL-8hO" secondAttribute="centerY" constant="-75" id="cnc-dH-BnH"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="fFg-HH-DFZ" secondAttribute="trailing" id="exX-Ln-DVk"/>
+                            <constraint firstItem="AWD-fU-mI1" firstAttribute="centerX" secondItem="SkT-lL-8hO" secondAttribute="centerX" id="gQs-fP-FBA"/>
+                            <constraint firstItem="4oy-tC-8sC" firstAttribute="leading" secondItem="SkT-lL-8hO" secondAttribute="leadingMargin" id="hV9-ha-c76"/>
+                            <constraint firstItem="AWD-fU-mI1" firstAttribute="top" secondItem="DQf-qU-G5v" secondAttribute="bottom" constant="10" id="jnM-FZ-rom"/>
+                            <constraint firstItem="9h2-Q0-2F0" firstAttribute="top" secondItem="Fb7-gd-je5" secondAttribute="bottom" constant="10" id="mw7-J2-mRb"/>
+                            <constraint firstItem="ndf-Tv-6IC" firstAttribute="leading" secondItem="SkT-lL-8hO" secondAttribute="leadingMargin" constant="8" id="nVB-Hd-QwC"/>
+                            <constraint firstItem="fFg-HH-DFZ" firstAttribute="leading" secondItem="AWD-fU-mI1" secondAttribute="trailing" constant="8" id="rX1-p9-dCP"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="HlS-XD-7gP" secondAttribute="trailing" id="t6I-Tv-BVH"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="gcu-IO-iq0" secondAttribute="trailing" id="wNM-cR-AC5"/>
+                            <constraint firstItem="MGP-NI-GuN" firstAttribute="top" secondItem="4oy-tC-8sC" secondAttribute="bottom" constant="10" id="yeb-4b-kJ5"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" title="More" id="mUS-s2-TZF"/>
+                    <connections>
+                        <outlet property="activityIndicator" destination="60R-3V-eXy" id="cSY-k2-f6i"/>
+                        <outlet property="disclaimerButton" destination="HlS-XD-7gP" id="gtx-zm-9Hj"/>
+                        <outlet property="donateButton" destination="gcu-IO-iq0" id="fN2-lX-OLz"/>
+                        <outlet property="holidaysButton" destination="MGP-NI-GuN" id="emg-Wp-Zi9"/>
+                        <outlet property="howItWorksButton" destination="4oy-tC-8sC" id="VS6-Nj-kXg"/>
+                        <outlet property="reviewButton" destination="Fb7-gd-je5" id="xBC-tQ-mok"/>
+                        <outlet property="textView" destination="ndf-Tv-6IC" id="Svt-yZ-Gdg"/>
+                        <outlet property="tipsButton" destination="fFg-HH-DFZ" id="HKB-nq-kqY"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ULJ-XG-LzZ" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2017.5" y="1086.443661971831"/>
+        </scene>
+        <!--Web View Controller-->
+        <scene sceneID="3Dg-y4-Hy0">
+            <objects>
+                <viewController storyboardIdentifier="webViewController" id="rmo-1O-l60" customClass="WebViewController" customModule="Swoop_" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="q6F-pK-cna"/>
+                        <viewControllerLayoutGuide type="bottom" id="8NB-oE-3yH"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="EEJ-RK-f4u">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <webView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="IU9-dX-jdr">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="623"/>
+                                <color key="backgroundColor" red="0.36078431370000003" green="0.38823529410000002" blue="0.4039215686" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            </webView>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="zeM-tl-3V1">
+                                <rect key="frame" x="0.0" y="623" width="375" height="44"/>
+                                <items>
+                                    <barButtonItem title="&lt;" id="MmO-I7-laU">
+                                        <connections>
+                                            <action selector="navigateBackWebView:" destination="rmo-1O-l60" id="SUD-HF-17P"/>
+                                        </connections>
+                                    </barButtonItem>
+                                    <barButtonItem title="&gt;" id="yhP-wx-ZLM">
+                                        <connections>
+                                            <action selector="navigateForwardWebView:" destination="rmo-1O-l60" id="55v-f3-Amm"/>
+                                        </connections>
+                                    </barButtonItem>
+                                </items>
+                            </toolbar>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="IU9-dX-jdr" firstAttribute="width" secondItem="EEJ-RK-f4u" secondAttribute="width" id="35C-Wm-h38"/>
+                            <constraint firstItem="zeM-tl-3V1" firstAttribute="width" secondItem="EEJ-RK-f4u" secondAttribute="width" id="EbI-EN-vJv"/>
+                            <constraint firstItem="zeM-tl-3V1" firstAttribute="centerX" secondItem="EEJ-RK-f4u" secondAttribute="centerX" id="JBF-Sc-fCR"/>
+                            <constraint firstItem="IU9-dX-jdr" firstAttribute="top" secondItem="EEJ-RK-f4u" secondAttribute="top" id="P89-TH-d5w"/>
+                            <constraint firstItem="8NB-oE-3yH" firstAttribute="top" secondItem="zeM-tl-3V1" secondAttribute="bottom" id="YiW-6Z-Gjb"/>
+                            <constraint firstItem="zeM-tl-3V1" firstAttribute="top" secondItem="IU9-dX-jdr" secondAttribute="bottom" id="atB-2S-7dN"/>
+                            <constraint firstItem="IU9-dX-jdr" firstAttribute="leading" secondItem="EEJ-RK-f4u" secondAttribute="leading" id="ir4-Ez-NIG"/>
+                            <constraint firstAttribute="trailing" secondItem="IU9-dX-jdr" secondAttribute="trailing" id="nKF-6g-nh6"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="webView" destination="IU9-dX-jdr" id="9Tz-Ng-7EW"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="qXq-aM-9nS" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2873" y="1138"/>
+        </scene>
+    </scenes>
+</document>

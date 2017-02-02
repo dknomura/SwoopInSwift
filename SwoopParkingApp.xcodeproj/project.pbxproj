@@ -45,8 +45,9 @@
 		9C61F0B11D7496DC00BA524C /* SPGoogleNetworking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C61F0B01D7496DB00BA524C /* SPGoogleNetworking.swift */; };
 		9C61F0B51D7608CC00BA524C /* SPSearchResultsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C61F0B41D7608CC00BA524C /* SPSearchResultsViewController.swift */; };
 		9C6A8D5D1DDABA180030545F /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C6A8D5C1DDABA180030545F /* StoreKit.framework */; };
+		9C736D171E42E3390082B40B /* More.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9C736D161E42E3390082B40B /* More.storyboard */; };
 		9C96EE901D625EC4007C4EC8 /* SPViewControllerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C96EE8F1D625EC4007C4EC8 /* SPViewControllerExtension.swift */; };
-		9C9D62791E24DEA20019261E /* CityAndStreetToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C9D62781E24DEA10019261E /* CityAndStreetToolbar.swift */; };
+		9C9D62791E24DEA20019261E /* SignsCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C9D62781E24DEA10019261E /* SignsCollectionViewController.swift */; };
 		9CA1E3361E41ACBD001106F9 /* MapViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CA1E3351E41ACBD001106F9 /* MapViewExtensions.swift */; };
 		9CA64D9B1DD7821E0015A8F2 /* InjectableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CA64D9A1DD7821E0015A8F2 /* InjectableViewController.swift */; };
 		9CA7DDC11D57EAB50050B75D /* LFHeatMap-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CA7DDBC1D57EAB50050B75D /* LFHeatMap-dummy.m */; };
@@ -153,8 +154,9 @@
 		9C61F0B01D7496DB00BA524C /* SPGoogleNetworking.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPGoogleNetworking.swift; sourceTree = "<group>"; };
 		9C61F0B41D7608CC00BA524C /* SPSearchResultsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPSearchResultsViewController.swift; sourceTree = "<group>"; };
 		9C6A8D5C1DDABA180030545F /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		9C736D161E42E3390082B40B /* More.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = More.storyboard; sourceTree = "<group>"; };
 		9C96EE8F1D625EC4007C4EC8 /* SPViewControllerExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPViewControllerExtension.swift; sourceTree = "<group>"; };
-		9C9D62781E24DEA10019261E /* CityAndStreetToolbar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CityAndStreetToolbar.swift; sourceTree = "<group>"; };
+		9C9D62781E24DEA10019261E /* SignsCollectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignsCollectionViewController.swift; sourceTree = "<group>"; };
 		9CA1E3351E41ACBD001106F9 /* MapViewExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapViewExtensions.swift; sourceTree = "<group>"; };
 		9CA64D9A1DD7821E0015A8F2 /* InjectableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InjectableViewController.swift; sourceTree = "<group>"; };
 		9CA7DDBC1D57EAB50050B75D /* LFHeatMap-dummy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "LFHeatMap-dummy.m"; sourceTree = "<group>"; };
@@ -361,7 +363,7 @@
 				9C215D9B1D6652D9006C1E3E /* SPTimeAndDayViewController.swift */,
 				9C61F0B41D7608CC00BA524C /* SPSearchResultsViewController.swift */,
 				9C96EE8F1D625EC4007C4EC8 /* SPViewControllerExtension.swift */,
-				9C9D62781E24DEA10019261E /* CityAndStreetToolbar.swift */,
+				9C9D62781E24DEA10019261E /* SignsCollectionViewController.swift */,
 				9CA64D9A1DD7821E0015A8F2 /* InjectableViewController.swift */,
 			);
 			name = Map;
@@ -373,6 +375,7 @@
 				9C4503071DD936D60047B708 /* MoreViewController.swift */,
 				9C45030A1DDA1AE70047B708 /* ViewExtensions.swift */,
 				9C45031D1DDA3FAC0047B708 /* WebViewController.swift */,
+				9C736D161E42E3390082B40B /* More.storyboard */,
 			);
 			name = Settings;
 			sourceTree = "<group>";
@@ -635,6 +638,7 @@
 				9CFEE3811CDA6D7A00CE5D53 /* Assets.xcassets in Resources */,
 				9C1A86C81DA586C900DAD930 /* Main.storyboard in Resources */,
 				9C1CA59F1DA8125B00EB875F /* SPSignInfoOverlay.xib in Resources */,
+				9C736D171E42E3390082B40B /* More.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -797,7 +801,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9C9D62791E24DEA20019261E /* CityAndStreetToolbar.swift in Sources */,
+				9C9D62791E24DEA20019261E /* SignsCollectionViewController.swift in Sources */,
 				9CBE25BB1D552BD500B5384B /* SPSQLiteReader.swift in Sources */,
 				9CD51DC91CE24662006B741D /* SPSignAndLocationParser.swift in Sources */,
 				9CFEE37C1CDA6D7900CE5D53 /* SPMapViewController.swift in Sources */,

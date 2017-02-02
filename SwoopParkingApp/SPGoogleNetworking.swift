@@ -29,8 +29,8 @@ struct SPGoogleNetworking {
         startURLGetSession(withURLString: queryString, delegateAction: .presentCoordinate)
     }
     
-    func searchAddress(_ address:String) {
-        let queryString = "https://maps.googleapis.com/maps/api/geocode/json?address=\(address)&bounds=\(minNYCCoordinate.latitude),\(minNYCCoordinate.longitude)|\(maxNYCCoordinate.latitude),\(maxNYCCoordinate.longitude)&key=\(googleGeocodingAPIKey)"
+    func searchAddress(_ address:String, city: SPCity) {
+        let queryString = "https://maps.googleapis.com/maps/api/geocode/json?address=\(address)&bounds=\(city.minCoordinate.latitude),\(city.minCoordinate.longitude)|\(city.maxCoordinate.latitude),\(city.maxCoordinate.longitude)&key=\(googleGeocodingAPIKey)"
         startURLGetSession(withURLString: queryString, delegateAction: .presentAddress)
     }
 

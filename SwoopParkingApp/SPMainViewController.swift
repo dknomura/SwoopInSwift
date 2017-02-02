@@ -10,7 +10,7 @@ import Foundation
 import GoogleMaps
 import DNTimeAndDay
 
-class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDataAccessObjectDelegate, SPSearchResultsViewControllerDelegate, SPMapViewControllerDelegate, SPTimeViewControllerDelegate, InjectableViewController {
+class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDataAccessObjectDelegate, SPSearchResultsViewControllerDelegate, SPMapViewControllerDelegate, SPTimeViewControllerDelegate, SignsCollectionViewControllerDelegate, InjectableViewController {
     @IBOutlet weak var timeAndDayContainerView: UIView!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
 
@@ -20,28 +20,35 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
     @IBOutlet weak var waitingLabel: UILabel!
     @IBOutlet weak var searchContainerView: UIView!
     
+    @IBOutlet weak var constraintOfToolbarToBottom: NSLayoutConstraint!
     @IBOutlet weak var greyOutMapView: UIView!
 
-    var searchContainerSegue: String { return "searchContainer" }
-    var timeContainerSegue:String { return "timeContainer" }
-    var mapContainerSegue: String { return "mapContainer" }
-    var waitingText:String { return "Finding street cleaning locations and rendering map..." }
-
-    var isSearchTableViewPresent = false
-    var toolbarsPresent = true
-    var isKeyboardPresent = false
-    var isSearchBarPresent = false
-    var shouldTapShowSearchBar = false
-    var didGetLocations = false
+    private var searchContainerSegue: String { return "searchContainer" }
+    private var timeContainerSegue:String { return "timeContainer" }
+    private var mapContainerSegue: String { return "mapContainer" }
+    private var collectionViewContainerSegue: String { return "collectionViewController" }
     
+    private var waitingText:String { return "Finding street cleaning locations and rendering map..." }
+
+    private var isSearchTableViewPresent = false
+    private var toolbarsPresent = true
+    private var isKeyboardPresent = false
+    private var isSearchBarPresent = false
+    private var shouldTapShowSearchBar = false
+    private var didGetLocations = false
+    private var isSwitchOn = false
     fileprivate var shouldGetCurrentLocations: Bool {
         return mapViewController.mapView.camera.zoom < mapViewController.zoomToSwitchOverlays
     }
+
     var timeAndDayViewController: SPTimeAndDayViewController!
     var searchViewController: SPSearchResultsViewController!
     var mapViewController: SPMapViewController!
+    var collectionViewToolbar: SignsCollectionViewController!
+    var allChildViewControllers: [UIViewController?] {
+        return [timeAndDayViewController, searchViewController, mapViewController, collectionViewToolbar]
+    }
     
-    var standardHeightOfToolOrSearchBar: CGFloat { return CGFloat(44.0) }
     var heightOfTimeContainer: CGFloat { return CGFloat(70.0) }
 
     
@@ -68,22 +75,12 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
         switch segue.identifier! {
         case timeContainerSegue:
             timeAndDayViewController = segue.destination as? SPTimeAndDayViewController
-            guard timeAndDayViewController != nil else {
-                print("Destination ViewController for segue \(segue.identifier) is not a TimeAndDay view controller. It is \(segue.destination)")
-                return
-            }
         case searchContainerSegue:
             searchViewController = segue.destination as? SPSearchResultsViewController
-            guard searchViewController != nil else {
-                print("Destination ViewController for segue \(segue.identifier) is not a Search results view controller. It is \(segue.destination)")
-                return
-            }
         case mapContainerSegue:
             mapViewController = segue.destination as? SPMapViewController
-            guard let _ = mapViewController else {
-                print("Destination ViewController for segue \(segue.identifier) is not a Map view controller. It is \(segue.destination)")
-                return
-            }
+        case collectionViewContainerSegue:
+            collectionViewToolbar = segue.destination as? SignsCollectionViewController
         default: return
         }
     }
@@ -95,8 +92,19 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
         notificationCenter.addObserver(self, selector: #selector(keyboardDidHide), name: NSNotification.Name.UIKeyboardDidHide, object: nil)
         notificationCenter.addObserver(self, selector: #selector(keyboardDidShow), name: NSNotification.Name.UIKeyboardDidShow, object: nil)
     }
-    @objc fileprivate func keyboardDidHide() { isKeyboardPresent = false }
-    @objc fileprivate func keyboardDidShow() { isKeyboardPresent = true }
+    @objc fileprivate func keyboardDidHide(notification: Notification) {
+        isKeyboardPresent = false
+        self.constraintOfToolbarToBottom.constant = 0
+        self.view.layoutIfNeeded()
+    }
+    @objc fileprivate func keyboardDidShow(notification: Notification) {
+        isKeyboardPresent = true
+        if collectionViewToolbar.collectionViewSwitch.isOn {
+            guard let keyboardFrame = notification.userInfo?[UIKeyboardFrameBeginUserInfoKey] as? CGRect else { return }
+            self.constraintOfToolbarToBottom.constant = keyboardFrame.height
+            self.view.layoutIfNeeded()
+        }
+    }
     
     //MARK: --Gestures
     fileprivate func setupGestures() {
@@ -134,6 +142,14 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
             mapViewController.cancelTapGesture = false
             return
         }
+        
+        if collectionViewToolbar.collectionViewSwitch.isOn {
+            collectionViewToolbar.collectionViewSwitch.setOn(false, animated: true)
+            collectionViewToolbar.adjustToToggleChange(isOn: false)
+            showHideTimeAndDayView(shouldShow: true)
+            showHideSearchBar(shouldShow: false, makeFirstResponder: false)
+        }
+        
         if isSearchTableViewPresent {
             searchViewController.hideSearchResultsTableView()
         }
@@ -193,6 +209,15 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
         if searchViewController.searchBar.isFirstResponder { return }
         showHideSearchBar(shouldShow: false, makeFirstResponder: false)
     }
+    //MARK: Button methods
+    
+    @IBAction func setToCurrentTime(_ sender: UIBarButtonItem) {
+        if !toolbarsPresent {
+            showHideToolbars(true)
+        }
+        timeAndDayViewController.adjustToCurrentTime()
+    }
+
 
     //MARK: --Swoop toggle
     //MARK: --Searchbar toggle
@@ -204,22 +229,22 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
         shouldTapShowSearchBar = show
     }
     
-    //MARK: Button methods
-    
-    @IBAction func setToCurrentTime(_ sender: UIBarButtonItem) {
-        if !toolbarsPresent {
-            showHideToolbars(true)
-        }
-        timeAndDayViewController.adjustToCurrentTime()
-    }
     
     
     //MARK: - Animation methods
+    fileprivate func showHideTimeAndDayView(shouldShow: Bool) {
+        UIView.animate(withDuration: standardAnimationDuration) { 
+            self.heightConstraintOfTimeAndDayContainer.constant = shouldShow ? self.heightOfTimeContainer : 0
+            self.timeAndDayViewController.heightConstraintOfBorderView.constant = shouldShow ? self.timeAndDayViewController.borderViewHeight : 0
+            self.view.layoutIfNeeded()
+        }
+    }
+    
     fileprivate func showHideToolbars(_ shouldShow:Bool) {
         UIView.animate(withDuration: standardAnimationDuration, animations: {
             self.heightConstraintOfTimeAndDayContainer.constant = shouldShow ? self.heightOfTimeContainer : 0
             self.timeAndDayViewController.heightConstraintOfBorderView.constant = shouldShow ? self.timeAndDayViewController.borderViewHeight : 0
-            self.heightConstraintOfToolbar.constant = shouldShow ? self.standardHeightOfToolOrSearchBar : 0
+            self.heightConstraintOfToolbar.constant = shouldShow ? standardHeightOfToolOrSearchBar : 0
             let sliderThumbCenter = self.timeAndDayViewController.centerOfSliderThumb
             self.timeAndDayViewController.sliderThumbLabel.center = shouldShow ? CGPoint(x: sliderThumbCenter.x, y: sliderThumbCenter.y + 35) : CGPoint(x: sliderThumbCenter.x, y: sliderThumbCenter.y - 20)
             self.view.layoutIfNeeded()
@@ -361,6 +386,29 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
         mapViewController.adjustViewsToZoom()
         timeAndDayViewController.adjustTimeSliderToDay()
         timeAndDayViewController.adjustSliderToTimeChange()
+    }
+    
+    //MARK: - Signs View Controller delegate
+    
+    func signsCollectionViewControllerDidToggleCollectionView(on switchIsOn: Bool) {
+        let maxHeight = view.frame.height - timeAndDayContainerView.frame.maxY
+        let toolbarHeight = switchIsOn ? maxHeight : standardHeightOfToolOrSearchBar
+        showHideTimeAndDayView(shouldShow: !switchIsOn)
+
+        guard switchIsOn else {
+            UIView.animate(withDuration: standardAnimationDuration, animations: { 
+                self.heightConstraintOfToolbar.constant = toolbarHeight
+                self.view.layoutIfNeeded()
+            })
+            searchViewController.searchBar.resignFirstResponder()
+            return
+        }
+        if let coordinate = dao.searchCoordinate {
+            
+        } else {
+            showHideSearchBar(shouldShow: switchIsOn, makeFirstResponder: true)
+            
+        }
     }
     
     //MARK: - Injectable protocol

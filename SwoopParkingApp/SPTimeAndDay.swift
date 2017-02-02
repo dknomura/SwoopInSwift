@@ -95,7 +95,7 @@ extension DNTimeAndDay: DNComparableTimeUnit {
         return "\(stringTupleForSQLQuery.time)\(stringTupleForSQLQuery.day)"
     }
     
-    static func allStreetLocationTimeAndDays(_ forCity:SPCities) -> [DNTimeAndDay] {
+    static func allStreetLocationTimeAndDays(_ forCity:SPCity) -> [DNTimeAndDay] {
         var returnTimeAndDays = [DNTimeAndDay]()
         for day in DNDay.allValues {
             let earliestLatestTime = day.earliestAndLatestCleaningTime

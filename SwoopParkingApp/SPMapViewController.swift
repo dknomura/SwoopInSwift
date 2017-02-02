@@ -32,7 +32,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     var zoomToSwitchOverlays: Float { return streetZoom - 2.5 }
     var streetZoom: Float { return 16 }
     var initialZoom: Float {
-        return mapView.initialStreetCleaningZoom(forCity: .NYC)
+        return dao.currentCity.initialStreetCleaningZoom(forMapView: mapView)
     }
     var restoredCamera: GMSCameraPosition?
     
@@ -197,7 +197,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     
     func adjustViewsToZoom() {
         if mapView.camera.zoom >= streetZoom {
-            guard mapView.isInNYC else {
+            guard mapView.isIn(city: dao.currentCity) else {
                 print("Current mapview is not in nyc, \(mapView)")
                 return
             }
@@ -209,7 +209,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
                 getNewHeatMapOverlays()
             }
         }
-        if mapView.camera.zoom > initialZoom || !mapView.isInNYC {
+        if mapView.camera.zoom > initialZoom || !mapView.isIn(city: dao.currentCity) {
             zoomOutButton.isHidden = false
         } else {
             zoomOutButton.isHidden = true

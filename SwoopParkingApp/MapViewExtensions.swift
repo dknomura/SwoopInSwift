@@ -12,9 +12,9 @@ import GoogleMaps
 extension GMSMapView {
     //MARK: - Determine if current mapView is within NYC
     
-    var isInNYC: Bool {
+    func isIn(city:SPCity) -> Bool {
         let region = GMSCoordinateBounds.init(region: self.projection.visibleRegion())
-        if region.northEast.isCoordinateWithinRegion( NECoordinate: maxNYCCoordinate, SWCoordinate: minNYCCoordinate) || region.southWest.isCoordinateWithinRegion(NECoordinate: maxNYCCoordinate, SWCoordinate: minNYCCoordinate) || maxNYCCoordinate.isCoordinateWithinRegion(NECoordinate: region.northEast, SWCoordinate: region.southWest) || minNYCCoordinate.isCoordinateWithinRegion(NECoordinate: region.northEast, SWCoordinate: region.southWest){
+        if region.northEast.isCoordinateWithinRegion(NECoordinate: city.maxCoordinate, SWCoordinate: city.minCoordinate) || region.southWest.isCoordinateWithinRegion(NECoordinate: city.maxCoordinate, SWCoordinate: city.minCoordinate) || city.maxCoordinate.isCoordinateWithinRegion(NECoordinate: region.northEast, SWCoordinate: region.southWest) || city.minCoordinate.isCoordinateWithinRegion(NECoordinate: region.northEast, SWCoordinate: region.southWest){
            return true
         } else {
             return false

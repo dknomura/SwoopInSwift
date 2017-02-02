@@ -142,7 +142,6 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, Injectab
         dao.primaryTimeAndDay = DNTimeAndDay.currentTimeAndDay()
         dao.primaryTimeAndDay.increaseTime()
         adjustTimeSliderToDay()
-        
     }
     
     func adjustSliderToTimeChange() {

@@ -394,29 +394,4 @@ struct SPPolylineManager: SPInjectable {
     }
 }
 
-extension GMSMapView {
-    func initialStreetCleaningZoom(forCity city: SPCities) -> Float {
-        // Using the logic above to find zoom, local points / world width point = local meters / world width meters
-        // world width points = local points * world width meters / local meters
-        // 2 ^ N = world width points / 256
-        // N = log2(world width points / 256)
-        // local points = map width 
-        // Local Meters: for NYC = 27425.3366774176
-        
-        let localMeters: Double
-
-        switch city {
-        case .NYC:
-            localMeters = 45000
-        case .Chicago, .Denver, .LA :
-            localMeters = 45000
-        }
-        let localPoints = Double(self.bounds.width)
-        let worldMeters = 40075000.0
-        
-        let worldPoints = localPoints * worldMeters / localMeters
-        let zoom = log2(worldPoints / 256.0)
-        return Float(zoom)
-    }
-}
 

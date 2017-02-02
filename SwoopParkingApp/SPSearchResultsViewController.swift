@@ -62,7 +62,7 @@ class SPSearchResultsViewController: UIViewController, UITableViewDelegate, UITa
         if (searchBar.text?.characters.count)! > 0 {
             var googleNetworking = SPGoogleNetworking()
             googleNetworking.delegate = dao
-            googleNetworking.searchAddress(searchBar.text!)
+            googleNetworking.searchAddress(searchBar.text!, city: dao.currentCity)
         }
     }
     
