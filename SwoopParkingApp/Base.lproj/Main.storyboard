@@ -138,6 +138,7 @@
                         <outlet property="heightConstraintOfToolbar" destination="qFr-YB-oou" id="c1n-Od-CUJ"/>
                         <outlet property="searchContainerView" destination="vz8-2e-oco" id="0EY-4L-Oh9"/>
                         <outlet property="searchDisplayController" destination="BMI-ff-lP2" id="WhR-Bb-g1e"/>
+                        <outlet property="signCollectionContainerView" destination="XbN-vU-f1X" id="PI1-we-cbl"/>
                         <outlet property="timeAndDayContainerView" destination="4Q6-5w-0gr" id="D8K-UP-8si"/>
                         <outlet property="waitingLabel" destination="EMK-Cb-Oig" id="7Xd-9F-Qcu"/>
                     </connections>
@@ -233,7 +234,7 @@
                                                 </connections>
                                             </button>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" restorationIdentifier="dayLabel" text="Thurs" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7Sj-W5-WbZ">
-                                                <rect key="frame" x="-10.5" y="21.5" width="60.5" height="28"/>
+                                                <rect key="frame" x="21" y="22" width="29" height="27"/>
                                                 <fontDescription key="fontDescription" name="Christopherhand" family="Christopherhand" pointSize="24"/>
                                                 <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <nil key="highlightedColor"/>
@@ -273,7 +274,7 @@
                                         </variation>
                                     </view>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="E2y-r6-dmi">
-                                        <rect key="frame" x="103" y="44" width="46.5" height="22"/>
+                                        <rect key="frame" x="103" y="44" width="30" height="22"/>
                                         <fontDescription key="fontDescription" name="Christopherhand" family="Christopherhand" pointSize="19"/>
                                         <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <nil key="highlightedColor"/>
@@ -285,7 +286,7 @@
                                         </connections>
                                     </slider>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="k1n-dd-TQB">
-                                        <rect key="frame" x="265.5" y="45" width="44.5" height="21"/>
+                                        <rect key="frame" x="281" y="45" width="29" height="21"/>
                                         <fontDescription key="fontDescription" name="Christopherhand" family="Christopherhand" pointSize="18"/>
                                         <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <nil key="highlightedColor"/>
@@ -360,9 +361,9 @@
                         <outlet property="heightConstraintOfBorderView" destination="IHD-VZ-PRJ" id="MWe-xi-Azf"/>
                         <outlet property="maxTimeLabel" destination="k1n-dd-TQB" id="3Y8-Rr-6DD"/>
                         <outlet property="minTimeLabel" destination="E2y-r6-dmi" id="Fus-tc-B0T"/>
+                        <outlet property="slider" destination="p9S-jK-NDU" id="Ugy-8G-Mfk"/>
+                        <outlet property="sliderGestureView" destination="oH4-GD-piu" id="AEZ-C7-BJn"/>
                         <outlet property="timeAndDayContainer" destination="Wut-nT-tHk" id="X7U-gW-BOS"/>
-                        <outlet property="timeSlider" destination="p9S-jK-NDU" id="4iE-Nj-V1U"/>
-                        <outlet property="timeSliderGestureView" destination="oH4-GD-piu" id="EDf-6r-an1"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="TM8-CT-SgW" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -392,11 +393,11 @@
                                         <rect key="frame" x="0.0" y="28" width="320" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Htt-Bb-jei" id="gnZ-cY-RlI">
-                                            <rect key="frame" x="0.0" y="0.0" width="320" height="43.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="cpP-X4-xxm">
-                                                    <rect key="frame" x="15" y="0.0" width="290" height="43.5"/>
+                                                    <rect key="frame" x="15" y="0.0" width="290" height="43"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -526,16 +527,24 @@
                                 </collectionViewFlowLayout>
                                 <cells/>
                             </collectionView>
-                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="G3n-1F-mYE">
+                            <slider hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="1" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="G3n-1F-mYE">
                                 <rect key="frame" x="71" y="8" width="4" height="31"/>
                                 <constraints>
                                     <constraint firstAttribute="width" id="T04-IC-WtR"/>
                                 </constraints>
+                                <connections>
+                                    <action selector="sliderValueChanged:" destination="UUw-iM-biU" eventType="valueChanged" id="AIG-PT-5Vz"/>
+                                </connections>
                             </slider>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="sZ1-aJ-q9h">
+                                <rect key="frame" x="73" y="0.0" width="0.0" height="46"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="G3n-1F-mYE" firstAttribute="top" secondItem="1cm-aO-yOP" secondAttribute="bottom" constant="8" id="4x8-fL-Akq"/>
+                            <constraint firstItem="sZ1-aJ-q9h" firstAttribute="leading" secondItem="G3n-1F-mYE" secondAttribute="leading" id="5Kc-D1-wFz"/>
                             <constraint firstItem="dqx-Gf-cqh" firstAttribute="trailing" secondItem="97Y-tT-fg3" secondAttribute="trailingMargin" id="Fox-6R-FP0"/>
                             <constraint firstItem="1dD-O9-3bb" firstAttribute="top" secondItem="1cm-aO-yOP" secondAttribute="bottom" constant="7" id="H9j-Md-2uj"/>
                             <constraint firstItem="dqx-Gf-cqh" firstAttribute="top" secondItem="d38-Px-enX" secondAttribute="bottom" id="HRk-YJ-Jnf"/>
@@ -543,21 +552,25 @@
                             <constraint firstItem="1dD-O9-3bb" firstAttribute="leading" secondItem="97Y-tT-fg3" secondAttribute="leadingMargin" id="M0O-BR-jON"/>
                             <constraint firstItem="dqx-Gf-cqh" firstAttribute="leading" secondItem="97Y-tT-fg3" secondAttribute="leadingMargin" id="Pqj-Wq-e0u"/>
                             <constraint firstItem="G3n-1F-mYE" firstAttribute="leading" secondItem="1dD-O9-3bb" secondAttribute="trailing" constant="8" id="SBi-Rb-BrU"/>
+                            <constraint firstItem="sZ1-aJ-q9h" firstAttribute="top" secondItem="1cm-aO-yOP" secondAttribute="bottom" id="Yvz-Ib-bhr"/>
+                            <constraint firstItem="sZ1-aJ-q9h" firstAttribute="width" secondItem="G3n-1F-mYE" secondAttribute="width" id="gmz-Fj-kL9"/>
                             <constraint firstItem="d38-Px-enX" firstAttribute="trailing" secondItem="97Y-tT-fg3" secondAttribute="trailingMargin" id="mWm-Pk-aY3"/>
                             <constraint firstItem="QKy-Pd-eeC" firstAttribute="top" secondItem="dqx-Gf-cqh" secondAttribute="bottom" id="oxM-zP-Kag"/>
+                            <constraint firstItem="sZ1-aJ-q9h" firstAttribute="centerY" secondItem="G3n-1F-mYE" secondAttribute="centerY" id="rOL-6T-Q3d"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="collectionView" destination="dqx-Gf-cqh" id="YLD-39-yrt"/>
                         <outlet property="collectionViewSwitch" destination="1dD-O9-3bb" id="yl2-NH-GCS"/>
                         <outlet property="moreButtonWidthConstraint" destination="Fxk-en-FyQ" id="XCo-oJ-DVV"/>
-                        <outlet property="radiusSlider" destination="G3n-1F-mYE" id="hIC-Kj-QFQ"/>
+                        <outlet property="slider" destination="G3n-1F-mYE" id="Tao-3a-Xwv"/>
+                        <outlet property="sliderGestureView" destination="sZ1-aJ-q9h" id="g5d-xF-07k"/>
                         <outlet property="sliderWidthConstraint" destination="T04-IC-WtR" id="EsN-Jp-nNm"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="d5h-Kd-HZB" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1160.625" y="1137.1478873239437"/>
+            <point key="canvasLocation" x="1160.625" y="1136.6197183098591"/>
         </scene>
     </scenes>
     <resources>

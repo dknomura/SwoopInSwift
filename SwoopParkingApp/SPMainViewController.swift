@@ -19,6 +19,7 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
     @IBOutlet weak var heightConstraintOfToolbar: NSLayoutConstraint!
     @IBOutlet weak var waitingLabel: UILabel!
     @IBOutlet weak var searchContainerView: UIView!
+    @IBOutlet weak var signCollectionContainerView: UIView!
     
     @IBOutlet weak var constraintOfToolbarToBottom: NSLayoutConstraint!
     @IBOutlet weak var greyOutMapView: UIView!
@@ -38,16 +39,13 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
     private var didGetLocations = false
     private var isSwitchOn = false
     fileprivate var shouldGetCurrentLocations: Bool {
-        return mapViewController.mapView.camera.zoom < mapViewController.zoomToSwitchOverlays
+        return mapViewController.mapView.camera.zoom < zoomToSwitchOverlays
     }
 
     var timeAndDayViewController: SPTimeAndDayViewController!
     var searchViewController: SPSearchResultsViewController!
     var mapViewController: SPMapViewController!
     var collectionViewToolbar: SignsCollectionViewController!
-    var allChildViewControllers: [UIViewController?] {
-        return [timeAndDayViewController, searchViewController, mapViewController, collectionViewToolbar]
-    }
     
     var heightOfTimeContainer: CGFloat { return CGFloat(70.0) }
 
@@ -91,6 +89,7 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
         let notificationCenter = NotificationCenter.default
         notificationCenter.addObserver(self, selector: #selector(keyboardDidHide), name: NSNotification.Name.UIKeyboardDidHide, object: nil)
         notificationCenter.addObserver(self, selector: #selector(keyboardDidShow), name: NSNotification.Name.UIKeyboardDidShow, object: nil)
+        notificationCenter.addObserver(self, selector: #selector(signsCollectionViewControllerDidToggleCollectionView(notification:)), name: collectionViewSwitchChangeNotification, object: nil)
     }
     @objc fileprivate func keyboardDidHide(notification: Notification) {
         isKeyboardPresent = false
@@ -138,16 +137,15 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
     
     
     @objc fileprivate func singleTapHandler(_ gesture: UITapGestureRecognizer) {
+        // When the marker is tapped an info view comes up, so that tap need to be ignored in this handler
         guard !mapViewController.cancelTapGesture else {
             mapViewController.cancelTapGesture = false
             return
         }
         
         if collectionViewToolbar.collectionViewSwitch.isOn {
-            collectionViewToolbar.collectionViewSwitch.setOn(false, animated: true)
-            collectionViewToolbar.adjustToToggleChange(isOn: false)
-            showHideTimeAndDayView(shouldShow: true)
-            showHideSearchBar(shouldShow: false, makeFirstResponder: false)
+            
+            return
         }
         
         if isSearchTableViewPresent {
@@ -157,19 +155,49 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
             view.endEditing(true)
             return
         }
-//        let tapLocation = gesture.location(in: mapViewController.mapView)
-//        if timeAndDayContainerView.frame.contains(tapLocation) || bottomToolbar.frame.contains(tapLocation) { return }
-        let signMarkerFrame = mapViewController.signMarker?.iconView?.frame,
-            searchMarkerFrame = mapViewController.searchMarker?.iconView?.frame,
-            infoWindowFrame = mapViewController.currentInfoWindow?.frame
-        let rects = [signMarkerFrame, searchMarkerFrame, infoWindowFrame]
-        for rect in rects {
-            if rect == nil { continue }
-            if rect!.contains(gesture.location(in: mapViewController.mapView)) { return }
+        
+        if shouldCancelTapOnMapViewIcons(gesture: gesture) {
+            return
         }
+        
         if mapViewController.areMarkersPresent {
             mapViewController.hideMarkers()
         }
+        adjustToolbarsToTap()
+    }
+    
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        if touch.view != nil {
+            let viewsToCancelTouch: [UIView?] = [mapViewController.zoomOutButton, mapViewController.myLocationButton, searchContainerView,  timeAndDayContainerView, mapViewController.currentInfoWindow, mapViewController.signMarker?.iconView, mapViewController.searchMarker?.iconView, signCollectionContainerView]
+            for untappableView in viewsToCancelTouch {
+                if untappableView == nil { continue }
+                if touch.view!.isDescendant(of: untappableView!) {
+                    return false
+                }
+            }
+        }
+        return true
+    }
+    
+    fileprivate func setCenter(toTapRecognizer tap: UIGestureRecognizer) {
+        let tapLocation = tap.location(in: mapViewController.mapView)
+        let coordinate = mapViewController.mapView.projection.coordinate(for: tapLocation)
+        mapViewController.mapView.animate(toLocation: coordinate)
+        searchViewController.searchBar.text = "(\(coordinate.longitude)), (\(coordinate.latitude))"
+    }
+    fileprivate func shouldCancelTapOnMapViewIcons(gesture: UIGestureRecognizer) -> Bool {
+        let signMarkerFrame = mapViewController.signMarker?.iconView?.frame,
+        searchMarkerFrame = mapViewController.searchMarker?.iconView?.frame,
+        infoWindowFrame = mapViewController.currentInfoWindow?.frame
+        let rects = [signMarkerFrame, searchMarkerFrame, infoWindowFrame]
+        for rect in rects {
+            if rect == nil { continue }
+            if rect!.contains(gesture.location(in: mapViewController.mapView)) { return true }
+        }
+        return false
+    }
+    
+    fileprivate func adjustToolbarsToTap(){
         if toolbarsPresent {
             if isSearchBarPresent {
                 searchViewController.hideSearchBar()
@@ -182,20 +210,6 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
             showHideToolbars(true)
         }
     }
-
-    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
-        if touch.view != nil {
-            let viewsToCancelTouch: [UIView?] = [mapViewController.zoomOutButton, mapViewController.myLocationButton, searchContainerView,  timeAndDayContainerView, mapViewController.currentInfoWindow, mapViewController.signMarker?.iconView, mapViewController.searchMarker?.iconView]
-            for untappableView in viewsToCancelTouch {
-                if untappableView == nil { continue }
-                if touch.view!.isDescendant(of: untappableView!) {
-                    return false
-                }
-            }
-        }
-        return true
-    }
-    
     //MARK: Other Views
     func setupViews() {
         showHideSearchBar(shouldShow: true, makeFirstResponder: false)
@@ -245,7 +259,7 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
             self.heightConstraintOfTimeAndDayContainer.constant = shouldShow ? self.heightOfTimeContainer : 0
             self.timeAndDayViewController.heightConstraintOfBorderView.constant = shouldShow ? self.timeAndDayViewController.borderViewHeight : 0
             self.heightConstraintOfToolbar.constant = shouldShow ? standardHeightOfToolOrSearchBar : 0
-            let sliderThumbCenter = self.timeAndDayViewController.centerOfSliderThumb
+            let sliderThumbCenter = self.timeAndDayViewController.centerOfSliderThumbLabel
             self.timeAndDayViewController.sliderThumbLabel.center = shouldShow ? CGPoint(x: sliderThumbCenter.x, y: sliderThumbCenter.y + 35) : CGPoint(x: sliderThumbCenter.x, y: sliderThumbCenter.y - 20)
             self.view.layoutIfNeeded()
         })
@@ -290,7 +304,7 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
         case .getAllLocationsWithUniqueCleaningSign, .getLocationsForTimeAndDay:
             mapViewController.getNewHeatMapOverlays()
             if queryType == .getLocationsForTimeAndDay {
-                timeAndDayViewController.setNewImage()
+                timeAndDayViewController.setNewSliderThumbImage()
             }
             hideWaitingView()
         }
@@ -309,30 +323,44 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
     }
     
     //MARK: -----Search container controller delegate
-    func searchContainer(toPerformDelegateAction delegateAction: SPNetworkingDelegateAction, withInfo: String) {
+    func searchContainer(toPerformDelegateAction delegateAction: SPNetworkingDelegateAction, withInfo: String?) {
         if delegateAction == .presentCoordinate {
-            zoomAndSetMapMarker()
+            if withInfo == nil {
+                moveMapViewTargetToSearchCoordinate()
+            } else {
+                zoomAndSetMapMarker()
+            }
         }
-    }
-    
-    //TODO: Call method to show collection view in bottom toolbar
-    func zoomAndSetMapMarker() {
-        if dao.googleSearchObject.coordinate == nil { return }
-        mapViewController.zoomMap(toCoordinate: dao.googleSearchObject.coordinate!, zoom: mapViewController.zoomToSwitchOverlays)
-        if dao.googleSearchObject.info == nil { return }
-        mapViewController.setSearchMarker(withUserData: dao.googleSearchObject.info!, atCoordinate: dao.googleSearchObject.coordinate!)
     }
     func searchContainerHeightShouldAdjust(_ height: CGFloat, tableViewPresent: Bool, searchBarPresent: Bool) -> Bool {
         UIView.animate(withDuration: standardAnimationDuration, animations: {
             self.heightConstraintOfSearchContainer.constant = height
             self.view.layoutIfNeeded()
-        }) 
+        })
         self.isSearchTableViewPresent = tableViewPresent
         self.isSearchBarPresent = searchBarPresent
         if self.isSearchTableViewPresent {
-            showHideToolbars(false)
+            if collectionViewToolbar.collectionViewSwitch.isOn {
+                showHideTimeAndDayView(shouldShow: false)
+            } else {
+                showHideToolbars(false)
+            }
         }
         return true
+    }
+    
+    fileprivate func moveMapViewTargetToSearchCoordinate() {
+        if let coordinate = dao.searchCoordinate {
+            mapViewController.mapView.animate(toLocation: coordinate)
+            
+        }
+    }
+
+    fileprivate func zoomAndSetMapMarker() {
+        if dao.googleSearchObject.coordinate == nil { return }
+        mapViewController.zoomMap(toCoordinate: dao.googleSearchObject.coordinate!, zoom: zoomToSwitchOverlays)
+        if dao.googleSearchObject.info == nil { return }
+        mapViewController.setSearchMarker(withUserData: dao.googleSearchObject.info!, atCoordinate: dao.googleSearchObject.coordinate!)
     }
 
     //MARK: --- Map Container Controller delegate
@@ -340,6 +368,7 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
         hideWaitingView()
     }
     func mapViewControllerIsZooming() {
+        collectionViewToolbar.adjustSliderToZoomChange()
         clearScreenForMapZoom()
     }
     func mapViewControllerShouldSearchStreetCleaning(_ mapView: GMSMapView) -> Bool {
@@ -352,6 +381,7 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
         activityIndicator.startAnimating()
         dao.getStreetCleaningLocationsForPrimaryTimeAndDay()
     }
+        
     //MARK: - UIStateRestoring Protocol
     override func encodeRestorableState(with coder: NSCoder) {
         coder.encode(mapViewController.mapView.camera.zoom, forKey: SPRestoreCoderKeys.zoom)
@@ -390,25 +420,36 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
     
     //MARK: - Signs View Controller delegate
     
-    func signsCollectionViewControllerDidToggleCollectionView(on switchIsOn: Bool) {
+    
+    func signsCollectionViewControllerDidToggleCollectionView(notification: Notification) {
+        guard let isOn = notification.userInfo?[collectionViewSwitchKey] as? Bool else { return }
+        isSwitchOn = isOn
         let maxHeight = view.frame.height - timeAndDayContainerView.frame.maxY
-        let toolbarHeight = switchIsOn ? maxHeight : standardHeightOfToolOrSearchBar
-        showHideTimeAndDayView(shouldShow: !switchIsOn)
+        let toolbarHeight = isSwitchOn ? maxHeight : standardHeightOfToolOrSearchBar
+        showHideTimeAndDayView(shouldShow: !isSwitchOn)
 
-        guard switchIsOn else {
-            UIView.animate(withDuration: standardAnimationDuration, animations: { 
-                self.heightConstraintOfToolbar.constant = toolbarHeight
-                self.view.layoutIfNeeded()
-            })
-            searchViewController.searchBar.resignFirstResponder()
+        guard isSwitchOn else {
+            showHideSearchBar(shouldShow: false, makeFirstResponder: false)
             return
         }
         if let coordinate = dao.searchCoordinate {
-            
+            UIView.animate(withDuration: standardAnimationDuration, animations: {
+                self.heightConstraintOfToolbar.constant = toolbarHeight
+                self.view.layoutIfNeeded()
+            })
+            //TODO: todo1 Get locationCounts from db and set up collection view
         } else {
-            showHideSearchBar(shouldShow: switchIsOn, makeFirstResponder: true)
-            
+            showHideSearchBar(shouldShow: isSwitchOn, makeFirstResponder: true)
         }
+    }
+    
+    func signsCollectionViewControllerNeedsMapZoom(switchIsOn: Bool) -> Float? {
+        return switchIsOn ? mapViewController.mapView.camera.zoom : nil
+    }
+    func signsCollectionViewControllerDidChangeRadius(radius: Double) {
+        let zoom = radius.toZoomFromWidthInMeters(forView: mapViewController.mapView)
+        mapViewController.mapView.animate(toZoom: zoom)
+        mapViewController.isZoomingIn = true
     }
     
     //MARK: - Injectable protocol

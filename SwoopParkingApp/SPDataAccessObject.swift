@@ -43,6 +43,8 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
     func getStreetCleaningLocationsForPrimaryTimeAndDay() {
         sqlReader.queryStreetCleaningLocations(forTimeAndDay: primaryTimeAndDay)
     }
+    
+    func getNumberOfStreetCleaningLocations
         
     func getSigns(forCurrentMapView mapView:GMSMapView) {
         let visibleRegionBounds = GMSCoordinateBounds.init(region: mapView.projection.visibleRegion())
@@ -107,11 +109,13 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
             setAddressResultsForTableView(fromResponse: response)
         case .presentCoordinate:
             googleSearchObject.coordinate = response.googleAPIResponse?.placeIDCoordinate
+            searchCoordinate = response.googleAPIResponse?.placeIDCoordinate
             googleSearchObject.info = response.googleAPIResponse?.formattedAddress
             delegate?.dataAccessObject(self, didSetGoogleSearchObject: googleSearchObject)
         case .presentAddress:
             if response.googleAPIResponse?.addressResults?.count == 1 {
                 googleSearchObject.coordinate = response.googleAPIResponse?.addressResults?[0].coordinate
+                searchCoordinate = googleSearchObject.coordinate
                 googleSearchObject.info = response.googleAPIResponse?.addressResults?[0].address
                 delegate?.dataAccessObject(self, didSetGoogleSearchObject: googleSearchObject)
             } else {

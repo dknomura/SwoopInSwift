@@ -39,7 +39,11 @@
 		9C4503081DD936D60047B708 /* MoreViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C4503071DD936D60047B708 /* MoreViewController.swift */; };
 		9C45030B1DDA1AE70047B708 /* ViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C45030A1DDA1AE70047B708 /* ViewExtensions.swift */; };
 		9C45031E1DDA3FAC0047B708 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C45031D1DDA3FAC0047B708 /* WebViewController.swift */; };
+		9C4AAAA81E495BEF00A77C15 /* SPNumericalConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C4AAAA71E495BEF00A77C15 /* SPNumericalConstants.swift */; };
+		9C4AAAAA1E49619F00A77C15 /* DoubleExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C4AAAA91E49619F00A77C15 /* DoubleExtension.swift */; };
+		9C4AAAAC1E496ADD00A77C15 /* UIImageExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C4AAAAB1E496ADD00A77C15 /* UIImageExtension.swift */; };
 		9C4DCF531D6E01F30060EEBF /* SPSignAndLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C4DCF521D6E01F30060EEBF /* SPSignAndLocation.swift */; };
+		9C4E2BED1E48EFB000C4982E /* ViewControllerWithSliderGestures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C4E2BEC1E48EFAF00C4982E /* ViewControllerWithSliderGestures.swift */; };
 		9C5279C81CEB62B900AF88FF /* SPQuickGCD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C5279C71CEB62B900AF88FF /* SPQuickGCD.swift */; };
 		9C617EF51D51BF5100FFA51A /* SPTileLayerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C617EF41D51BF5100FFA51A /* SPTileLayerManager.swift */; };
 		9C61F0B11D7496DC00BA524C /* SPGoogleNetworking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C61F0B01D7496DB00BA524C /* SPGoogleNetworking.swift */; };
@@ -67,7 +71,7 @@
 		9CFEE3841CDA6D7A00CE5D53 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9CFEE3821CDA6D7A00CE5D53 /* LaunchScreen.storyboard */; };
 		9CFEE38F1CDA6D7A00CE5D53 /* SwoopParkingAppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CFEE38E1CDA6D7A00CE5D53 /* SwoopParkingAppTests.swift */; };
 		9CFEE39A1CDA6D7A00CE5D53 /* SwoopParkingAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CFEE3991CDA6D7A00CE5D53 /* SwoopParkingAppUITests.swift */; };
-		9CFEE3A81CDA6E6600CE5D53 /* SPConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CFEE3A71CDA6E6600CE5D53 /* SPConstants.swift */; };
+		9CFEE3A81CDA6E6600CE5D53 /* SPStringConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CFEE3A71CDA6E6600CE5D53 /* SPStringConstants.swift */; };
 		9CFEE3E91CDC140E00CE5D53 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9CFEE3E81CDC140E00CE5D53 /* CoreLocation.framework */; };
 		9CFF46E71D501FBE00504407 /* SPPolylineManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CFF46E61D501FBE00504407 /* SPPolylineManager.swift */; };
 /* End PBXBuildFile section */
@@ -148,7 +152,11 @@
 		9C4503071DD936D60047B708 /* MoreViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MoreViewController.swift; sourceTree = "<group>"; };
 		9C45030A1DDA1AE70047B708 /* ViewExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewExtensions.swift; sourceTree = "<group>"; };
 		9C45031D1DDA3FAC0047B708 /* WebViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
+		9C4AAAA71E495BEF00A77C15 /* SPNumericalConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPNumericalConstants.swift; sourceTree = "<group>"; };
+		9C4AAAA91E49619F00A77C15 /* DoubleExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DoubleExtension.swift; sourceTree = "<group>"; };
+		9C4AAAAB1E496ADD00A77C15 /* UIImageExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIImageExtension.swift; sourceTree = "<group>"; };
 		9C4DCF521D6E01F30060EEBF /* SPSignAndLocation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPSignAndLocation.swift; sourceTree = "<group>"; };
+		9C4E2BEC1E48EFAF00C4982E /* ViewControllerWithSliderGestures.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewControllerWithSliderGestures.swift; sourceTree = "<group>"; };
 		9C5279C71CEB62B900AF88FF /* SPQuickGCD.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPQuickGCD.swift; sourceTree = "<group>"; };
 		9C617EF41D51BF5100FFA51A /* SPTileLayerManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPTileLayerManager.swift; sourceTree = "<group>"; };
 		9C61F0B01D7496DB00BA524C /* SPGoogleNetworking.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPGoogleNetworking.swift; sourceTree = "<group>"; };
@@ -189,7 +197,7 @@
 		9CFEE3951CDA6D7A00CE5D53 /* SwoopParkingAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwoopParkingAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9CFEE3991CDA6D7A00CE5D53 /* SwoopParkingAppUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwoopParkingAppUITests.swift; sourceTree = "<group>"; };
 		9CFEE39B1CDA6D7A00CE5D53 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		9CFEE3A71CDA6E6600CE5D53 /* SPConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPConstants.swift; sourceTree = "<group>"; };
+		9CFEE3A71CDA6E6600CE5D53 /* SPStringConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPStringConstants.swift; sourceTree = "<group>"; };
 		9CFEE3E81CDC140E00CE5D53 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		9CFF46E61D501FBE00504407 /* SPPolylineManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPPolylineManager.swift; sourceTree = "<group>"; };
 		9FB96FFC95D26B9CFD94AF39 /* Pods_SwoopParkingAppTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SwoopParkingAppTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -391,6 +399,17 @@
 			name = ParkingGuidelines;
 			sourceTree = "<group>";
 		};
+		9C4E2BE81E46CD8700C4982E /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				9CA1E3351E41ACBD001106F9 /* MapViewExtensions.swift */,
+				9C4E2BEC1E48EFAF00C4982E /* ViewControllerWithSliderGestures.swift */,
+				9C4AAAA91E49619F00A77C15 /* DoubleExtension.swift */,
+				9C4AAAAB1E496ADD00A77C15 /* UIImageExtension.swift */,
+			);
+			name = Extensions;
+			sourceTree = "<group>";
+		};
 		9C61F0AF1D7496C100BA524C /* Networking */ = {
 			isa = PBXGroup;
 			children = (
@@ -433,9 +452,10 @@
 		9CF750811D354F4F00000823 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
-				9CFEE3A71CDA6E6600CE5D53 /* SPConstants.swift */,
+				9CFEE3A71CDA6E6600CE5D53 /* SPStringConstants.swift */,
+				9C4AAAA71E495BEF00A77C15 /* SPNumericalConstants.swift */,
 				9C5279C71CEB62B900AF88FF /* SPQuickGCD.swift */,
-				9CA1E3351E41ACBD001106F9 /* MapViewExtensions.swift */,
+				9C4E2BE81E46CD8700C4982E /* Extensions */,
 			);
 			name = Utils;
 			sourceTree = "<group>";
@@ -811,9 +831,12 @@
 				9C96EE901D625EC4007C4EC8 /* SPViewControllerExtension.swift in Sources */,
 				9C1CA5A11DA8130D00EB875F /* SPSignInfoOverlay.swift in Sources */,
 				9C1CA5A31DA83FB800EB875F /* SPGoogleNetworkingObject.swift in Sources */,
+				9C4AAAAA1E49619F00A77C15 /* DoubleExtension.swift in Sources */,
 				9CA7DDC51D590BEF0050B75D /* SPGroundOverlayManager.swift in Sources */,
 				9C45030B1DDA1AE70047B708 /* ViewExtensions.swift in Sources */,
+				9C4AAAAC1E496ADD00A77C15 /* UIImageExtension.swift in Sources */,
 				9C04E2821D948C520012EAE0 /* FMDatabaseAdditions.m in Sources */,
+				9C4AAAA81E495BEF00A77C15 /* SPNumericalConstants.swift in Sources */,
 				9CA7DDC11D57EAB50050B75D /* LFHeatMap-dummy.m in Sources */,
 				9CFEE37A1CDA6D7900CE5D53 /* AppDelegate.swift in Sources */,
 				9C61F0B11D7496DC00BA524C /* SPGoogleNetworking.swift in Sources */,
@@ -824,9 +847,10 @@
 				9C1A86C71DA5517E00DAD930 /* SPMainViewController.swift in Sources */,
 				9CFF46E71D501FBE00504407 /* SPPolylineManager.swift in Sources */,
 				9CC46A131D2EAFE500AC0717 /* SPLambdaManager.swift in Sources */,
-				9CFEE3A81CDA6E6600CE5D53 /* SPConstants.swift in Sources */,
+				9CFEE3A81CDA6E6600CE5D53 /* SPStringConstants.swift in Sources */,
 				9C04E2841D948C520012EAE0 /* FMDatabaseQueue.m in Sources */,
 				9C617EF51D51BF5100FFA51A /* SPTileLayerManager.swift in Sources */,
+				9C4E2BED1E48EFB000C4982E /* ViewControllerWithSliderGestures.swift in Sources */,
 				9C04E2851D948C520012EAE0 /* FMResultSet.m in Sources */,
 				9C4503081DD936D60047B708 /* MoreViewController.swift in Sources */,
 				9CBBB4681D5CD19D00AE1511 /* SPTimeAndDay.swift in Sources */,

@@ -9,7 +9,6 @@
 import UIKit
 import GoogleMaps
 
-private var kvoSelectedMarkerKeyPath = "selectedMarker"
 class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDelegate, UIGestureRecognizerDelegate, InjectableViewController {
     
     weak var delegate: SPMapViewControllerDelegate?
@@ -29,8 +28,8 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     var isZoomingIn = false
     var cancelTapGesture = false
     
-    var zoomToSwitchOverlays: Float { return streetZoom - 2.5 }
-    var streetZoom: Float { return 16 }
+    var isCollectionViewSwitchOn = false
+    
     var initialZoom: Float {
         return dao.currentCity.initialStreetCleaningZoom(forMapView: mapView)
     }
@@ -63,23 +62,27 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         super.didReceiveMemoryWarning()
     }
     
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        func defaultReturn() { super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context) }
-        guard keyPath != nil && change != nil else {
-            defaultReturn()
-            return
-        }
-        switch keyPath! {
-        case kvoSelectedMarkerKeyPath:
-            let newSelectedMarker = change![NSKeyValueChangeKey.newKey]
-            if !(newSelectedMarker is GMSMarker) && lastSelectedMarkerKVO is GMSMarker {
-                cancelTapGesture = true
-            }
-            lastSelectedMarkerKVO = newSelectedMarker as AnyObject?
-        default:
-            defaultReturn()
-        }
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        NotificationCenter.default.removeObserver(self)
     }
+//    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+//        func defaultReturn() { super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context) }
+//        guard keyPath != nil && change != nil else {
+//            defaultReturn()
+//            return
+//        }
+//        switch keyPath! {
+//        case kvoSelectedMarkerKeyPath:
+//            let newSelectedMarker = change![NSKeyValueChangeKey.newKey]
+//            if !(newSelectedMarker is GMSMarker) && lastSelectedMarkerKVO is GMSMarker {
+//                cancelTapGesture = true
+//            }
+//            lastSelectedMarkerKVO = newSelectedMarker as AnyObject?
+//        default:
+//            defaultReturn()
+//        }
+//    }
     
 
     //MARK: - Setup/breakdown methods
@@ -97,6 +100,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         let camera = GMSCameraPosition.camera(withTarget: mapView.projection.coordinate(for: pointOnMap), zoom: doubleTapZoom)
         isZoomingIn = true
         animateMap(toCameraPosition: camera, duration: 0.8)
+//        delegate?.mapViewControllerDidAdjustToDoubleTap()
     }
     @objc func zoomOutDoubleTouchTapOnMap(_ gesture:UITapGestureRecognizer) {
         zoomMap(toZoom: mapView.camera.zoom - 1.5)
@@ -124,8 +128,17 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     
     //MARK: --Observers
     fileprivate func setupObservers() {
-        mapView.addObserver(self, forKeyPath: kvoSelectedMarkerKeyPath, options: .new, context: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(signsCollectionViewControllerDidToggleCollectionView(notification:)), name: collectionViewSwitchChangeNotification, object: nil)
     }
+    
+    
+    //MARK: Notification methods
+    func signsCollectionViewControllerDidToggleCollectionView(notification: Notification) {
+        if let isOn = notification.userInfo?[collectionViewSwitchKey] as? Bool {
+            isCollectionViewSwitchOn = isOn
+        }
+    }
+
     
     //MARK: --Views
     fileprivate func setUpMap() {
@@ -142,7 +155,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     }
     
     fileprivate func setUpButtons() {
-        zoomOutButton.setTitle("Zoom Out", for: UIControlState())
+        zoomOutButton.setTitle("Zoom to", for: UIControlState())
         zoomOutButton.titleLabel?.font = UIFont(name: "Christopherhand", size: 25)
         let buttonSize = zoomOutButton.intrinsicContentSize
         zoomOutButton.frame = CGRect(x:8, y:8, width: buttonSize.width, height: buttonSize.height)
@@ -168,20 +181,23 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     //MARK: - Button Methods
     //MARK: -- Other buttons
     @objc fileprivate func zoomOut(_ sender:UIButton) {
-        zoomMap(toCamera: initialMapViewCamera)
+        mapView.animate(to: initialMapViewCamera)
     }
     @objc fileprivate func moveCameraToUserLocation() {
+        goToUserLocation()
+    }
+    fileprivate func goToUserLocation() {
         if UserDefaults.standard.bool(forKey: kSPDidAllowLocationServices) {
             if let currentCoordinate = dao.currentLocation?.coordinate {
-                let zoomTo = mapView.camera.zoom <= zoomToSwitchOverlays ? zoomToSwitchOverlays : streetZoom
+                let zoomTo = isCollectionViewSwitchOn ? zoomToSwitchOverlays : streetZoom
                 let camera = GMSCameraPosition.camera(withTarget: currentCoordinate, zoom: zoomTo)
                 animateMap(toCameraPosition: camera, duration: 0.6)
             }
         } else {
             dao.locationManager.requestWhenInUseAuthorization()
         }
+
     }
-    
     
     //MARK: - Animations
     // MARK: --Map animation methods
@@ -209,7 +225,9 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
                 getNewHeatMapOverlays()
             }
         }
-        if mapView.camera.zoom > initialZoom || !mapView.isIn(city: dao.currentCity) {
+        if mapView.camera.zoom > initialZoom ||
+            mapView.camera.zoom < initialZoom - 1 ||
+            !mapView.isIn(city: dao.currentCity) {
             zoomOutButton.isHidden = false
         } else {
             zoomOutButton.isHidden = true

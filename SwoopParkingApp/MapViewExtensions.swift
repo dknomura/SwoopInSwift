@@ -14,7 +14,10 @@ extension GMSMapView {
     
     func isIn(city:SPCity) -> Bool {
         let region = GMSCoordinateBounds.init(region: self.projection.visibleRegion())
-        if region.northEast.isCoordinateWithinRegion(NECoordinate: city.maxCoordinate, SWCoordinate: city.minCoordinate) || region.southWest.isCoordinateWithinRegion(NECoordinate: city.maxCoordinate, SWCoordinate: city.minCoordinate) || city.maxCoordinate.isCoordinateWithinRegion(NECoordinate: region.northEast, SWCoordinate: region.southWest) || city.minCoordinate.isCoordinateWithinRegion(NECoordinate: region.northEast, SWCoordinate: region.southWest){
+        if region.northEast.isIn(city: city) ||
+            region.southWest.isIn(city: city) ||
+            city.coordinateNE.isCoordinateWithinRegion(NECoordinate: region.northEast, SWCoordinate: region.southWest) ||
+            city.coordinateSW.isCoordinateWithinRegion(NECoordinate: region.northEast, SWCoordinate: region.southWest){
            return true
         } else {
             return false
@@ -30,5 +33,7 @@ extension CLLocationCoordinate2D {
             else { return false }
         } else { return false }
     }
-
+    func isIn(city:SPCity) -> Bool {
+        return isCoordinateWithinRegion(NECoordinate: city.coordinateNE, SWCoordinate: city.coordinateSW)
+    }
 }
