@@ -130,32 +130,33 @@ class SignsCollectionViewController: UIViewController, UICollectionViewDelegate,
                 header.headerButton.titleLabel?.font = UIFont(name: "Christopherhand", size: 25)
                 header.headerButton.titleLabel?.textColor = UIColor.white
                 header.tag = indexPath.section
+                print("Header: \(day.stringValue(forFormat: .abbrDay)). Tag/Section: \(indexPath.section))")
                 return header
             }
         }
         return collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: signCollectionHeaderReuse, for: indexPath)
     }
     
+    fileprivate func indexPaths(forSection section: Int) -> [IndexPath]? {
+        guard let day = DNDay(rawValue: section + 1),
+            let locationCountsForTime = dao.locationCountsForTimeAndDay[day]  else { return nil }
+        var indexPaths = [IndexPath]()
+        for i in 0..<locationCountsForTime.count {
+            indexPaths.append(IndexPath(row: i, section: section))
+        }
+        return indexPaths
+    }
     @objc func sectionButtonTouchedUpInside(sender: UIButton) {
         let section = sender.tag
         guard let day = DNDay(rawValue: section + 1) else { return }
         if !collapsedSections.contains(section) {
-            var indexPaths = [IndexPath]()
-
-            guard let locationCountsForTime = dao.locationCountsForTimeAndDay[day] else { return }
-            for i in 0..<locationCountsForTime.count {
-                indexPaths.append(IndexPath(row: i, section: section))
-            }
-            
+            guard let indexPathsToDelete = indexPaths(forSection: section) else { return }
             collectionView.performBatchUpdates({ _ in
-                self.collectionView.deleteItems(at: indexPaths)
-            }, completion: nil )
-            
+                self.collectionView.deleteItems(at: indexPathsToDelete)
+            }, completion: nil)
             collapsedSections.insert(section)
         } else {
-            if dao.locationCountsForTimeAndDay[day] == nil {
-                
-            }
+            dao.setCountOfStreetCleaningTimes(forDay: day, at: dao.searchCoordinate!, radius: currentRadius)
             collapsedSections.remove(section)
         }
         sender.backgroundColor = collapsedSections.contains(section) ? UIColor.lightGray : UIColor.darkGray

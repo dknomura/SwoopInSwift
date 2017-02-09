@@ -22,10 +22,10 @@ struct SPSQLiteReader {
         self.delegate = delegate
     }
     var databasePath : String {
-        return Bundle.main.path(forResource: "swoop-sqlite-no-FTS", ofType: "db")!
+        return Bundle.main.path(forResource: "swoop-sqlite-with-tag-table", ofType: "db")!
     }
     func querySignsAndLocations(swCoordinate:CLLocationCoordinate2D, neCoordinate: CLLocationCoordinate2D) {
-        let query = "SELECT location_number, side_of_street, sign_content_tag, from_latitude, from_longitude, to_latitude, to_longitude, sign_content, direction_of_arrow, position_in_feet FROM locations l JOIN signs s ON l.id = s.location_id WHERE (from_latitude BETWEEN ? AND ? AND from_longitude BETWEEN ? AND ?) OR (to_latitude BETWEEN ? AND ? AND to_longitude BETWEEN ? AND ?);"
+        let query = "SELECT location_number, side_of_street, from_latitude, from_longitude, to_latitude, to_longitude, sign_content, direction_of_arrow, position_in_feet FROM locations l JOIN signs s ON l.id = s.location_id WHERE (from_latitude BETWEEN ? AND ? AND from_longitude BETWEEN ? AND ?) OR (to_latitude BETWEEN ? AND ? AND to_longitude BETWEEN ? AND ?);"
         let values = [NSNumber(value: swCoordinate.latitude as Double),
                       NSNumber(value: neCoordinate.latitude as Double),
                       NSNumber(value: swCoordinate.longitude as Double),
@@ -38,7 +38,7 @@ struct SPSQLiteReader {
     }
     
     func queryStreetCleaningLocations(forTimeAndDay timeAndDay: DNTimeAndDay) {
-        let query = "SELECT location_number, sign_content_tag, from_latitude, from_longitude FROM locations WHERE sign_content_tag LIKE '%\(timeAndDay.stringForSQLTagQuery)%'"
+        let query = "SELECT location_number, tag, from_latitude, from_longitude FROM locations l JOIN location_tags t on l.id = t.location_id WHERE tag = '\(timeAndDay.stringForSQLTagQuery)'"
         callSQL(query: query, withValues: [], responseObject: SPSQLResponse.init(queryType: .getLocationsForTimeAndDay))
     }
     
@@ -50,13 +50,13 @@ struct SPSQLiteReader {
 //        callSQL(query: query, withValues: [], responseObject: response)
 //    }
     
-    func queryLocationCount(forTimeAndDay timeAndDay: DNTimeAndDay, swCoordinate: CLLocationCoordinate2D, neCoordinate: CLLocationCoordinate2D) {
-        let query = "SELECT sign_content_tag, COUNT(*) FROM locations WHERE (from_latitude BETWEEN ? AND ? AND from_longitude BETWEEN ? AND ?) AND sign_content_tag like '%\(timeAndDay.stringForSQLTagQuery)%'"
+    func queryLocationCounts(forDay day: DNDay, swCoordinate: CLLocationCoordinate2D, neCoordinate: CLLocationCoordinate2D) {
+        let query = "SELECT tag, COUNT(*) FROM locations l JOIN location_tags t on l.id = t.location_id WHERE (from_latitude BETWEEN ? AND ? AND from_longitude BETWEEN ? AND ?) AND tag like '%\(day.stringValue(forFormat: .abbrDay))' GROUP BY tag"
         let values = [NSNumber(value: swCoordinate.latitude as Double),
                       NSNumber(value: neCoordinate.latitude as Double),
                       NSNumber(value: swCoordinate.longitude as Double),
                       NSNumber(value: neCoordinate.longitude as Double)]
-        callSQL(query: query, withValues: values, responseObject: SPSQLResponse(queryType: .getLocationCountsForRadius, timeAndDayParameter: timeAndDay))
+        callSQL(query: query, withValues: values, responseObject: SPSQLResponse(queryType: .getLocationCountsForRadius))
     }
     
     //Call with initialized response object so that 

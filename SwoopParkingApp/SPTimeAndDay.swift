@@ -33,6 +33,16 @@ extension DNDay {
             return (DNTime.init(rawValue: earliestCleaningHour)!, DNTime.init(rawValue: latestCleaningHour)!)
         }
     }
+    func allStreetCleaningTime(forCity city: SPCity, day: DNDay) -> [DNTimeAndDay] {
+        var timeAndDays = [DNTimeAndDay]()
+        let earliestLatestTime = earliestAndLatestCleaningTime(forCity: city)
+        var earliestTime = earliestLatestTime.earliest
+        while earliestTime != earliestLatestTime.latest {
+            timeAndDays.append(DNTimeAndDay.init(day: day, time: earliestTime))
+            earliestTime.increase(by: 30)
+        }
+        return timeAndDays
+    }
 }
 
 extension DNTimeAndDay {
@@ -96,19 +106,7 @@ extension DNTimeAndDay {
         return returnTuple
     }
     var stringForSQLTagQuery: String {
-        var tagForTimeAndDay = "\(stringTupleForSQLQuery.time)\(stringTupleForSQLQuery.day)"
-        // This is to determine the difference between 2/2:30 and 12/12:30. Will be fixed once new database structure is implemented
-        if self.time.hour == 14 {
-            let dayString = self.day.stringValue(forFormat: DNTimeAndDayFormat.abbrDay).uppercased()
-            var notLike = ""
-            if self.time.min == 0 {
-                notLike = "'%12PM\(dayString)"
-            }else if self.time.hour == 14 && self.time.min == 30 {
-                notLike = "'%12:30PM\(dayString)"
-            }
-            tagForTimeAndDay += "%' AND sign_content_tag NOT LIKE \(notLike)"
-        }
-        return tagForTimeAndDay
+        return "\(stringTupleForSQLQuery.time)\(stringTupleForSQLQuery.day)"
     }
     
     static func allStreetLocationTimeAndDays(forCity city:SPCity) -> [DNTimeAndDay] {

@@ -299,12 +299,7 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
             timeAndDayViewController.setNewSliderThumbImage()
             hideWaitingView()
         case .getLocationCountsForRadius:
-            //TODO: Refactor me please
-            dao.numberOfCounts += 1
-            if dao.expectedNumberOfCounts == dao.numberOfCounts {
-                print("Got all of the counts. Took \(dao.date.timeIntervalSinceNow)")
-                signsCollectionViewController.collectionView.reloadData()
-            }
+            signsCollectionViewController.collectionView.reloadData()
         default: break
         }
     }
@@ -378,13 +373,13 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
     
     func mapViewControllerShouldSearchStreetCleaning(_ mapView: GMSMapView) -> Bool {
         showWaitingView(withLabel: waitingText, isStreetView: false)
-        dao.getSigns(forCurrentMapView: mapView)
+        dao.setSigns(forCurrentMapView: mapView)
         return shouldGetCurrentLocations
     }
     
     func mapViewControllerShouldSearchLocationsForTimeAndDay() {
         activityIndicator.startAnimating()
-        dao.getStreetCleaningLocationsForPrimaryTimeAndDay()
+        dao.setStreetCleaningLocationsForPrimaryTimeAndDay()
     }
     
     //MARK: - Signs View Controller delegate
@@ -431,6 +426,7 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
     
     //MARK: - UIStateRestoring Protocol
     override func encodeRestorableState(with coder: NSCoder) {
+        super.encodeRestorableState(with: coder)
         coder.encode(mapViewController.mapView.camera.zoom, forKey: SPRestoreCoderKeys.zoom)
         let centerCoordinates = mapViewController.mapView.camera.target
         coder.encode(centerCoordinates.latitude, forKey: SPRestoreCoderKeys.centerLat)
@@ -440,10 +436,10 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
         coder.encodeCInt(Int32(dao.primaryTimeAndDay.time.hour), forKey: SPRestoreCoderKeys.hour)
         coder.encodeCInt(Int32(dao.primaryTimeAndDay.time.min), forKey: SPRestoreCoderKeys.min)
         coder.encode(isSwitchOn, forKey: SPRestoreCoderKeys.isSwitchOn)
-        super.encodeRestorableState(with: coder)
     }
     
     override func decodeRestorableState(with coder: NSCoder) {
+        super.decodeRestorableState(with: coder)
         let zoom = coder.decodeFloat(forKey: SPRestoreCoderKeys.zoom),
         centerLat = coder.decodeDouble(forKey: SPRestoreCoderKeys.centerLat),
         centerLong = coder.decodeDouble(forKey: SPRestoreCoderKeys.centerLong)
@@ -456,14 +452,15 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
             dao.primaryTimeAndDay = restoredTimeAndDay
         }
         searchViewController.searchBar.text = coder.decodeObject(forKey: SPRestoreCoderKeys.searchText) as? String
-        signsCollectionViewController.adjustToToggleChange(isOn: coder.decodeBool(forKey: SPRestoreCoderKeys.isSwitchOn))
-        super.decodeRestorableState(with: coder)
+        
+        let isSwitchOn = coder.decodeBool(forKey: SPRestoreCoderKeys.isSwitchOn)
+        self.isSwitchOn = isSwitchOn
+        signsCollectionViewController.collectionViewSwitch.setOn(isSwitchOn, animated: true)
     }
     
     override func applicationFinishedRestoringState() {
         guard let _ = mapViewController.restoredCamera else { return }
         mapViewController.mapView.camera = mapViewController.restoredCamera!
-        dao.getStreetCleaningLocationsForPrimaryTimeAndDay()
         mapViewController.adjustViewsToZoom()
         timeAndDayViewController.adjustTimeSliderToDay()
         timeAndDayViewController.adjustSliderToTimeChange()

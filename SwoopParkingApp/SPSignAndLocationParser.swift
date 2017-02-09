@@ -32,28 +32,18 @@ struct SPParser {
             dao.allLocationsForDayValue[dao.primaryTimeAndDay.rawValue] = locationsWithTags(fromResults: results)
         case .getLocationsForCurrentMapView:
             dao.currentMapViewLocations = locationsWithSigns(fromResults: results)
-        case .getLocationCountsForRadius: break
+        case .getLocationCountsForRadius:
+            setLocationCountForTimeAndDay(fromResults: results)
         default: break
         }
     }
     
-    fileprivate func locationCountForTimeAndDay(fromResults results: FMResultSet, timeAndDayParameter: DNTimeAndDay) -> [DNDay: [DNTime: Int]]? {
-        var locationCountForTimeAndDay: [DNDay: [DNTime:Int]]?
+    fileprivate func setLocationCountForTimeAndDay(fromResults results: FMResultSet) {
         while results.next() {
-            guard let sqlTagString = results.string(forColumn: kSPSignContentTagSQL) else { return nil }
-            let tags = sqlTagString.components(separatedBy: " ")
-            for tag in tags{
-                guard let timeAndDay = DNTimeAndDay(sqlTag: tag) else { continue }
-                if timeAndDay == timeAndDayParameter {
-                    let count = results.int(forColumn: "count(*)")
-                    locationCountForTimeAndDay = [timeAndDay.day : [timeAndDay.time : Int(count)]]
-                    break
-                } else {
-                    continue
-                }
-            }
+            let count = results.int(forColumn: "count(*)")
+            guard let timeAndDay = DNTimeAndDay(sqlTag: results.string(forColumn: "tag")) else { continue }
+            dao.locationCountsForTimeAndDay[timeAndDay.day]?[timeAndDay.time] = Int(count)
         }
-        return locationCountForTimeAndDay
     }
     
     fileprivate func locationsForDayValue(fromResults results: FMResultSet) -> [Double: [SPLocation]] {
@@ -117,7 +107,7 @@ struct SPParser {
                 if location.locationNumber != nil {
                     returnLocations.append(location)
                 }
-                location = locationWithTags(fromResults: results, includeTag: true)
+                location = locationWithTags(fromResults: results, includeTag: false)
                 let toLat = results.double(forColumn: kSPToLatitudeSQL)
                 let toLong = results.double(forColumn: kSPToLongitudeSQL)
                 location.toCoordinate =  CLLocationCoordinate2D.init(latitude: toLat, longitude: toLong)
