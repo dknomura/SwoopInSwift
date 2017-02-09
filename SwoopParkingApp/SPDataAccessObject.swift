@@ -20,6 +20,10 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
     
     var locationsForDayAndTime = [SPLocation]()
     var currentMapViewLocations = [SPLocation]()
+    var locationCountsForTimeAndDay = [DNDay: [DNTime: Int]]()
+    var locationsCountsForDays = [DNDay: Int]()
+    var expectedNumberOfCounts = 0
+    var numberOfCounts = 0
     var currentLocation: CLLocation?
     let locationManager = CLLocationManager()
     var primaryTimeAndDay = DNTimeAndDay.currentTimeAndDay()
@@ -32,20 +36,21 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
     }
     var signForPathCoordinates = [String: SPSign]()
     var isFirstLocationAfterAuthorization = false
+    var date = Date()
     
     var currentCity: SPCity = .NYC
 
     // MARK: - SQLite methods
-    func getAllStreetCleaningLocations() {
-        sqlReader.queryAllStreetCleaningLocations()
-    }
-    
     func getStreetCleaningLocationsForPrimaryTimeAndDay() {
         sqlReader.queryStreetCleaningLocations(forTimeAndDay: primaryTimeAndDay)
     }
     
-    func getNumberOfStreetCleaningLocations
+    func getCountOfStreetCleaningLocationsForDay(at coordinate: CLLocationCoordinate2D, radius: Double) {
+        date = Date()
+        let corners = coordinate.swNECorners(withRadius: radius)
         
+    }
+    
     func getSigns(forCurrentMapView mapView:GMSMapView) {
         let visibleRegionBounds = GMSCoordinateBounds.init(region: mapView.projection.visibleRegion())
         sqlReader.querySignsAndLocations(swCoordinate: visibleRegionBounds.southWest, neCoordinate: visibleRegionBounds.northEast)
@@ -55,7 +60,8 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
     func sqlQueryDidFinish(withResponse response: SPSQLResponse) {
         var parser = SPParser()
         parser.inject(self)
-        parser.parseSQL(fromResults: response.results!, queryType: response.queryType)
+        guard response.results != nil else { return }
+        parser.parseSQL(fromResponse: response)
 //            locationCountForDayValue[response.timeAndDay!.rawValue] = Int(response.results!.intForColumn("count(*)"))
         DispatchQueue.main.async {
             self.delegate?.dataAccessObject(self, didSetLocationsForQueryType: response.queryType)

@@ -17,18 +17,34 @@ class SPSearchResultsViewController: UIViewController, UITableViewDelegate, UITa
     fileprivate var dao: SPDataAccessObject!
     weak var delegate: SPSearchResultsViewControllerDelegate?
     var isSwitchOn = false
+    var isInCity: Bool {
+        if let isInCity = dao.currentLocation?.coordinate.isIn(city: dao.currentCity) {
+            return isInCity
+        } else {
+            return false
+        }
+    }
     
     var cellReuseIdentifier:String { return "searchResultsCellIdentifier" }
-    var standardHeightOfToolOrSearchBar: CGFloat { return CGFloat(44.0) }
     var numberOfRows: Int {
-        return dao.currentLocation == nil ? dao.addressResults.count : dao.addressResults.count + 1
+        if dao.currentLocation == nil {
+            return dao.addressResults.count
+        } else {
+            if !isInCity {
+                return dao.addressResults.count
+            } else {
+                return dao.addressResults.count + 1
+            }
+        }
     }
+    var isMyLocationPresent: Bool { return dao.currentLocation != nil && isInCity }
     
     //MARK: - View life cycle methods
     override func viewDidLoad() {
         super.viewDidLoad()
         searchResultsTableView.register(UITableViewCell.self, forCellReuseIdentifier: cellReuseIdentifier)
         searchResultsTableView.isUserInteractionEnabled = true
+        NotificationCenter.default.addObserver(self, selector: #selector(collectionViewSwitchChanged), name: collectionViewSwitchChangeNotification, object: nil)
         assertDependencies()
     }
     
@@ -48,7 +64,7 @@ class SPSearchResultsViewController: UIViewController, UITableViewDelegate, UITa
             googleNetworking.delegate = dao
             googleNetworking.autocomplete(searchBar.text!)
         } else if searchBar.text?.characters.count == 0 {
-            hideSearchResultsTableView()
+            searchResultsTableView.reloadData()
         }
     }
  
@@ -70,23 +86,22 @@ class SPSearchResultsViewController: UIViewController, UITableViewDelegate, UITa
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         var cell = tableView.dequeueReusableCell(withIdentifier: cellReuseIdentifier)
         if cell != nil { cell = UITableViewCell.init(style: .default, reuseIdentifier: cellReuseIdentifier) }
-        if indexPath.row == 0 && dao.currentLocation != nil {
+        if indexPath.row == 0 && isMyLocationPresent {
             cell?.textLabel?.text = "My Location"
         } else {
-            let row = dao.currentLocation != nil ? indexPath.row - 1 : indexPath.row
+            let row = isMyLocationPresent ? indexPath.row - 1 : indexPath.row
             cell?.textLabel?.text = dao.addressResults[row].address
         }
         cell?.isUserInteractionEnabled = true
         return cell!
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if indexPath.row == 0 && dao.currentLocation != nil {
+        if indexPath.row == 0 && isMyLocationPresent {
             dao.searchCoordinate = dao.currentLocation?.coordinate
-            searchBar.text = "(\(dao.searchCoordinate?.longitude)), (\(dao.searchCoordinate?.latitude))"
             delegate?.searchContainer(toPerformDelegateAction: .presentCoordinate, withInfo: nil)
             return
         }
-        let row = dao.currentLocation != nil ? indexPath.row - 1 : indexPath.row
+        let row = isMyLocationPresent ? indexPath.row - 1 : indexPath.row
 
         let addressResult = dao.addressResults[row]
         searchBar.text = addressResult.address
@@ -156,6 +171,14 @@ class SPSearchResultsViewController: UIViewController, UITableViewDelegate, UITa
     func assertDependencies() {
         assert(dao != nil)
     }
+    
+    //MARK: - fileprivate
+    @objc fileprivate func collectionViewSwitchChanged(notification: Notification) {
+        if let isSwitchOn = notification.userInfo?[collectionViewSwitchKey] as? Bool {
+            self.isSwitchOn = isSwitchOn
+        }
+    }
+
 
 }
 

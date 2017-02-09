@@ -64,6 +64,10 @@
 		9CC46A101D26C26500AC0717 /* AWSCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9CC46A0E1D26C26500AC0717 /* AWSCore.framework */; };
 		9CC46A111D26C26500AC0717 /* AWSLambda.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9CC46A0F1D26C26500AC0717 /* AWSLambda.framework */; };
 		9CC46A131D2EAFE500AC0717 /* SPLambdaManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CC46A121D2EAFE500AC0717 /* SPLambdaManager.swift */; };
+		9CC537A41E4B779F0051D490 /* SQLResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CC537A31E4B779F0051D490 /* SQLResponse.swift */; };
+		9CC537A61E4BD4C50051D490 /* SignsCollectionViewHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CC537A51E4BD4C50051D490 /* SignsCollectionViewHeader.swift */; };
+		9CC537A81E4BD5290051D490 /* SignsCollectionViewHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9CC537A71E4BD5290051D490 /* SignsCollectionViewHeader.xib */; };
+		9CC537AB1E4BF69A0051D490 /* CLLocationCoordinate2DExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CC537AA1E4BF69A0051D490 /* CLLocationCoordinate2DExtension.swift */; };
 		9CD51DC91CE24662006B741D /* SPSignAndLocationParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CD51DC81CE24662006B741D /* SPSignAndLocationParser.swift */; };
 		9CFEE37A1CDA6D7900CE5D53 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CFEE3791CDA6D7900CE5D53 /* AppDelegate.swift */; };
 		9CFEE37C1CDA6D7900CE5D53 /* SPMapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CFEE37B1CDA6D7900CE5D53 /* SPMapViewController.swift */; };
@@ -182,6 +186,10 @@
 		9CC46A0E1D26C26500AC0717 /* AWSCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AWSCore.framework; path = "Pods/../build/Debug-iphoneos/AWSCore/AWSCore.framework"; sourceTree = "<group>"; };
 		9CC46A0F1D26C26500AC0717 /* AWSLambda.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AWSLambda.framework; path = "Pods/../build/Debug-iphoneos/AWSLambda/AWSLambda.framework"; sourceTree = "<group>"; };
 		9CC46A121D2EAFE500AC0717 /* SPLambdaManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPLambdaManager.swift; sourceTree = "<group>"; };
+		9CC537A31E4B779F0051D490 /* SQLResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SQLResponse.swift; sourceTree = "<group>"; };
+		9CC537A51E4BD4C50051D490 /* SignsCollectionViewHeader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignsCollectionViewHeader.swift; sourceTree = "<group>"; };
+		9CC537A71E4BD5290051D490 /* SignsCollectionViewHeader.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SignsCollectionViewHeader.xib; sourceTree = "<group>"; };
+		9CC537AA1E4BF69A0051D490 /* CLLocationCoordinate2DExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CLLocationCoordinate2DExtension.swift; sourceTree = "<group>"; };
 		9CD51DC81CE24662006B741D /* SPSignAndLocationParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPSignAndLocationParser.swift; sourceTree = "<group>"; };
 		9CEC196E1D77EA37006AEAB0 /* KeyboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; };
 		9CEC19701D77EA37006AEAB0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -289,6 +297,7 @@
 			isa = PBXGroup;
 			children = (
 				9C42DAB21D5A589E004ECA97 /* SPDataAccessObject.swift */,
+				9CD51DC81CE24662006B741D /* SPSignAndLocationParser.swift */,
 				9C04E2721D9028680012EAE0 /* Local */,
 				9C61F0AF1D7496C100BA524C /* Networking */,
 			);
@@ -339,6 +348,8 @@
 				9CA7DDC41D590BEF0050B75D /* SPGroundOverlayManager.swift */,
 				9C1CA59E1DA8125B00EB875F /* SPSignInfoOverlay.xib */,
 				9C1CA5A01DA8130D00EB875F /* SPSignInfoOverlay.swift */,
+				9CC537A51E4BD4C50051D490 /* SignsCollectionViewHeader.swift */,
+				9CC537A71E4BD5290051D490 /* SignsCollectionViewHeader.xib */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -346,10 +357,10 @@
 		9C42DAB61D5A6A63004ECA97 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				9CD51DC81CE24662006B741D /* SPSignAndLocationParser.swift */,
 				9C4DCF521D6E01F30060EEBF /* SPSignAndLocation.swift */,
 				9CBBB4671D5CD19D00AE1511 /* SPTimeAndDay.swift */,
 				9C1CA5A21DA83FB800EB875F /* SPGoogleNetworkingObject.swift */,
+				9CC537A31E4B779F0051D490 /* SQLResponse.swift */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -404,6 +415,7 @@
 			children = (
 				9CA1E3351E41ACBD001106F9 /* MapViewExtensions.swift */,
 				9C4E2BEC1E48EFAF00C4982E /* ViewControllerWithSliderGestures.swift */,
+				9CC537AA1E4BF69A0051D490 /* CLLocationCoordinate2DExtension.swift */,
 				9C4AAAA91E49619F00A77C15 /* DoubleExtension.swift */,
 				9C4AAAAB1E496ADD00A77C15 /* UIImageExtension.swift */,
 			);
@@ -658,6 +670,7 @@
 				9CFEE3811CDA6D7A00CE5D53 /* Assets.xcassets in Resources */,
 				9C1A86C81DA586C900DAD930 /* Main.storyboard in Resources */,
 				9C1CA59F1DA8125B00EB875F /* SPSignInfoOverlay.xib in Resources */,
+				9CC537A81E4BD5290051D490 /* SignsCollectionViewHeader.xib in Resources */,
 				9C736D171E42E3390082B40B /* More.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -839,10 +852,13 @@
 				9C4AAAA81E495BEF00A77C15 /* SPNumericalConstants.swift in Sources */,
 				9CA7DDC11D57EAB50050B75D /* LFHeatMap-dummy.m in Sources */,
 				9CFEE37A1CDA6D7900CE5D53 /* AppDelegate.swift in Sources */,
+				9CC537A41E4B779F0051D490 /* SQLResponse.swift in Sources */,
 				9C61F0B11D7496DC00BA524C /* SPGoogleNetworking.swift in Sources */,
 				9C45031E1DDA3FAC0047B708 /* WebViewController.swift in Sources */,
+				9CC537A61E4BD4C50051D490 /* SignsCollectionViewHeader.swift in Sources */,
 				9CA1E3361E41ACBD001106F9 /* MapViewExtensions.swift in Sources */,
 				9CA7DDC21D57EAB50050B75D /* LFHeatMap.m in Sources */,
+				9CC537AB1E4BF69A0051D490 /* CLLocationCoordinate2DExtension.swift in Sources */,
 				9C5279C81CEB62B900AF88FF /* SPQuickGCD.swift in Sources */,
 				9C1A86C71DA5517E00DAD930 /* SPMainViewController.swift in Sources */,
 				9CFF46E71D501FBE00504407 /* SPPolylineManager.swift in Sources */,

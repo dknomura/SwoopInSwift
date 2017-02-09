@@ -81,7 +81,7 @@ struct SPLocation {
         let fromLong = results.double(forColumn: kSPFromLongitudeSQL)
         let fromCoordinate = CLLocationCoordinate2D.init(latitude: fromLat, longitude: fromLong)
         var loc = SPLocation.init(locationNumber: results.string(forColumn: kSPLocationNumberSQL), fromCoordinate: fromCoordinate, signContentTag: results.string(forColumn: kSPSignContentTagSQL))
-        if queryType == .getAllLocationsWithUniqueCleaningSign || queryType == .getLocationsForTimeAndDay {
+        if queryType == .getLocationsForTimeAndDay {
             while results.string(forColumn: kSPLocationNumberSQL) == loc.locationNumber {
                 results.next()
             }

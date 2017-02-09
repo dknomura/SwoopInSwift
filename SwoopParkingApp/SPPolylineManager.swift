@@ -295,7 +295,7 @@ struct SPPolylineManager: SPInjectable {
         let side = try normalize(sideOfStreet: sideOfStreet)
         try rotate(bearing: &bearings, direction: side)
         
-        // Then you can find the displacement of the path
+        // Then you can find the displaced coordinates of the path
         //        var φ2 = Math.asin( Math.sin(φ1)*Math.cos(d/R) +
         //          Math.cos(φ1)*Math.sin(d/R)*Math.cos(brng) );
         //        var λ2 = λ1 + Math.atan2(Math.sin(brng)*Math.sin(d/R)*

@@ -29,9 +29,9 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="XbN-vU-f1X">
-                                <rect key="frame" x="0.0" y="623" width="320" height="44"/>
+                                <rect key="frame" x="0.0" y="367" width="320" height="300"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="44" id="qFr-YB-oou"/>
+                                    <constraint firstAttribute="height" constant="300" id="qFr-YB-oou"/>
                                 </constraints>
                                 <connections>
                                     <segue destination="UUw-iM-biU" kind="embed" identifier="collectionViewController" id="Y0P-w5-kfm"/>
@@ -47,13 +47,13 @@
                                 </connections>
                             </containerView>
                             <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="oeU-fI-pGb" userLabel="Map Container View">
-                                <rect key="frame" x="0.0" y="178" width="320" height="445"/>
+                                <rect key="frame" x="0.0" y="178" width="320" height="189"/>
                                 <connections>
                                     <segue destination="tF9-3D-TiD" kind="embed" identifier="mapContainer" id="ZIY-VO-gOY"/>
                                 </connections>
                             </containerView>
                             <view opaque="NO" userInteractionEnabled="NO" alpha="0.5" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="XJZ-gd-JZ7">
-                                <rect key="frame" x="0.0" y="178" width="320" height="445"/>
+                                <rect key="frame" x="0.0" y="178" width="320" height="189"/>
                                 <color key="backgroundColor" red="0.33333333333333331" green="0.33333333333333331" blue="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             </view>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Finding locations for time and date..." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="7" adjustsLetterSpacingToFitWidth="YES" translatesAutoresizingMaskIntoConstraints="NO" id="EMK-Cb-Oig">
@@ -453,11 +453,11 @@
                         <viewControllerLayoutGuide type="bottom" id="ddR-V9-5bI"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="fFQ-e8-rVk">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="445"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="189"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" restorationIdentifier="mapView" translatesAutoresizingMaskIntoConstraints="NO" id="azD-Bj-X44" customClass="GMSMapView">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="445"/>
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="189"/>
                                 <color key="backgroundColor" red="0.66666666666666663" green="0.66666666666666663" blue="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             </view>
                         </subviews>
@@ -494,7 +494,7 @@
                         <viewControllerLayoutGuide type="bottom" id="QKy-Pd-eeC"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="97Y-tT-fg3">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="300"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="1dD-O9-3bb">
@@ -504,7 +504,7 @@
                                 </connections>
                             </switch>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="d38-Px-enX">
-                                <rect key="frame" x="265" y="0.0" width="39" height="44"/>
+                                <rect key="frame" x="265" y="0.0" width="39" height="50"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="39" id="Fxk-en-FyQ"/>
                                 </constraints>
@@ -516,17 +516,6 @@
                                     <action selector="goToMorePage:" destination="UUw-iM-biU" eventType="touchUpInside" id="5eL-AI-w7H"/>
                                 </connections>
                             </button>
-                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="dqx-Gf-cqh">
-                                <rect key="frame" x="16" y="44" width="288" height="0.0"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="KU0-bO-Gbp">
-                                    <size key="itemSize" width="50" height="50"/>
-                                    <size key="headerReferenceSize" width="0.0" height="0.0"/>
-                                    <size key="footerReferenceSize" width="0.0" height="0.0"/>
-                                    <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
-                                </collectionViewFlowLayout>
-                                <cells/>
-                            </collectionView>
                             <slider hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="1" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="G3n-1F-mYE">
                                 <rect key="frame" x="71" y="8" width="4" height="31"/>
                                 <constraints>
@@ -540,6 +529,25 @@
                                 <rect key="frame" x="73" y="0.0" width="0.0" height="46"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                             </view>
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="dqx-Gf-cqh">
+                                <rect key="frame" x="16" y="50" width="288" height="250"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="KU0-bO-Gbp">
+                                    <size key="itemSize" width="50" height="50"/>
+                                    <size key="headerReferenceSize" width="50" height="50"/>
+                                    <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                                    <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                </collectionViewFlowLayout>
+                                <cells/>
+                                <collectionReusableView key="sectionHeaderView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="SignsCollectionViewHeader" id="wJO-LG-l5D" customClass="SignsCollectionViewHeader" customModule="Swoop_" customModuleProvider="target">
+                                    <rect key="frame" x="0.0" y="0.0" width="288" height="50"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </collectionReusableView>
+                                <connections>
+                                    <outlet property="dataSource" destination="UUw-iM-biU" id="2kH-04-QsV"/>
+                                    <outlet property="delegate" destination="UUw-iM-biU" id="th5-JM-ngn"/>
+                                </connections>
+                            </collectionView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
@@ -570,7 +578,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="d5h-Kd-HZB" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1160.625" y="1136.6197183098591"/>
+            <point key="canvasLocation" x="1164" y="1119"/>
         </scene>
     </scenes>
     <resources>

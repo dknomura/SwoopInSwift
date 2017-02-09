@@ -57,7 +57,7 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, Injectab
                 if change == 0 { return }
                 let originalStartDay = startDay
                 startDay.increase(by: change)
-                dayLabel.text = startDay.stringValue(forFormat: DNTimeAndDayFormat.abbrDay())
+                dayLabel.text = startDay.stringValue(forFormat: DNTimeAndDayFormat.abbrDay)
                 startDay = originalStartDay
             } else {
                 dao.primaryTimeAndDay.day.increase(by: change)
@@ -72,8 +72,6 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, Injectab
     @objc func panSlider(_ recognizer: UIPanGestureRecognizer) {
         if recognizer.state == .began || recognizer.state == .changed || recognizer.state == .ended {
             adjustTimeSlider(toRecognizer: recognizer)
-        }
-        if recognizer.state == .ended {
             self.delegate?.timeViewControllerDidChangeTime()
         }
     }
@@ -132,11 +130,11 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, Injectab
             dao.primaryTimeAndDay.time = newTime
         }
         setNewSliderThumbImage()
-        sliderThumbLabel.text = dao.primaryTimeAndDay.time.stringValue(forFormat: .format12Hour())
+        sliderThumbLabel.text = dao.primaryTimeAndDay.time.stringValue(forFormat: .format12Hour)
     }
     func adjustTimeSliderToDay() {
         setTimeRangeForDay()
-        dao.primaryTimeAndDay.adjustTimeToValidStreetCleaningTime()
+        dao.primaryTimeAndDay.adjustTimeToValidStreetCleaningTime(forCity: dao.currentCity)
         slider.maximumValue = Float(timeRange.count - 1)
         if let currentTimeValue = timeRange.index(of: Float(dao.primaryTimeAndDay.time.rawValue)) {
             slider.setValue(Float(currentTimeValue), animated: false)
@@ -148,10 +146,10 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, Injectab
     }
     
     fileprivate func setSliderMaxMinLabels() {
-        let minMaxTime = dao.primaryTimeAndDay.day.earliestAndLatestCleaningTime
-        minTimeLabel.text = minMaxTime.earliest.stringValue(forFormat: DNTimeAndDayFormat.format12Hour())
-        maxTimeLabel.text = minMaxTime.latest.stringValue(forFormat: DNTimeAndDayFormat.format12Hour())
-        let currentTime = dao.primaryTimeAndDay.time.stringValue(forFormat: DNTimeAndDayFormat.format12Hour())
+        let minMaxTime = dao.primaryTimeAndDay.day.earliestAndLatestCleaningTime(forCity: dao.currentCity)
+        minTimeLabel.text = minMaxTime.earliest.stringValue(forFormat: DNTimeAndDayFormat.format12Hour)
+        maxTimeLabel.text = minMaxTime.latest.stringValue(forFormat: DNTimeAndDayFormat.format12Hour)
+        let currentTime = dao.primaryTimeAndDay.time.stringValue(forFormat: DNTimeAndDayFormat.format12Hour)
         sliderThumbLabel.text = currentTime
     }
     //MARK: Image processing
@@ -175,7 +173,7 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, Injectab
     
     var timeRange: [Float]!
     fileprivate func setTimeRangeForDay() {
-        let maxMinTime = dao.primaryTimeAndDay.day.earliestAndLatestCleaningTime
+        let maxMinTime = dao.primaryTimeAndDay.day.earliestAndLatestCleaningTime(forCity: dao.currentCity)
         var minTime = maxMinTime.earliest
         var returnRange = [Float]()
         while minTime <= maxMinTime.latest {

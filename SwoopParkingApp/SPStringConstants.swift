@@ -25,7 +25,6 @@ let kSPDidAllowLocationServices = "didAllowLocationServices"
 //MARK: - Enums
 //MARK: SQL query types
 enum SPSQLLocationQueryTypes: String {
-    case getAllLocationsWithUniqueCleaningSign
     case getLocationsForCurrentMapView
     case getLocationsForTimeAndDay
     case getLocationCountForTimeAndDay
@@ -46,6 +45,7 @@ struct SPRestoreCoderKeys {
     static let centerLat = "centerLat"
     static let centerLong = "centerLong"
     static let searchText = "searchText"
+    static let isSwitchOn = "isSwitchOn"
 }
 
 

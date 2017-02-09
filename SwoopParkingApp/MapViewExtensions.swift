@@ -26,14 +26,3 @@ extension GMSMapView {
     
 }
 
-extension CLLocationCoordinate2D {
-    func isCoordinateWithinRegion (NECoordinate: CLLocationCoordinate2D, SWCoordinate: CLLocationCoordinate2D) -> Bool {
-        if latitude < NECoordinate.latitude && latitude > SWCoordinate.latitude {
-            if longitude < NECoordinate.longitude && longitude > SWCoordinate.longitude { return true }
-            else { return false }
-        } else { return false }
-    }
-    func isIn(city:SPCity) -> Bool {
-        return isCoordinateWithinRegion(NECoordinate: city.coordinateNE, SWCoordinate: city.coordinateSW)
-    }
-}

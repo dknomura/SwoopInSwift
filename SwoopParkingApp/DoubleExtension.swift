@@ -19,10 +19,10 @@ extension Double {
                 return String(format: "%.2f km", kilometers)
             }
         case .us:
-            return String(format: "%.2f mi", self.toMiles)
+            return String(format: "%.2f mi", self.toMilesFromMeters)
         }
     }
-    var toMiles: Double {
+    var toMilesFromMeters: Double {
         return self / 1609.344
     }
     
@@ -39,7 +39,16 @@ extension Double {
         let zoom = log2(worldPoints / 256.0)
         return Float(zoom)
     }
+    
+    var toRadiansFromDegrees: Double{
+        return self * M_PI  / 180
+    }
+    var toDegreesFromRadians: Double {
+        return self * 180 / M_PI
+    }
 }
+
+
 
 extension Float {
     func toWidthInMetersFromGMSZoom(forView view: UIView) -> Double {

@@ -111,8 +111,8 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         if gesture.state == .changed {
             let zoomScale = ((gesture.scale - scale) / scale)
             let zoom = Float( zoomScale / 10 + 1) * mapView.camera.zoom
-            let coordinate = mapView.projection.coordinate(for: gesture.location(in: mapView))
-            zoomMap(toCoordinate: coordinate, zoom: zoom)
+//            let coordinate = mapView.projection.coordinate(for: gesture.location(in: mapView))
+            zoomMap(toZoom: zoom)
         } else { return }
         isPinchZooming = true
     }
@@ -176,6 +176,8 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         let heightConstraint = NSLayoutConstraint(item: myLocationButton, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 40)
         let widthConstraint = NSLayoutConstraint(item: myLocationButton, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 40)
         NSLayoutConstraint.activate([rightConstraint, bottomConstraint, heightConstraint, widthConstraint])
+        
+        
     }
     
     //MARK: - Button Methods
@@ -295,6 +297,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     //MARK: --MapView delegate
     func mapView(_ mapView: GMSMapView, idleAt position: GMSCameraPosition) {
         adjustViewsToZoom()
+        delegate?.mapViewControllerDidIdleAt(coordinate: mapView.camera.target, zoom: mapView.camera.zoom)
         if isZoomingIn { isZoomingIn = false }
         if isPinchZooming && currentMapPolylines.count > 0 { isPinchZooming = false }
     }
@@ -433,6 +436,7 @@ protocol SPMapViewControllerDelegate: class {
     func mapViewControllerShouldSearchStreetCleaning(_ mapView: GMSMapView) -> Bool
     func mapViewControllerDidFinishDrawingPolylines()
     func mapViewControllerShouldSearchLocationsForTimeAndDay()
+    func mapViewControllerDidIdleAt(coordinate: CLLocationCoordinate2D, zoom: Float)
 }
 
 
