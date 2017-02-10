@@ -22,8 +22,6 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
     var currentMapViewLocations = [SPLocation]()
     var locationCountsForTimeAndDay = [DNDay: [DNTime: Int]]()
     var locationsCountsForDays = [DNDay: Int]()
-    var expectedNumberOfCounts = 0
-    var numberOfCounts = 0
     var currentLocation: CLLocation?
     let locationManager = CLLocationManager()
     var primaryTimeAndDay = DNTimeAndDay.currentTimeAndDay()
@@ -34,8 +32,10 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
     var locationsForPrimaryTimeAndDay: [SPLocation]? {
         return allLocationsForDayValue[primaryTimeAndDay.rawValue]
     }
+    var currentRadius: Double = 0
     var signForPathCoordinates = [String: SPSign]()
     var isFirstLocationAfterAuthorization = false
+    private var handleCompletionOfSetCountOfTimesForDays: (() -> Void)?
     var date = Date()
     
     var currentCity: SPCity = .NYC
@@ -45,15 +45,12 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
         sqlReader.queryStreetCleaningLocations(forTimeAndDay: primaryTimeAndDay)
     }
     
-    func setCountOfStreetCleaningTimes(forDay day: DNDay, at coordinate: CLLocationCoordinate2D, radius: Double) {
+    func setCountOfStreetCleaningTimes(forDays days: [DNDay], at coordinate: CLLocationCoordinate2D, radius: Double, completion: @escaping () -> Void) {
+        handleCompletionOfSetCountOfTimesForDays = completion
         let corners = coordinate.swNECorners(withRadius: radius)
-        sqlReader.queryLocationCounts(forDay: day, swCoordinate: corners.sw, neCoordinate: corners.ne)
+        sqlReader.queryLocationCounts(forMultipleDays: days, swCoordinate: corners.sw, neCoordinate: corners.ne)
     }
     
-    func setCountOfStreetCleaningLocationsForAllDays(at coordinate: CLLocationCoordinate2D, radius: Double) {
-        let corners = coordinate.swNECorners(withRadius: radius)
-        
-    }
     
     func setSigns(forCurrentMapView mapView:GMSMapView) {
         let visibleRegionBounds = GMSCoordinateBounds.init(region: mapView.projection.visibleRegion())
@@ -67,8 +64,14 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
         parser.inject(self)
         guard response.results != nil else { return }
         parser.parseSQL(fromResponse: response)
-//            locationCountForDayValue[response.timeAndDay!.rawValue] = Int(response.results!.intForColumn("count(*)"))
         DispatchQueue.main.async {
+            switch response.queryType {
+            case .getLocationCountsForDays:
+                if let completionHandler = self.handleCompletionOfSetCountOfTimesForDays {
+                    completionHandler()
+                }
+            case .getLocationCountForTimeAndDay, .getLocationsForCurrentMapView, .getLocationsForTimeAndDay: break
+            }
             self.delegate?.dataAccessObject(self, didSetLocationsForQueryType: response.queryType)
         }
     }

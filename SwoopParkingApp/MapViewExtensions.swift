@@ -24,5 +24,11 @@ extension GMSMapView {
         }
     }
     
+    var currentRadius: Double {
+        let visibleRegion = self.projection.visibleRegion()
+        let west = CLLocation(latitude: visibleRegion.nearLeft.latitude, longitude: visibleRegion.nearLeft.longitude)
+        let east = CLLocation(latitude: visibleRegion.nearRight.latitude, longitude: visibleRegion.nearRight.longitude)
+        return west.distance(from: east) / 2
+    }
 }
 

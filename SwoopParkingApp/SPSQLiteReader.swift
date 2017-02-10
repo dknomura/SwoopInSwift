@@ -49,16 +49,20 @@ struct SPSQLiteReader {
 //        response.timeAndDay = timeAndDay
 //        callSQL(query: query, withValues: [], responseObject: response)
 //    }
-    
-    func queryLocationCounts(forDay day: DNDay, swCoordinate: CLLocationCoordinate2D, neCoordinate: CLLocationCoordinate2D) {
-        let query = "SELECT tag, COUNT(*) FROM locations l JOIN location_tags t on l.id = t.location_id WHERE (from_latitude BETWEEN ? AND ? AND from_longitude BETWEEN ? AND ?) AND tag like '%\(day.stringValue(forFormat: .abbrDay))' GROUP BY tag"
+    func queryLocationCounts(forMultipleDays days: [DNDay], swCoordinate: CLLocationCoordinate2D, neCoordinate: CLLocationCoordinate2D) {
+        if days.count == 0 { return }
+        var query = "SELECT tag, COUNT(*) FROM locations l JOIN location_tags t on l.id = t.location_id WHERE (from_latitude BETWEEN ? AND ? AND from_longitude BETWEEN ? AND ?) "
+        for day in days {
+            query += "AND tag like '%\(day.stringValue(forFormat: .abbrDay))' "
+        }
+        query += "GROUP BY tag"
         let values = [NSNumber(value: swCoordinate.latitude as Double),
                       NSNumber(value: neCoordinate.latitude as Double),
                       NSNumber(value: swCoordinate.longitude as Double),
                       NSNumber(value: neCoordinate.longitude as Double)]
-        callSQL(query: query, withValues: values, responseObject: SPSQLResponse(queryType: .getLocationCountsForRadius))
+        callSQL(query: query, withValues: values, responseObject: SPSQLResponse(queryType: .getLocationCountsForDays))
     }
-    
+        
     //Call with initialized response object so that 
     fileprivate func callSQL(query:String, withValues values:[AnyObject], responseObject:SPSQLResponse) {
         DispatchQueue.global(qos: DispatchQoS.QoSClass.utility).async {

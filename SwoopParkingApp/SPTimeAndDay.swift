@@ -55,7 +55,7 @@ extension DNTimeAndDay {
             guard let time = DNTime(stringValue: sqlTag.substring(to: mRange.lowerBound)) else {
                 return nil
             }
-            if let day = DNDay(stringValue: sqlTag.substring(from: mRange.lowerBound)){
+            if let day = DNDay(stringValue: sqlTag.substring(from: mRange.upperBound)){
                 self.init(day: day, time: time)
                 return
             } else {

@@ -29,6 +29,9 @@
 		9C1CA5A11DA8130D00EB875F /* SPSignInfoOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C1CA5A01DA8130D00EB875F /* SPSignInfoOverlay.swift */; };
 		9C1CA5A31DA83FB800EB875F /* SPGoogleNetworkingObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C1CA5A21DA83FB800EB875F /* SPGoogleNetworkingObject.swift */; };
 		9C215D9C1D6652D9006C1E3E /* SPTimeAndDayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C215D9B1D6652D9006C1E3E /* SPTimeAndDayViewController.swift */; };
+		9C4032371E4CD2870092E0C2 /* SignsCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C4032351E4CD2870092E0C2 /* SignsCollectionViewCell.swift */; };
+		9C4032381E4CD2870092E0C2 /* SignsCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9C4032361E4CD2870092E0C2 /* SignsCollectionViewCell.xib */; };
+		9C40323E1E4CD73E0092E0C2 /* ViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C40323D1E4CD73E0092E0C2 /* ViewExtension.swift */; };
 		9C42DAB31D5A589E004ECA97 /* SPDataAccessObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C42DAB21D5A589E004ECA97 /* SPDataAccessObject.swift */; };
 		9C431BAC1DE4C1E1000B9C66 /* How it works.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9C431BA81DE4C1E1000B9C66 /* How it works.pdf */; };
 		9C431BAD1DE4C1E1000B9C66 /* Parking holidays.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9C431BA91DE4C1E1000B9C66 /* Parking holidays.pdf */; };
@@ -36,7 +39,6 @@
 		9C431BB41DEFACFC000B9C66 /* Disclaimer.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9C431BB31DEFACFC000B9C66 /* Disclaimer.pdf */; };
 		9C4503031DD8D6420047B708 /* comesinhandy.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9C4503021DD8D6420047B708 /* comesinhandy.ttf */; };
 		9C4503081DD936D60047B708 /* MoreViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C4503071DD936D60047B708 /* MoreViewController.swift */; };
-		9C45030B1DDA1AE70047B708 /* ViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C45030A1DDA1AE70047B708 /* ViewExtensions.swift */; };
 		9C45031E1DDA3FAC0047B708 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C45031D1DDA3FAC0047B708 /* WebViewController.swift */; };
 		9C4AAAA81E495BEF00A77C15 /* SPNumericalConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C4AAAA71E495BEF00A77C15 /* SPNumericalConstants.swift */; };
 		9C4AAAAA1E49619F00A77C15 /* DoubleExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C4AAAA91E49619F00A77C15 /* DoubleExtension.swift */; };
@@ -146,6 +148,9 @@
 		9C1CA5A01DA8130D00EB875F /* SPSignInfoOverlay.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPSignInfoOverlay.swift; sourceTree = "<group>"; };
 		9C1CA5A21DA83FB800EB875F /* SPGoogleNetworkingObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPGoogleNetworkingObject.swift; sourceTree = "<group>"; };
 		9C215D9B1D6652D9006C1E3E /* SPTimeAndDayViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPTimeAndDayViewController.swift; sourceTree = "<group>"; };
+		9C4032351E4CD2870092E0C2 /* SignsCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignsCollectionViewCell.swift; sourceTree = "<group>"; };
+		9C4032361E4CD2870092E0C2 /* SignsCollectionViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SignsCollectionViewCell.xib; sourceTree = "<group>"; };
+		9C40323D1E4CD73E0092E0C2 /* ViewExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewExtension.swift; sourceTree = "<group>"; };
 		9C42DAB21D5A589E004ECA97 /* SPDataAccessObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPDataAccessObject.swift; sourceTree = "<group>"; };
 		9C431BA81DE4C1E1000B9C66 /* How it works.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "How it works.pdf"; sourceTree = "<group>"; };
 		9C431BA91DE4C1E1000B9C66 /* Parking holidays.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "Parking holidays.pdf"; sourceTree = "<group>"; };
@@ -153,7 +158,6 @@
 		9C431BB31DEFACFC000B9C66 /* Disclaimer.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = Disclaimer.pdf; sourceTree = "<group>"; };
 		9C4503021DD8D6420047B708 /* comesinhandy.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = comesinhandy.ttf; sourceTree = "<group>"; };
 		9C4503071DD936D60047B708 /* MoreViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MoreViewController.swift; sourceTree = "<group>"; };
-		9C45030A1DDA1AE70047B708 /* ViewExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewExtensions.swift; sourceTree = "<group>"; };
 		9C45031D1DDA3FAC0047B708 /* WebViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
 		9C4AAAA71E495BEF00A77C15 /* SPNumericalConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPNumericalConstants.swift; sourceTree = "<group>"; };
 		9C4AAAA91E49619F00A77C15 /* DoubleExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DoubleExtension.swift; sourceTree = "<group>"; };
@@ -331,6 +335,29 @@
 			path = LFHeatMap/fmdb;
 			sourceTree = "<group>";
 		};
+		9C4032331E4CD22C0092E0C2 /* ForSignsCollectionView */ = {
+			isa = PBXGroup;
+			children = (
+				9CC537A51E4BD4C50051D490 /* SignsCollectionViewHeader.swift */,
+				9CC537A71E4BD5290051D490 /* SignsCollectionViewHeader.xib */,
+				9C4032351E4CD2870092E0C2 /* SignsCollectionViewCell.swift */,
+				9C4032361E4CD2870092E0C2 /* SignsCollectionViewCell.xib */,
+			);
+			name = ForSignsCollectionView;
+			sourceTree = "<group>";
+		};
+		9C4032341E4CD24D0092E0C2 /* ForMapView */ = {
+			isa = PBXGroup;
+			children = (
+				9CFF46E61D501FBE00504407 /* SPPolylineManager.swift */,
+				9C617EF41D51BF5100FFA51A /* SPTileLayerManager.swift */,
+				9CA7DDC41D590BEF0050B75D /* SPGroundOverlayManager.swift */,
+				9C1CA59E1DA8125B00EB875F /* SPSignInfoOverlay.xib */,
+				9C1CA5A01DA8130D00EB875F /* SPSignInfoOverlay.swift */,
+			);
+			name = ForMapView;
+			sourceTree = "<group>";
+		};
 		9C42DAB41D5A6A37004ECA97 /* Controller */ = {
 			isa = PBXGroup;
 			children = (
@@ -343,13 +370,8 @@
 		9C42DAB51D5A6A47004ECA97 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				9CFF46E61D501FBE00504407 /* SPPolylineManager.swift */,
-				9C617EF41D51BF5100FFA51A /* SPTileLayerManager.swift */,
-				9CA7DDC41D590BEF0050B75D /* SPGroundOverlayManager.swift */,
-				9C1CA59E1DA8125B00EB875F /* SPSignInfoOverlay.xib */,
-				9C1CA5A01DA8130D00EB875F /* SPSignInfoOverlay.swift */,
-				9CC537A51E4BD4C50051D490 /* SignsCollectionViewHeader.swift */,
-				9CC537A71E4BD5290051D490 /* SignsCollectionViewHeader.xib */,
+				9C4032341E4CD24D0092E0C2 /* ForMapView */,
+				9C4032331E4CD22C0092E0C2 /* ForSignsCollectionView */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -377,11 +399,11 @@
 		9C4503051DD9360D0047B708 /* Map */ = {
 			isa = PBXGroup;
 			children = (
+				9C1A86CA1DA586C900DAD930 /* Main.storyboard */,
 				9C1A86C61DA5517E00DAD930 /* SPMainViewController.swift */,
 				9CFEE37B1CDA6D7900CE5D53 /* SPMapViewController.swift */,
 				9C215D9B1D6652D9006C1E3E /* SPTimeAndDayViewController.swift */,
 				9C61F0B41D7608CC00BA524C /* SPSearchResultsViewController.swift */,
-				9C96EE8F1D625EC4007C4EC8 /* SPViewControllerExtension.swift */,
 				9C9D62781E24DEA10019261E /* SignsCollectionViewController.swift */,
 				9CA64D9A1DD7821E0015A8F2 /* InjectableViewController.swift */,
 			);
@@ -392,7 +414,6 @@
 			isa = PBXGroup;
 			children = (
 				9C4503071DD936D60047B708 /* MoreViewController.swift */,
-				9C45030A1DDA1AE70047B708 /* ViewExtensions.swift */,
 				9C45031D1DDA3FAC0047B708 /* WebViewController.swift */,
 				9C736D161E42E3390082B40B /* More.storyboard */,
 			);
@@ -413,7 +434,9 @@
 		9C4E2BE81E46CD8700C4982E /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				9C96EE8F1D625EC4007C4EC8 /* SPViewControllerExtension.swift */,
 				9CA1E3351E41ACBD001106F9 /* MapViewExtensions.swift */,
+				9C40323D1E4CD73E0092E0C2 /* ViewExtension.swift */,
 				9C4E2BEC1E48EFAF00C4982E /* ViewControllerWithSliderGestures.swift */,
 				9CC537AA1E4BF69A0051D490 /* CLLocationCoordinate2DExtension.swift */,
 				9C4AAAA91E49619F00A77C15 /* DoubleExtension.swift */,
@@ -507,7 +530,6 @@
 				9C04E2731D93FC6A0012EAE0 /* SPProtocols.swift */,
 				9CFEE3801CDA6D7A00CE5D53 /* Assets.xcassets */,
 				9C45030C1DDA390F0047B708 /* ParkingGuidelines */,
-				9C1A86CA1DA586C900DAD930 /* Main.storyboard */,
 				9CFEE3821CDA6D7A00CE5D53 /* LaunchScreen.storyboard */,
 				9CFEE3851CDA6D7A00CE5D53 /* Info.plist */,
 				9CBE25BC1D552BFA00B5384B /* SwoopParkingApp-Bridging-Header.h */,
@@ -670,6 +692,7 @@
 				9CFEE3811CDA6D7A00CE5D53 /* Assets.xcassets in Resources */,
 				9C1A86C81DA586C900DAD930 /* Main.storyboard in Resources */,
 				9C1CA59F1DA8125B00EB875F /* SPSignInfoOverlay.xib in Resources */,
+				9C4032381E4CD2870092E0C2 /* SignsCollectionViewCell.xib in Resources */,
 				9CC537A81E4BD5290051D490 /* SignsCollectionViewHeader.xib in Resources */,
 				9C736D171E42E3390082B40B /* More.storyboard in Resources */,
 			);
@@ -839,14 +862,15 @@
 				9CD51DC91CE24662006B741D /* SPSignAndLocationParser.swift in Sources */,
 				9CFEE37C1CDA6D7900CE5D53 /* SPMapViewController.swift in Sources */,
 				9C04E2831D948C520012EAE0 /* FMDatabasePool.m in Sources */,
+				9C40323E1E4CD73E0092E0C2 /* ViewExtension.swift in Sources */,
 				9C04E2811D948C520012EAE0 /* FMDatabase.m in Sources */,
 				9C215D9C1D6652D9006C1E3E /* SPTimeAndDayViewController.swift in Sources */,
 				9C96EE901D625EC4007C4EC8 /* SPViewControllerExtension.swift in Sources */,
 				9C1CA5A11DA8130D00EB875F /* SPSignInfoOverlay.swift in Sources */,
+				9C4032371E4CD2870092E0C2 /* SignsCollectionViewCell.swift in Sources */,
 				9C1CA5A31DA83FB800EB875F /* SPGoogleNetworkingObject.swift in Sources */,
 				9C4AAAAA1E49619F00A77C15 /* DoubleExtension.swift in Sources */,
 				9CA7DDC51D590BEF0050B75D /* SPGroundOverlayManager.swift in Sources */,
-				9C45030B1DDA1AE70047B708 /* ViewExtensions.swift in Sources */,
 				9C4AAAAC1E496ADD00A77C15 /* UIImageExtension.swift in Sources */,
 				9C04E2821D948C520012EAE0 /* FMDatabaseAdditions.m in Sources */,
 				9C4AAAA81E495BEF00A77C15 /* SPNumericalConstants.swift in Sources */,
@@ -1040,7 +1064,7 @@
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				"FRAMEWORK_SEARCH_PATHS[arch=*]" = "$(inherited)";
 				INFOPLIST_FILE = SwoopParkingApp/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.dnom.SwoopParkingApp;
@@ -1069,7 +1093,7 @@
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				"FRAMEWORK_SEARCH_PATHS[arch=*]" = "$(inherited)";
 				INFOPLIST_FILE = SwoopParkingApp/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.dnom.SwoopParkingApp;

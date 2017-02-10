@@ -11,7 +11,7 @@ import Foundation
 @objc protocol ViewControllerWithSliderGestures {
     weak var sliderGestureView: UIView! { get set }
     weak var slider: UISlider! { get set }
-    var sliderThumbLabel: UILabel! { get set }
+    weak var sliderThumbLabel: UILabel! { get set }
     func panSlider(_ recognizer: UIPanGestureRecognizer)
     func tapToMoveSliderThumb(_ recognizer: UIGestureRecognizer)
 }

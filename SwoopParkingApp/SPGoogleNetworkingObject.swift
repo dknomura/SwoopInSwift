@@ -31,6 +31,7 @@ struct SPGoogleCoordinateAndInfo {
 }
 
 enum SPNetworkingDelegateAction {
+    case presentCurrentLocation
     case presentCoordinate
     case presentAutocompleteResults
     case presentAddress

@@ -32,7 +32,7 @@ struct SPParser {
             dao.allLocationsForDayValue[dao.primaryTimeAndDay.rawValue] = locationsWithTags(fromResults: results)
         case .getLocationsForCurrentMapView:
             dao.currentMapViewLocations = locationsWithSigns(fromResults: results)
-        case .getLocationCountsForRadius:
+        case .getLocationCountsForDays:
             setLocationCountForTimeAndDay(fromResults: results)
         default: break
         }
@@ -42,7 +42,11 @@ struct SPParser {
         while results.next() {
             let count = results.int(forColumn: "count(*)")
             guard let timeAndDay = DNTimeAndDay(sqlTag: results.string(forColumn: "tag")) else { continue }
-            dao.locationCountsForTimeAndDay[timeAndDay.day]?[timeAndDay.time] = Int(count)
+            if let _ = dao.locationCountsForTimeAndDay[timeAndDay.day] {
+                dao.locationCountsForTimeAndDay[timeAndDay.day]?[timeAndDay.time] = Int(count)
+            } else {
+                dao.locationCountsForTimeAndDay[timeAndDay.day] =  [timeAndDay.time: Int(count)]
+            }
         }
     }
     

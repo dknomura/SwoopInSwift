@@ -97,8 +97,7 @@ class SPSearchResultsViewController: UIViewController, UITableViewDelegate, UITa
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.row == 0 && isMyLocationPresent {
-            dao.searchCoordinate = dao.currentLocation?.coordinate
-            delegate?.searchContainer(toPerformDelegateAction: .presentCoordinate, withInfo: nil)
+            delegate?.searchContainer(toPerformDelegateAction: .presentCurrentLocation, withInfo: nil)
             return
         }
         let row = isMyLocationPresent ? indexPath.row - 1 : indexPath.row

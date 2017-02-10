@@ -15,6 +15,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     @IBOutlet weak var mapView: GMSMapView!
     var zoomOutButton = UIButton.init(type:.roundedRect)
     var myLocationButton = UIButton(type: .roundedRect)
+    var crosshairImageView: UIImageView!
     
     var initialMapViewCamera: GMSCameraPosition {
         return GMSCameraPosition.camera(withTarget: CLLocationCoordinate2DMake(40.7193748839769, -73.9289110153913), zoom: initialZoom)
@@ -53,7 +54,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpMap()
-        setUpButtons()
+        setupViews()
         assertDependencies()
         setupObservers()
         dao.setUpLocationManager()
@@ -66,25 +67,6 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         super.viewWillDisappear(animated)
         NotificationCenter.default.removeObserver(self)
     }
-//    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-//        func defaultReturn() { super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context) }
-//        guard keyPath != nil && change != nil else {
-//            defaultReturn()
-//            return
-//        }
-//        switch keyPath! {
-//        case kvoSelectedMarkerKeyPath:
-//            let newSelectedMarker = change![NSKeyValueChangeKey.newKey]
-//            if !(newSelectedMarker is GMSMarker) && lastSelectedMarkerKVO is GMSMarker {
-//                cancelTapGesture = true
-//            }
-//            lastSelectedMarkerKVO = newSelectedMarker as AnyObject?
-//        default:
-//            defaultReturn()
-//        }
-//    }
-    
-
     //MARK: - Setup/breakdown methods
     //MARK: --Gestures
     @objc func zoomToDoubleTapOnMap(_ gesture:UITapGestureRecognizer) {
@@ -100,10 +82,10 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         let camera = GMSCameraPosition.camera(withTarget: mapView.projection.coordinate(for: pointOnMap), zoom: doubleTapZoom)
         isZoomingIn = true
         animateMap(toCameraPosition: camera, duration: 0.8)
-//        delegate?.mapViewControllerDidAdjustToDoubleTap()
     }
+    
     @objc func zoomOutDoubleTouchTapOnMap(_ gesture:UITapGestureRecognizer) {
-        zoomMap(toZoom: mapView.camera.zoom - 1.5)
+        zoomMap(toZoom: mapView.camera.zoom - 2)
     }
     var scale:CGFloat = 0
     @objc func pinchZoom(_ gesture:UIPinchGestureRecognizer) {
@@ -111,19 +93,9 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         if gesture.state == .changed {
             let zoomScale = ((gesture.scale - scale) / scale)
             let zoom = Float( zoomScale / 10 + 1) * mapView.camera.zoom
-//            let coordinate = mapView.projection.coordinate(for: gesture.location(in: mapView))
             zoomMap(toZoom: zoom)
         } else { return }
         isPinchZooming = true
-    }
-    
-    @objc func longPressZoom(_ gesture: UILongPressGestureRecognizer) {
-        if mapView.camera.zoom < streetZoom {
-            let pointOnMap = gesture.location(in: mapView)
-            let camera = GMSCameraPosition.camera(withTarget: mapView.projection.coordinate(for: pointOnMap), zoom: streetZoom)
-            isZoomingIn = true
-            animateMap(toCameraPosition: camera, duration: 0.7)
-        }
     }
     
     //MARK: --Observers
@@ -136,6 +108,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     func signsCollectionViewControllerDidToggleCollectionView(notification: Notification) {
         if let isOn = notification.userInfo?[collectionViewSwitchKey] as? Bool {
             isCollectionViewSwitchOn = isOn
+            crosshairImageView.isHidden = !isOn
         }
     }
 
@@ -154,6 +127,20 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         }
     }
     
+    fileprivate func setupViews() {
+        crosshairImageView = UIImageView(image: UIImage(named: "crosshair"))
+        crosshairImageView.translatesAutoresizingMaskIntoConstraints = false
+        mapView.addSubview(crosshairImageView)
+        crosshairImageView.isHidden = !isCollectionViewSwitchOn
+        let verticalConstraint = NSLayoutConstraint(item: crosshairImageView, attribute: .centerY, relatedBy: .equal, toItem: mapView, attribute: .centerY, multiplier: 1, constant: 0)
+        let horizontalConstraint = NSLayoutConstraint(item: crosshairImageView, attribute: .centerX, relatedBy: .equal, toItem: mapView, attribute: .centerX, multiplier: 1, constant: 0)
+        let widthConstraint = NSLayoutConstraint(item: crosshairImageView, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 40)
+        let heightConstraint = NSLayoutConstraint(item: crosshairImageView, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 40)
+        NSLayoutConstraint.activate([verticalConstraint, horizontalConstraint, widthConstraint, heightConstraint])
+        
+        setUpButtons()
+    }
+    
     fileprivate func setUpButtons() {
         zoomOutButton.setTitle("Zoom to", for: UIControlState())
         zoomOutButton.titleLabel?.font = UIFont(name: "Christopherhand", size: 25)
@@ -161,9 +148,16 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         zoomOutButton.frame = CGRect(x:8, y:8, width: buttonSize.width, height: buttonSize.height)
         zoomOutButton.backgroundColor = UIColor.white
         zoomOutButton.alpha = 0.8
-        zoomOutButton.isHidden = true
+        zoomOutButton.isHidden = false
         zoomOutButton.addTarget(self, action: #selector(zoomOut(_:)), for: .touchUpInside)
+        zoomOutButton.translatesAutoresizingMaskIntoConstraints = false
         mapView.addSubview(zoomOutButton)
+        let zoomLeftConstraint = NSLayoutConstraint(item: mapView, attribute: .leftMargin, relatedBy: .equal, toItem: zoomOutButton, attribute: .left, multiplier: 1, constant: 8)
+        let zoomTopConstraint = NSLayoutConstraint(item: mapView, attribute: .topMargin, relatedBy: .equal, toItem: zoomOutButton, attribute: .top, multiplier: 1, constant: 8)
+        let zoomHeightConstraint = NSLayoutConstraint(item: zoomOutButton, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: buttonSize.height)
+        let zoomWidthConstraint = NSLayoutConstraint(item: zoomOutButton, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: buttonSize.width)
+        NSLayoutConstraint.activate([zoomLeftConstraint, zoomTopConstraint, zoomHeightConstraint, zoomWidthConstraint])
+
         
         guard let locationImage = UIImage.init(named: "location-icon") else { return }
         myLocationButton.imageView?.contentMode = .scaleAspectFit
@@ -171,13 +165,11 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         myLocationButton.translatesAutoresizingMaskIntoConstraints = false
         myLocationButton.addTarget(self, action: #selector(moveCameraToUserLocation), for: .touchUpInside)
         mapView.addSubview(myLocationButton)
-        let rightConstraint = NSLayoutConstraint(item: mapView, attribute: .rightMargin, relatedBy: .equal, toItem: myLocationButton, attribute: .right, multiplier: 1, constant: 8)
-        let bottomConstraint = NSLayoutConstraint(item: mapView, attribute: .bottomMargin, relatedBy: .equal, toItem: myLocationButton, attribute: .bottom, multiplier: 1, constant: 8)
-        let heightConstraint = NSLayoutConstraint(item: myLocationButton, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 40)
-        let widthConstraint = NSLayoutConstraint(item: myLocationButton, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 40)
-        NSLayoutConstraint.activate([rightConstraint, bottomConstraint, heightConstraint, widthConstraint])
-        
-        
+        let locationRightConstraint = NSLayoutConstraint(item: mapView, attribute: .rightMargin, relatedBy: .equal, toItem: myLocationButton, attribute: .right, multiplier: 1, constant: 8)
+        let locationBottomConstraint = NSLayoutConstraint(item: mapView, attribute: .bottomMargin, relatedBy: .equal, toItem: myLocationButton, attribute: .bottom, multiplier: 1, constant: 8)
+        let locationHeightConstraint = NSLayoutConstraint(item: myLocationButton, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 40)
+        let locationWidthConstraint = NSLayoutConstraint(item: myLocationButton, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 40)
+        NSLayoutConstraint.activate([locationRightConstraint, locationBottomConstraint, locationHeightConstraint, locationWidthConstraint])
     }
     
     //MARK: - Button Methods
@@ -206,35 +198,34 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     fileprivate func animateMap(toCameraPosition cameraPosition:GMSCameraPosition, duration:Float) {
         CATransaction.begin()
         CATransaction.setCompletionBlock { 
-            self.adjustViewsToZoom()
+            self.adjustOverlayToZoom()
         }
         CATransaction.setValue(duration, forKey: kCATransactionAnimationDuration)
         zoomMap(toCamera: cameraPosition)
         CATransaction.commit()
     }
     
-    func adjustViewsToZoom() {
+    func adjustOverlayToZoom() {
         if mapView.camera.zoom >= streetZoom {
             guard mapView.isIn(city: dao.currentCity) else {
                 print("Current mapview is not in nyc, \(mapView)")
                 return
             }
             _ = delegate?.mapViewControllerShouldSearchStreetCleaning(mapView)
-        } else {
+        }
+        adjustGroundOverlaysToZoom()
+    }
+    
+    func adjustGroundOverlaysToZoom() {
+        if mapView.camera.zoom < streetZoom {
             if dao.locationsForPrimaryTimeAndDay == nil {
                 delegate?.mapViewControllerShouldSearchLocationsForTimeAndDay()
             } else {
                 getNewHeatMapOverlays()
             }
         }
-        if mapView.camera.zoom > initialZoom ||
-            mapView.camera.zoom < initialZoom - 1 ||
-            !mapView.isIn(city: dao.currentCity) {
-            zoomOutButton.isHidden = false
-        } else {
-            zoomOutButton.isHidden = true
-        }
     }
+    
     func zoomMap(toCoordinate coordinate:CLLocationCoordinate2D?, zoom:Float) {
         if coordinate != nil {
             let camera = GMSCameraPosition.camera(withTarget: coordinate!, zoom: zoom)
@@ -296,14 +287,16 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     // MARK: - Delegate Methods
     //MARK: --MapView delegate
     func mapView(_ mapView: GMSMapView, idleAt position: GMSCameraPosition) {
-        adjustViewsToZoom()
+        adjustOverlayToZoom()
         delegate?.mapViewControllerDidIdleAt(coordinate: mapView.camera.target, zoom: mapView.camera.zoom)
         if isZoomingIn { isZoomingIn = false }
-        if isPinchZooming && currentMapPolylines.count > 0 { isPinchZooming = false }
+        if isPinchZooming { isPinchZooming = false }
     }
     func mapView(_ mapView: GMSMapView, didChange position: GMSCameraPosition) {
         if (isPinchZooming || isZoomingIn){
-            adjustViewsToZoom()
+            adjustGroundOverlaysToZoom()
+            //Send message to delegate when zoom is not controlled by radius slider
+            delegate?.mapViewControllerDidChangeMap(coordinate: position.target, zoom: position.zoom)
         }
     }
     func mapView(_ mapView: GMSMapView, willMove gesture: Bool) {
@@ -437,6 +430,7 @@ protocol SPMapViewControllerDelegate: class {
     func mapViewControllerDidFinishDrawingPolylines()
     func mapViewControllerShouldSearchLocationsForTimeAndDay()
     func mapViewControllerDidIdleAt(coordinate: CLLocationCoordinate2D, zoom: Float)
+    func mapViewControllerDidChangeMap(coordinate: CLLocationCoordinate2D, zoom: Float)
 }
 
 

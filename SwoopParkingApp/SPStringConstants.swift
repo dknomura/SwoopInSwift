@@ -28,7 +28,7 @@ enum SPSQLLocationQueryTypes: String {
     case getLocationsForCurrentMapView
     case getLocationsForTimeAndDay
     case getLocationCountForTimeAndDay
-    case getLocationCountsForRadius
+    case getLocationCountsForDays
 }
 
 //MARK: Measurement systems

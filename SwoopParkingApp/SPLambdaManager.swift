@@ -15,7 +15,7 @@ struct SPLambdaManager {
     //MARK: TO DO 
     // Change lambda function names to match SPSQLLocationQueryType.rawValues
     func upcomingStreetCleaningQuery(forDayAndTime dayAndTime:(day:Int, hour:Int, minute:Int)) {
-        let parameters = ["hour": dayAndTime.hour, "day": dayAndTime.day]
+        _ = ["hour": dayAndTime.hour, "day": dayAndTime.day]
 //        invoke(.getAllLocationsWithUniqueCleaningSign, parameters: parameters as NSDictionary)
     }
     
