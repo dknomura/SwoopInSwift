@@ -17,8 +17,6 @@ let kSPGoogleMapsKey = "AIzaSyCGKTmya_bbd5_S9hJOzO9eKf4pDckrffQ"
 
 //MARK: - NotificationCenter names
 let kSPSearchTableViewDataSourceDidChange = "SearchTableViewDataSourceDidChange"
-let collectionViewSwitchChangeNotification = Notification.Name("collectionViewSwitchChangeNotification")
-let collectionViewSwitchKey = "isSwitchOn"
 //MARK: NSUserDefaults keys
 let kSPDidAllowLocationServices = "didAllowLocationServices"
 

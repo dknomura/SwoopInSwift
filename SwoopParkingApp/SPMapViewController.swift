@@ -56,7 +56,6 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         setUpMap()
         setupViews()
         assertDependencies()
-        setupObservers()
         dao.setUpLocationManager()
     }
     override func didReceiveMemoryWarning() {
@@ -97,21 +96,6 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         } else { return }
         isPinchZooming = true
     }
-    
-    //MARK: --Observers
-    fileprivate func setupObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(signsCollectionViewControllerDidToggleCollectionView(notification:)), name: collectionViewSwitchChangeNotification, object: nil)
-    }
-    
-    
-    //MARK: Notification methods
-    func signsCollectionViewControllerDidToggleCollectionView(notification: Notification) {
-        if let isOn = notification.userInfo?[collectionViewSwitchKey] as? Bool {
-            isCollectionViewSwitchOn = isOn
-            crosshairImageView.isHidden = !isOn
-        }
-    }
-
     
     //MARK: --Views
     fileprivate func setUpMap() {

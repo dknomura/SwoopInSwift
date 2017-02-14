@@ -93,7 +93,6 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
         let notificationCenter = NotificationCenter.default
         notificationCenter.addObserver(self, selector: #selector(keyboardDidHide), name: NSNotification.Name.UIKeyboardDidHide, object: nil)
         notificationCenter.addObserver(self, selector: #selector(keyboardDidShow), name: NSNotification.Name.UIKeyboardDidShow, object: nil)
-        notificationCenter.addObserver(self, selector: #selector(signsCollectionViewControllerDidToggleCollectionView(notification:)), name: collectionViewSwitchChangeNotification, object: nil)
         notificationCenter.addObserver(self, selector: #selector(orientationDidChange), name: Notification.Name.UIDeviceOrientationDidChange, object: nil)
     }
     @objc fileprivate func keyboardDidHide(notification: Notification) {
@@ -175,9 +174,14 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
             view.endEditing(true)
             return
         }
-        if shouldCancelTapOnMapViewIcons(gesture: gesture) || isSwitchOn {
+        if shouldCancelTapOnMapViewIcons(gesture: gesture) {
             return
         }
+        if isSwitchOn {
+            setCenter(toTapRecognizer: gesture)
+            return
+        }
+        //TODO: add when marker popouts are present
         if mapViewController.areMarkersPresent {
             mapViewController.hideMarkers()
         }
@@ -201,7 +205,6 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
         let tapLocation = tap.location(in: mapViewController.mapView)
         let coordinate = mapViewController.mapView.projection.coordinate(for: tapLocation)
         mapViewController.mapView.animate(toLocation: coordinate)
-        searchViewController.searchBar.text = "(\(coordinate.longitude)), (\(coordinate.latitude))"
     }
     fileprivate func shouldCancelTapOnMapViewIcons(gesture: UIGestureRecognizer) -> Bool {
         let signMarkerFrame = mapViewController.signMarker?.iconView?.frame,
@@ -209,8 +212,10 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
         infoWindowFrame = mapViewController.currentInfoWindow?.frame
         let rects = [signMarkerFrame, searchMarkerFrame, infoWindowFrame]
         for rect in rects {
-            if rect == nil { continue }
-            if rect!.contains(gesture.location(in: mapViewController.mapView)) { return true }
+            guard let isGestureInRect = rect?.contains(gesture.location(in: mapViewController.mapView)) else { continue }
+            if isGestureInRect{
+                return true
+            }
         }
         return false
     }
@@ -433,17 +438,25 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
     }
     func signsCollectionViewControllerDidSelect(timeAndDay: DNTimeAndDay) {
         signsCollectionViewController.collectionViewSwitch.setOn(false, animated: true)
-        signsCollectionViewController.adjustToToggleChange(isOn: false, completion: {
-            self.dao.primaryTimeAndDay = timeAndDay
-            self.timeAndDayViewController.adjustTimeSliderToDay()
-            self.mapViewController.adjustOverlayToZoom()
-
+        dao.primaryTimeAndDay = timeAndDay
+        signsCollectionViewController.adjustToToggleChange(isOn: false, completion: { [unowned self] in
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8, execute: {
+                self.timeAndDayViewController.adjustTimeSliderToDay()
+                self.mapViewController.adjustOverlayToZoom()
+                UIView.animate(withDuration: standardAnimationDuration, animations: { 
+                    self.timeAndDayViewController.dayView.backgroundColor = UIColor.green
+                    self.timeAndDayViewController.sliderThumbLabel.backgroundColor = UIColor.green
+                }, completion: { _ in
+                    self.timeAndDayViewController.dayView.backgroundColor = UIColor.clear
+                    self.timeAndDayViewController.sliderThumbLabel.backgroundColor = UIColor.clear
+                })
+            })
         })
     }
-    
-    //MARK: SignsCollectionViewController Notification
-    func signsCollectionViewControllerDidToggleCollectionView(notification: Notification) {
-        guard let isOn = notification.userInfo?[collectionViewSwitchKey] as? Bool else { return }
+    func signsCollectionViewController(didTurnSwitchOn isOn: Bool) {
+        mapViewController.isCollectionViewSwitchOn = isOn
+        mapViewController.crosshairImageView.isHidden = !isOn
+        searchViewController.isSwitchOn = isOn
         isSwitchOn = isOn
         let maxHeight = view.frame.height / 2
         let toolbarHeight = isSwitchOn ? maxHeight : bottomToolbarHeight

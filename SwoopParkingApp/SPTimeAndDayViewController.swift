@@ -34,7 +34,10 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, Injectab
         setupSlider()
         setupGestures()
     }
-    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        sliderThumbLabel.center = centerOfSliderThumbLabel
+    }
     //MARK: Gestures
     fileprivate func setupGestures() {
         registerGesturesForSlider()
@@ -132,7 +135,7 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, Injectab
         sliderThumbLabel.text = dao.primaryTimeAndDay.time.stringValue(forFormat: .format12Hour)
     }
     func adjustTimeSliderToDay() {
-        setTimeRangeForDay()
+        setTimeRangeOnSliderForDay()
         dao.primaryTimeAndDay.adjustTimeToValidStreetCleaningTime(forCity: dao.currentCity)
         slider.maximumValue = Float(timeRange.count - 1)
         if let currentTimeValue = timeRange.index(of: Float(dao.primaryTimeAndDay.time.rawValue)) {
@@ -171,7 +174,7 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, Injectab
     }
     
     var timeRange: [Float]!
-    fileprivate func setTimeRangeForDay() {
+    fileprivate func setTimeRangeOnSliderForDay() {
         let maxMinTime = dao.primaryTimeAndDay.day.earliestAndLatestCleaningTime(forCity: dao.currentCity)
         var minTime = maxMinTime.earliest
         var returnRange = [Float]()

@@ -21,7 +21,7 @@ class SignsCollectionViewController: UIViewController, UICollectionViewDelegate,
     @IBOutlet weak var panResizeIndicator: UILabel!
     
     private var streetDetailZoom: CGFloat!
-    private let numberOfSections = 7
+    private let numberOfSections = 8
     private let collectionViewSize = CGSize(width: 70, height: 70)
     private let signCollectionHeaderReuse = "SignsCollectionViewHeader"
     private let signsCollectionViewCellReuse = "SignsCollectionViewCell"
@@ -40,7 +40,7 @@ class SignsCollectionViewController: UIViewController, UICollectionViewDelegate,
     var heightOfSlider: CGFloat {
         return collectionViewSwitch.isOn ? 30 : 1
     }
-    
+    //TODO: add a activity view for loading
     //MARK: - Lifecycle methods
     override func viewDidLoad() {
         assertDependencies()
@@ -62,17 +62,18 @@ class SignsCollectionViewController: UIViewController, UICollectionViewDelegate,
     
     func adjustToToggleChange(isOn:Bool, completion: (() -> Void)? = nil){
         if isOn {
-            sliderThumbLabel.text = dao.currentRadius.metersToDistanceString(forSystem: .us)
+            dao.currentRadius = delegate.signsCollectionViewControllerNeedsCurrentRadius
+            adjustSliderToZoomChange()
         }
         UIView.animate(withDuration: standardAnimationDuration, animations: {
             self.panResizeIndicator.isHidden = !isOn
             self.heightConstraintOfSlider.constant = self.heightOfSlider
+            self.sliderThumbLabel.isHidden = !isOn
             self.slider.isHidden = !isOn
         }, completion: { _ in
             completion?()
         })
-        
-        NotificationCenter.default.post(name: collectionViewSwitchChangeNotification, object: nil, userInfo: [collectionViewSwitchKey: isOn])
+        delegate.signsCollectionViewController(didTurnSwitchOn: isOn)
     }
     
     //MARK: UISlider methods
@@ -129,7 +130,7 @@ class SignsCollectionViewController: UIViewController, UICollectionViewDelegate,
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if let day = DNDay(rawValue: section + 1),
+        if let day = DNDay(rawValue: section),
             let locationsForTime =  dao.locationCountsForTimeAndDay[day] {
             return collapsedSections.contains(section) ? 0 : locationsForTime.count
         } else {
@@ -161,7 +162,7 @@ class SignsCollectionViewController: UIViewController, UICollectionViewDelegate,
     }
     
     private func getTimeAndDay(fromIndexPath indexPath: IndexPath) -> DNTimeAndDay? {
-        if let day = DNDay(rawValue: indexPath.section + 1),
+        if let day = DNDay(rawValue: indexPath.section),
             let timesDictionary = dao.locationCountsForTimeAndDay[day] {
             let times = sortedTimes(fromTimesDictionary: timesDictionary)
             return DNTimeAndDay(day: day, time: times[indexPath.row])
@@ -177,9 +178,19 @@ class SignsCollectionViewController: UIViewController, UICollectionViewDelegate,
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         let section = indexPath.section
+        if section == 0 {
+            if let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: signCollectionHeaderReuse, for: indexPath) as? SignsCollectionViewHeader {
+                header.headerButton.setTitle("Select a time and day", for: .normal)
+                header.headerButton.backgroundColor = backgroundColor(forSection: section)
+                header.headerButton.titleLabel?.font = UIFont(name: "Christopherhand", size: 25)
+                header.headerButton.setTitleColor(UIColor.white, for: .normal)
+                header.headerButton.tag = section
+                return header
+            }
+        }
         if kind == UICollectionElementKindSectionHeader {
             if let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: signCollectionHeaderReuse, for: indexPath) as? SignsCollectionViewHeader,
-                let day = DNDay(rawValue: section + 1) {
+                let day = DNDay(rawValue: section) {
                 
                 if dao.locationCountsForTimeAndDay[day] == nil {
                     collapsedSections.insert(section)
@@ -201,15 +212,14 @@ class SignsCollectionViewController: UIViewController, UICollectionViewDelegate,
         if !collapsedSections.contains(section) {
             collapsedSections.insert(section)
             guard let indexPathsToDelete = indexPaths(forSection: section) else { return }
-            self.collapsedSections.insert(section)
             collectionView.performBatchUpdates({ _ in
                 self.collectionView.deleteItems(at: indexPathsToDelete)
             }, completion: nil)
         } else {
             collapsedSections.remove(section)
-            guard let day = DNDay(rawValue: section + 1) else { return }
-            let currentRadius = delegate.signsCollectionViewControllerNeedsCurrentRadius
-            dao.setCountOfStreetCleaningTimes(forDays: [day], at: dao.searchCoordinate!, radius: currentRadius, completion: { [unowned self] in
+            guard let day = DNDay(rawValue: section) else { return }
+            dao.currentRadius = delegate.signsCollectionViewControllerNeedsCurrentRadius
+            dao.setCountOfStreetCleaningTimes(forDays: [day], at: dao.searchCoordinate!, radius: dao.currentRadius, completion: { [unowned self] in
                 self.delegate.signsCollectionViewControllerDidFinishQuery()
                 guard let indexPathsToAdd = self.indexPaths(forSection: section) else { return }
                 self.collectionView.performBatchUpdates({ _ in
@@ -223,7 +233,7 @@ class SignsCollectionViewController: UIViewController, UICollectionViewDelegate,
     }
     
     fileprivate func indexPaths(forSection section: Int) -> [IndexPath]? {
-        guard let day = DNDay(rawValue: section + 1),
+        guard let day = DNDay(rawValue: section),
             let locationCountsForTime = dao.locationCountsForTimeAndDay[day]  else { return nil }
         var indexPaths = [IndexPath]()
         for i in 0..<locationCountsForTime.count {
@@ -252,7 +262,6 @@ class SignsCollectionViewController: UIViewController, UICollectionViewDelegate,
     }
     
     fileprivate func setupSlider() {
-        sliderThumbLabel.isHidden = true
         if let radiusImage = UIImage(named: "radius") {
             let scaledImage = UIImage.imageWith(image: radiusImage, scaledToSize: CGSize(width: 40, height: 40))
             slider.setThumbImage(scaledImage, for: .normal)
@@ -268,7 +277,7 @@ class SignsCollectionViewController: UIViewController, UICollectionViewDelegate,
                 flow.sectionHeadersPinToVisibleBounds = true
             } 
         }
-        for i in 0..<numberOfSections {
+        for i in 1...numberOfSections {
             collapsedSections.insert(i)
         }
     }
@@ -276,6 +285,7 @@ class SignsCollectionViewController: UIViewController, UICollectionViewDelegate,
 
 
 protocol SignsCollectionViewControllerDelegate: class {
+    func signsCollectionViewController(didTurnSwitchOn isOn: Bool)
     func signsCollectionViewControllerDidStartQuery()
     func signsCollectionViewControllerDidFinishQuery()
     var signsCollectionViewControllerNeedsCurrentRadius: Double { get }

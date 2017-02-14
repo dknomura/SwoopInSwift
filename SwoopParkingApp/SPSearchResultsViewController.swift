@@ -44,7 +44,6 @@ class SPSearchResultsViewController: UIViewController, UITableViewDelegate, UITa
         super.viewDidLoad()
         searchResultsTableView.register(UITableViewCell.self, forCellReuseIdentifier: cellReuseIdentifier)
         searchResultsTableView.isUserInteractionEnabled = true
-        NotificationCenter.default.addObserver(self, selector: #selector(collectionViewSwitchChanged), name: collectionViewSwitchChangeNotification, object: nil)
         assertDependencies()
     }
     
@@ -172,13 +171,6 @@ class SPSearchResultsViewController: UIViewController, UITableViewDelegate, UITa
     }
     
     //MARK: - fileprivate
-    @objc fileprivate func collectionViewSwitchChanged(notification: Notification) {
-        if let isSwitchOn = notification.userInfo?[collectionViewSwitchKey] as? Bool {
-            self.isSwitchOn = isSwitchOn
-        }
-    }
-
-
 }
 
 protocol SPSearchResultsViewControllerDelegate: class {
