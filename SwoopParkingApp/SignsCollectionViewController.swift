@@ -14,15 +14,15 @@ class SignsCollectionViewController: UIViewController, UICollectionViewDelegate,
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var slider: UISlider!
     @IBOutlet weak var collectionViewSwitch: UISwitch!
-    @IBOutlet weak var resizeContainerGestureView: UIView!
     @IBOutlet weak var sliderGestureView: UIView!
     @IBOutlet weak var sliderThumbLabel: UILabel!
-    @IBOutlet weak var heightConstraintOfSlider: NSLayoutConstraint!
     @IBOutlet weak var panResizeIndicator: UILabel!
+    @IBOutlet weak var waitingView: UIView!
+    @IBOutlet weak var activityView: UIActivityIndicatorView!
     
     private var streetDetailZoom: CGFloat!
     private let numberOfSections = 8
-    private let collectionViewSize = CGSize(width: 70, height: 70)
+    private let collectionViewCellSize = CGSize(width: 70, height: 70)
     private let signCollectionHeaderReuse = "SignsCollectionViewHeader"
     private let signsCollectionViewCellReuse = "SignsCollectionViewCell"
     private weak var delegate: SignsCollectionViewControllerDelegate!
@@ -37,10 +37,6 @@ class SignsCollectionViewController: UIViewController, UICollectionViewDelegate,
         }
         return uncollapsed
     }
-    var heightOfSlider: CGFloat {
-        return collectionViewSwitch.isOn ? 30 : 1
-    }
-    //TODO: add a activity view for loading
     //MARK: - Lifecycle methods
     override func viewDidLoad() {
         assertDependencies()
@@ -67,9 +63,10 @@ class SignsCollectionViewController: UIViewController, UICollectionViewDelegate,
         }
         UIView.animate(withDuration: standardAnimationDuration, animations: {
             self.panResizeIndicator.isHidden = !isOn
-            self.heightConstraintOfSlider.constant = self.heightOfSlider
             self.sliderThumbLabel.isHidden = !isOn
             self.slider.isHidden = !isOn
+            self.sliderGestureView.isHidden = !isOn
+            self.collectionView.isHidden = !isOn
         }, completion: { _ in
             completion?()
         })
@@ -123,6 +120,16 @@ class SignsCollectionViewController: UIViewController, UICollectionViewDelegate,
         sliderThumbLabel.text = dao.currentRadius.metersToDistanceString(forSystem: .us)
     }
     
+    //MARK: - WaitingView Methods
+    func showWaitingView() {
+        waitingView.isHidden = false
+        activityView.startAnimating()
+    }
+    func hideWaitingView() {
+        waitingView.isHidden = true
+        activityView.stopAnimating()
+    }
+    
     //MARK: - Protocols
     //MARK: <CollectionView Delegate/Datasource>
     func numberOfSections(in collectionView: UICollectionView) -> Int {
@@ -139,7 +146,7 @@ class SignsCollectionViewController: UIViewController, UICollectionViewDelegate,
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return collectionViewSize
+        return collectionViewCellSize
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -166,10 +173,11 @@ class SignsCollectionViewController: UIViewController, UICollectionViewDelegate,
             let timesDictionary = dao.locationCountsForTimeAndDay[day] {
             let times = sortedTimes(fromTimesDictionary: timesDictionary)
             return DNTimeAndDay(day: day, time: times[indexPath.row])
-        }else {
+        } else {
             return nil
         }
     }
+    
     private func sortedTimes(fromTimesDictionary timesDictionary: [DNTime: Int]) -> [DNTime] {
         let times = Array(timesDictionary.keys)
         let timesArray = times.sorted { $0 < $1 }
@@ -177,38 +185,33 @@ class SignsCollectionViewController: UIViewController, UICollectionViewDelegate,
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        let defaultHeader = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: signCollectionHeaderReuse, for: indexPath)
+        guard kind == UICollectionElementKindSectionHeader else { return defaultHeader }
+        guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: signCollectionHeaderReuse, for: indexPath) as? SignsCollectionViewHeader else { return defaultHeader }
         let section = indexPath.section
+        header.headerButton.backgroundColor = backgroundColor(forSection: section)
+        header.headerButton.titleLabel?.font = UIFont(name: "Christopherhand", size: 25)
+        header.headerButton.setTitleColor(UIColor.white, for: .normal)
+        header.headerButton.tag = section
+        //Title headers
         if section == 0 {
-            if let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: signCollectionHeaderReuse, for: indexPath) as? SignsCollectionViewHeader {
-                header.headerButton.setTitle("Select a time and day", for: .normal)
-                header.headerButton.backgroundColor = backgroundColor(forSection: section)
-                header.headerButton.titleLabel?.font = UIFont(name: "Christopherhand", size: 25)
-                header.headerButton.setTitleColor(UIColor.white, for: .normal)
-                header.headerButton.tag = section
-                return header
+            header.headerButton.setTitle("Select a time and day", for: .normal)
+        } else {
+        //Day headers
+            header.headerButton.addTarget(self, action: #selector(sectionButtonTouchedUpInside), for: .touchUpInside)
+            guard let day = DNDay(rawValue: section) else { return defaultHeader }
+            header.headerButton.setTitle(day.stringValue(forFormat: .fullDay), for: .normal)
+            print("day: \(day). title: \(header.headerButton.currentTitle). background color: \(header.headerButton.backgroundColor)")
+            if dao.locationCountsForTimeAndDay[day] == nil {
+                collapsedSections.insert(section)
             }
         }
-        if kind == UICollectionElementKindSectionHeader {
-            if let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: signCollectionHeaderReuse, for: indexPath) as? SignsCollectionViewHeader,
-                let day = DNDay(rawValue: section) {
-                
-                if dao.locationCountsForTimeAndDay[day] == nil {
-                    collapsedSections.insert(section)
-                }
-                header.headerButton.setTitle(day.stringValue(forFormat: .fullDay), for: .normal)
-                header.headerButton.backgroundColor = backgroundColor(forSection: section)
-                header.headerButton.addTarget(self, action: #selector(sectionButtonTouchedUpInside), for: .touchUpInside)
-                header.headerButton.titleLabel?.font = UIFont(name: "Christopherhand", size: 25)
-                header.headerButton.setTitleColor(UIColor.white, for: .normal)
-                header.headerButton.tag = section
-                return header
-            }
-        }
-        return collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: signCollectionHeaderReuse, for: indexPath)
+        return header
     }
     
     @objc func sectionButtonTouchedUpInside(sender: UIButton) {
         let section = sender.tag
+        if section == 0 { return }
         if !collapsedSections.contains(section) {
             collapsedSections.insert(section)
             guard let indexPathsToDelete = indexPaths(forSection: section) else { return }
@@ -225,7 +228,9 @@ class SignsCollectionViewController: UIViewController, UICollectionViewDelegate,
                 self.collectionView.performBatchUpdates({ _ in
                     self.collectionView.insertItems(at: indexPathsToAdd)
                 }, completion: nil)
+//                self.hideWaitingView()
             })
+//            showWaitingView()
             delegate.signsCollectionViewControllerDidStartQuery()
             
         }
@@ -243,7 +248,7 @@ class SignsCollectionViewController: UIViewController, UICollectionViewDelegate,
     }
 
     fileprivate func backgroundColor(forSection section:Int) -> UIColor {
-        return collapsedSections.contains(section) ? UIColor(red: 170/256, green: 90/256, blue: 88/256, alpha: 1) : UIColor.red
+        return collapsedSections.contains(section) ? UIColor.swoopRed : UIColor.red
     }
     
     //MARK: <InjectableViewController>

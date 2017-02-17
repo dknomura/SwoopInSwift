@@ -15,12 +15,10 @@ class SPTimeAndDayViewController: UIViewController, UITextViewDelegate, Injectab
     @IBOutlet weak var dayView: UIView!
     @IBOutlet weak var sliderGestureView: UIView!
     @IBOutlet weak var dayLabel: UILabel!
-    @IBOutlet weak var heightConstraintOfBorderView: NSLayoutConstraint!
     @IBOutlet weak var slider: UISlider!
     @IBOutlet weak var minTimeLabel: UILabel!
     @IBOutlet weak var maxTimeLabel: UILabel!
     
-    var borderViewHeight: CGFloat = 8.0
     weak var delegate: SPTimeViewControllerDelegate?
     
     var sliderThumbLabel: UILabel!

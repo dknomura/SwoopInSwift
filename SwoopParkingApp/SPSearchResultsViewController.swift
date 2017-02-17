@@ -58,12 +58,13 @@ class SPSearchResultsViewController: UIViewController, UITableViewDelegate, UITa
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        if (searchBar.text?.characters.count)! > 0 {
+        guard let characterCount = searchBar.text?.characters.count else { return  }
+        if characterCount > 0 {
             var googleNetworking = SPGoogleNetworking()
             googleNetworking.delegate = dao
             googleNetworking.autocomplete(searchBar.text!)
         } else if searchBar.text?.characters.count == 0 {
-            searchResultsTableView.reloadData()
+            hideSearchResultsTableView()
         }
     }
  
@@ -127,7 +128,8 @@ class SPSearchResultsViewController: UIViewController, UITableViewDelegate, UITa
         }
     }
     func hideSearchResultsTableView() {
-        if delegate!.searchContainerHeightShouldAdjust(standardHeightOfToolOrSearchBar, tableViewPresent: false, searchBarPresent: true) {
+        let height = heightConstraintOfSearchBar.constant == 0 ? 0 : standardHeightOfToolOrSearchBar
+        if delegate!.searchContainerHeightShouldAdjust(height, tableViewPresent: false, searchBarPresent: true) {
             UIView.animate(withDuration: standardAnimationDuration, animations: {
                 self.heightConstraintOfTableView.constant = 0
                 self.view.layoutIfNeeded()

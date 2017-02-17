@@ -26,7 +26,9 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     var userControl = false
     var animatingFromCityView = true
     var isPinchZooming = false
-    var isZoomingIn = false
+    
+    // isZooming is true when the zoom action is caused by something other than the slider.
+    var isZooming = false
     var cancelTapGesture = false
     
     var isCollectionViewSwitchOn = false
@@ -50,6 +52,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     
     var currentInfoWindow: SPSignInfoOverlay?
 
+    //TODO: organize the locations by sector and use markers with numbers to show location counts
     //MARK: - Override methods
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -71,7 +74,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     @objc func zoomToDoubleTapOnMap(_ gesture:UITapGestureRecognizer) {
         let pointOnMap = gesture.location(in: mapView)
         var doubleTapZoom: Float
-        if mapView.camera.zoom < zoomToSwitchOverlays - 1{
+        if mapView.camera.zoom < zoomToSwitchOverlays {
             doubleTapZoom = zoomToSwitchOverlays
         } else if mapView.camera.zoom < streetZoom {
             doubleTapZoom = streetZoom
@@ -79,8 +82,8 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
             doubleTapZoom = mapView.camera.zoom + 1
         }
         let camera = GMSCameraPosition.camera(withTarget: mapView.projection.coordinate(for: pointOnMap), zoom: doubleTapZoom)
-        isZoomingIn = true
-        animateMap(toCameraPosition: camera, duration: 0.8)
+        isZooming = true
+        animateMap(toCameraPosition: camera, duration: 0.5)
     }
     
     @objc func zoomOutDoubleTouchTapOnMap(_ gesture:UITapGestureRecognizer) {
@@ -159,6 +162,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     //MARK: - Button Methods
     //MARK: -- Other buttons
     @objc fileprivate func zoomOut(_ sender:UIButton) {
+        isZooming = true
         mapView.animate(to: initialMapViewCamera)
     }
     @objc fileprivate func moveCameraToUserLocation() {
@@ -169,7 +173,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
             if let currentCoordinate = dao.currentLocation?.coordinate {
                 let zoomTo = isCollectionViewSwitchOn ? zoomToSwitchOverlays : streetZoom
                 let camera = GMSCameraPosition.camera(withTarget: currentCoordinate, zoom: zoomTo)
-                animateMap(toCameraPosition: camera, duration: 0.6)
+                animateMap(toCameraPosition: camera, duration: 0.5)
             }
         } else {
             dao.locationManager.requestWhenInUseAuthorization()
@@ -273,11 +277,11 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     func mapView(_ mapView: GMSMapView, idleAt position: GMSCameraPosition) {
         adjustOverlayToZoom()
         delegate?.mapViewControllerDidIdleAt(coordinate: mapView.camera.target, zoom: mapView.camera.zoom)
-        if isZoomingIn { isZoomingIn = false }
+        if isZooming { isZooming = false }
         if isPinchZooming { isPinchZooming = false }
     }
     func mapView(_ mapView: GMSMapView, didChange position: GMSCameraPosition) {
-        if (isPinchZooming || isZoomingIn){
+        if (isPinchZooming || isZooming){
             adjustGroundOverlaysToZoom()
             //Send message to delegate when zoom is not controlled by radius slider
             delegate?.mapViewControllerDidChangeMap(coordinate: position.target, zoom: position.zoom)

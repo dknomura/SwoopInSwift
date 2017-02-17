@@ -29,6 +29,8 @@
 		9C1CA5A11DA8130D00EB875F /* SPSignInfoOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C1CA5A01DA8130D00EB875F /* SPSignInfoOverlay.swift */; };
 		9C1CA5A31DA83FB800EB875F /* SPGoogleNetworkingObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C1CA5A21DA83FB800EB875F /* SPGoogleNetworkingObject.swift */; };
 		9C215D9C1D6652D9006C1E3E /* SPTimeAndDayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C215D9B1D6652D9006C1E3E /* SPTimeAndDayViewController.swift */; };
+		9C3BF56B1E554C9500710CE6 /* NSLayoutConstraint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C3BF56A1E554C9500710CE6 /* NSLayoutConstraint.swift */; };
+		9C3BF56D1E566C1E00710CE6 /* UIColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C3BF56C1E566C1E00710CE6 /* UIColorExtension.swift */; };
 		9C4032371E4CD2870092E0C2 /* SignsCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C4032351E4CD2870092E0C2 /* SignsCollectionViewCell.swift */; };
 		9C4032381E4CD2870092E0C2 /* SignsCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9C4032361E4CD2870092E0C2 /* SignsCollectionViewCell.xib */; };
 		9C40323E1E4CD73E0092E0C2 /* ViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C40323D1E4CD73E0092E0C2 /* ViewExtension.swift */; };
@@ -148,6 +150,8 @@
 		9C1CA5A01DA8130D00EB875F /* SPSignInfoOverlay.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPSignInfoOverlay.swift; sourceTree = "<group>"; };
 		9C1CA5A21DA83FB800EB875F /* SPGoogleNetworkingObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPGoogleNetworkingObject.swift; sourceTree = "<group>"; };
 		9C215D9B1D6652D9006C1E3E /* SPTimeAndDayViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPTimeAndDayViewController.swift; sourceTree = "<group>"; };
+		9C3BF56A1E554C9500710CE6 /* NSLayoutConstraint.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSLayoutConstraint.swift; sourceTree = "<group>"; };
+		9C3BF56C1E566C1E00710CE6 /* UIColorExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIColorExtension.swift; sourceTree = "<group>"; };
 		9C4032351E4CD2870092E0C2 /* SignsCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignsCollectionViewCell.swift; sourceTree = "<group>"; };
 		9C4032361E4CD2870092E0C2 /* SignsCollectionViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SignsCollectionViewCell.xib; sourceTree = "<group>"; };
 		9C40323D1E4CD73E0092E0C2 /* ViewExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewExtension.swift; sourceTree = "<group>"; };
@@ -349,8 +353,8 @@
 		9C4032341E4CD24D0092E0C2 /* ForMapView */ = {
 			isa = PBXGroup;
 			children = (
-				9CFF46E61D501FBE00504407 /* SPPolylineManager.swift */,
 				9C617EF41D51BF5100FFA51A /* SPTileLayerManager.swift */,
+				9CFF46E61D501FBE00504407 /* SPPolylineManager.swift */,
 				9CA7DDC41D590BEF0050B75D /* SPGroundOverlayManager.swift */,
 				9C1CA59E1DA8125B00EB875F /* SPSignInfoOverlay.xib */,
 				9C1CA5A01DA8130D00EB875F /* SPSignInfoOverlay.swift */,
@@ -441,6 +445,8 @@
 				9CC537AA1E4BF69A0051D490 /* CLLocationCoordinate2DExtension.swift */,
 				9C4AAAA91E49619F00A77C15 /* DoubleExtension.swift */,
 				9C4AAAAB1E496ADD00A77C15 /* UIImageExtension.swift */,
+				9C3BF56A1E554C9500710CE6 /* NSLayoutConstraint.swift */,
+				9C3BF56C1E566C1E00710CE6 /* UIColorExtension.swift */,
 			);
 			name = Extensions;
 			sourceTree = "<group>";
@@ -872,9 +878,11 @@
 				9C4AAAAA1E49619F00A77C15 /* DoubleExtension.swift in Sources */,
 				9CA7DDC51D590BEF0050B75D /* SPGroundOverlayManager.swift in Sources */,
 				9C4AAAAC1E496ADD00A77C15 /* UIImageExtension.swift in Sources */,
+				9C3BF56B1E554C9500710CE6 /* NSLayoutConstraint.swift in Sources */,
 				9C04E2821D948C520012EAE0 /* FMDatabaseAdditions.m in Sources */,
 				9C4AAAA81E495BEF00A77C15 /* SPNumericalConstants.swift in Sources */,
 				9CA7DDC11D57EAB50050B75D /* LFHeatMap-dummy.m in Sources */,
+				9C3BF56D1E566C1E00710CE6 /* UIColorExtension.swift in Sources */,
 				9CFEE37A1CDA6D7900CE5D53 /* AppDelegate.swift in Sources */,
 				9CC537A41E4B779F0051D490 /* SQLResponse.swift in Sources */,
 				9C61F0B11D7496DC00BA524C /* SPGoogleNetworking.swift in Sources */,

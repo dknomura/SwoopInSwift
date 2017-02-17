@@ -40,6 +40,7 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
     
     var currentCity: SPCity = .NYC
 
+    //TODO: add method to get location counts for day
     // MARK: - SQLite methods
     func setStreetCleaningLocationsForPrimaryTimeAndDay() {
         sqlReader.queryStreetCleaningLocations(forTimeAndDay: primaryTimeAndDay)
@@ -54,7 +55,6 @@ class SPDataAccessObject: NSObject, CLLocationManagerDelegate, SPSQLiteReaderDel
     
     func setSigns(forCurrentMapView mapView:GMSMapView) {
         let visibleRegionBounds = GMSCoordinateBounds.init(region: mapView.projection.visibleRegion())
-        print("Coordainte: \(visibleRegionBounds.northEast), \(visibleRegionBounds.southWest)")
         sqlReader.querySignsAndLocations(swCoordinate: visibleRegionBounds.southWest, neCoordinate: visibleRegionBounds.northEast)
     }
     
