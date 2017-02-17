@@ -129,7 +129,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
     }
     
     fileprivate func setUpButtons() {
-        zoomOutButton.setTitle("Zoom to", for: UIControlState())
+        zoomOutButton.setTitle("Zoom Out", for: UIControlState())
         zoomOutButton.titleLabel?.font = UIFont(name: "Christopherhand", size: 25)
         let buttonSize = zoomOutButton.intrinsicContentSize
         zoomOutButton.frame = CGRect(x:8, y:8, width: buttonSize.width, height: buttonSize.height)
@@ -137,6 +137,7 @@ class SPMapViewController: UIViewController, CLLocationManagerDelegate, GMSMapVi
         zoomOutButton.alpha = 0.8
         zoomOutButton.isHidden = false
         zoomOutButton.addTarget(self, action: #selector(zoomOut(_:)), for: .touchUpInside)
+        zoomOutButton.createBorder(color: UIColor.white.cgColor)
         zoomOutButton.translatesAutoresizingMaskIntoConstraints = false
         mapView.addSubview(zoomOutButton)
         let zoomLeftConstraint = NSLayoutConstraint(item: mapView, attribute: .leftMargin, relatedBy: .equal, toItem: zoomOutButton, attribute: .left, multiplier: 1, constant: 8)

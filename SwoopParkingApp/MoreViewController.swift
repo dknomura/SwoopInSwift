@@ -9,7 +9,7 @@
 import Foundation
 import StoreKit
 
-class MoreViewController: UIViewController, SKProductsRequestDelegate, SKPaymentTransactionObserver {
+class MoreViewController: UIViewController, SKProductsRequestDelegate, SKPaymentTransactionObserver, WebViewPresenter {
     @IBOutlet weak var textView: UITextView!
     @IBOutlet weak var howItWorksButton: UIButton!
     @IBOutlet weak var tipsButton: UIButton!
@@ -40,18 +40,13 @@ class MoreViewController: UIViewController, SKProductsRequestDelegate, SKPayment
     
     
     //MARK: - Button methods
-    
-    @IBAction func openAppInstructions(_ sender: UIButton) {
-        if let documentName = sender.titleLabel?.text,
-            let pdfPath = Bundle.main.path(forResource: documentName, ofType: "pdf")
-            {
-                guard let webViewController = storyboard?.instantiateViewController(withIdentifier: "webViewController") as? WebViewController else { return }
-                webViewController.title = documentName
-            webViewController.url = URL(fileURLWithPath: pdfPath)
-                navigationController?.pushViewController(webViewController, animated: true)
-            
-        }
+    @IBAction func showParkingHolidaysPDF(_ sender: UIButton) {
+        let url = URL(string: "http://www.nyc.gov/html/dot/downloads/pdf/asp-calendar-2017.pdf")
+        presentWebView(withUrl: url)
     }
+    
+
+    
     @IBAction func openReview(_ sender: UIButton) {
         goToAppStoreReview()
     }
@@ -67,7 +62,7 @@ class MoreViewController: UIViewController, SKProductsRequestDelegate, SKPayment
             print("Can't make purchases")
         }
     }
-
+    
     //MARK: - Products Request Delegate
     
     func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {

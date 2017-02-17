@@ -6,6 +6,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -15,6 +16,99 @@
         </array>
     </customFonts>
     <scenes>
+        <!--How It Works View Controller-->
+        <scene sceneID="Cjg-tX-E2i">
+            <objects>
+                <viewController id="fEi-dR-0wL" customClass="HowItWorksViewController" customModule="Swoop_" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="MTK-8N-bOD"/>
+                        <viewControllerLayoutGuide type="bottom" id="Yy9-lh-myJ"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="0LV-Cp-g5C">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="5cS-5g-4XZ">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                                <subviews>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="QDo-xi-7Rb">
+                                        <rect key="frame" x="0.0" y="0.0" width="375" height="800"/>
+                                        <subviews>
+                                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="fjD-8d-UiD">
+                                                <rect key="frame" x="0.0" y="617" width="375" height="183"/>
+                                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="183" id="bgt-dR-qUb"/>
+                                                </constraints>
+                                                <string key="text">This is only a suggestion based on data for this particular area. I take no responsibility for any tickets issued when parking with the help of Swoop. </string>
+                                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                            </textView>
+                                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="EyQ-5r-E9M">
+                                                <rect key="frame" x="0.0" y="0.0" width="375" height="396"/>
+                                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="396" id="asC-XS-qpt"/>
+                                                </constraints>
+                                                <mutableString key="text">This app maps out where street cleaning is going to finish at a given time. The idea is that if you arrive before street cleaning finishes there is a good chance that you will be able to find a free, long term parking space (between a couple of days and a week). I tried to only show areas where there are no other parking regulations to ensure that you will be able to park after the street cleaning period, but please be mindful and read the posted signs before parking. 
+
+When should I arrive/park my car?
+In busier parts of the city people are already double parking and waiting for those street cleaning spots to open up and most of the spots are taken immediately. Many people arrive 30+ minutes before the street cleaning period ends. Keep in mind that double parking is illegal. 
+
+According to iQuantNY blog (iquantny.tumblr.com/post/76937212765/using-open-data-to-predict-when-you-might-get-your) and its analysis of NYC parking ticket data, you are safe parking and leaving your car up to 10 minutes before street cleaning is finished. Below is a graph of tickets issued for a street cleaning spot from 11:30 AM to 1 PM. 
+</mutableString>
+                                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                                <dataDetectorType key="dataDetectorTypes" link="YES"/>
+                                            </textView>
+                                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="iQuantGraph" translatesAutoresizingMaskIntoConstraints="NO" id="ADa-EX-Pr1">
+                                                <rect key="frame" x="0.0" y="404" width="375" height="250"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" secondItem="ADa-EX-Pr1" secondAttribute="height" multiplier="75:50" id="w5p-5n-spR"/>
+                                                </constraints>
+                                            </imageView>
+                                        </subviews>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        <constraints>
+                                            <constraint firstItem="ADa-EX-Pr1" firstAttribute="centerX" secondItem="EyQ-5r-E9M" secondAttribute="centerX" id="4ke-me-Kno"/>
+                                            <constraint firstAttribute="height" constant="800" id="6b3-yE-oJd"/>
+                                            <constraint firstAttribute="trailing" secondItem="EyQ-5r-E9M" secondAttribute="trailing" id="X8W-XK-zqM"/>
+                                            <constraint firstItem="EyQ-5r-E9M" firstAttribute="top" secondItem="QDo-xi-7Rb" secondAttribute="top" id="c9v-7I-39H"/>
+                                            <constraint firstAttribute="trailing" secondItem="fjD-8d-UiD" secondAttribute="trailing" id="dZs-8X-gjv"/>
+                                            <constraint firstItem="fjD-8d-UiD" firstAttribute="leading" secondItem="QDo-xi-7Rb" secondAttribute="leading" id="hva-SW-Zfr"/>
+                                            <constraint firstAttribute="bottom" secondItem="fjD-8d-UiD" secondAttribute="bottom" id="iYw-YH-Xg0"/>
+                                            <constraint firstItem="ADa-EX-Pr1" firstAttribute="top" secondItem="EyQ-5r-E9M" secondAttribute="bottom" constant="8" id="rQm-XM-imw"/>
+                                            <constraint firstItem="EyQ-5r-E9M" firstAttribute="leading" secondItem="QDo-xi-7Rb" secondAttribute="leading" id="uuz-Uy-B40"/>
+                                        </constraints>
+                                    </view>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="trailing" secondItem="QDo-xi-7Rb" secondAttribute="trailing" id="41R-Hy-WtJ"/>
+                                    <constraint firstAttribute="bottom" secondItem="QDo-xi-7Rb" secondAttribute="bottom" id="gm0-R9-Zv4"/>
+                                    <constraint firstItem="QDo-xi-7Rb" firstAttribute="top" secondItem="5cS-5g-4XZ" secondAttribute="top" id="udr-bn-hGv"/>
+                                    <constraint firstItem="QDo-xi-7Rb" firstAttribute="leading" secondItem="5cS-5g-4XZ" secondAttribute="leading" id="y8S-h8-xGl"/>
+                                </constraints>
+                            </scrollView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="5cS-5g-4XZ" secondAttribute="trailing" id="2ld-8E-Q9Z"/>
+                            <constraint firstItem="Yy9-lh-myJ" firstAttribute="top" secondItem="5cS-5g-4XZ" secondAttribute="bottom" id="EbP-Xd-oek"/>
+                            <constraint firstItem="ADa-EX-Pr1" firstAttribute="width" secondItem="0LV-Cp-g5C" secondAttribute="width" id="M2F-yz-3fD"/>
+                            <constraint firstItem="5cS-5g-4XZ" firstAttribute="top" secondItem="0LV-Cp-g5C" secondAttribute="top" id="Rq2-Hp-6h8"/>
+                            <constraint firstItem="QDo-xi-7Rb" firstAttribute="width" secondItem="0LV-Cp-g5C" secondAttribute="width" id="Rwf-Zz-s7c"/>
+                            <constraint firstItem="5cS-5g-4XZ" firstAttribute="leading" secondItem="0LV-Cp-g5C" secondAttribute="leading" id="oR0-0I-XNF"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="firstTextView" destination="EyQ-5r-E9M" id="ikt-L0-Sxe"/>
+                        <outlet property="secondTextView" destination="fjD-8d-UiD" id="wre-CX-ITp"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="qjk-Tt-QEm" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1356" y="583.3583208395803"/>
+        </scene>
         <!--More-->
         <scene sceneID="ts8-B0-H1s">
             <objects>
@@ -32,7 +126,7 @@
                                 <fontDescription key="fontDescription" name="Christopherhand" family="Christopherhand" pointSize="26"/>
                                 <state key="normal" title="Parking tips"/>
                                 <connections>
-                                    <action selector="openAppInstructions:" destination="0TU-lI-CBw" eventType="touchUpInside" id="trs-pY-cBw"/>
+                                    <segue destination="3u7-rO-8Ee" kind="show" id="Ryx-Ke-BPb"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="HlS-XD-7gP">
@@ -40,15 +134,7 @@
                                 <fontDescription key="fontDescription" name="Christopherhand" family="Christopherhand" pointSize="26"/>
                                 <state key="normal" title="Disclaimer"/>
                                 <connections>
-                                    <action selector="openAppInstructions:" destination="0TU-lI-CBw" eventType="touchUpInside" id="wZV-ph-6bX"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="249" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4oy-tC-8sC">
-                                <rect key="frame" x="16" y="30" width="162" height="42"/>
-                                <fontDescription key="fontDescription" name="Christopherhand" family="Christopherhand" pointSize="26"/>
-                                <state key="normal" title="How it works"/>
-                                <connections>
-                                    <action selector="openAppInstructions:" destination="0TU-lI-CBw" eventType="touchUpInside" id="bPe-wm-YNt"/>
+                                    <segue destination="PQ3-0K-VKt" kind="show" id="oPF-vm-5zy"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gcu-IO-iq0">
@@ -74,7 +160,7 @@
                                 <fontDescription key="fontDescription" name="Christopherhand" family="Christopherhand" pointSize="26"/>
                                 <state key="normal" title="Parking holidays"/>
                                 <connections>
-                                    <action selector="openAppInstructions:" destination="0TU-lI-CBw" eventType="touchUpInside" id="qiD-PX-71z"/>
+                                    <action selector="showParkingHolidaysPDF:" destination="0TU-lI-CBw" eventType="touchUpInside" id="jC8-DA-Kbi"/>
                                 </connections>
                             </button>
                             <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="AWD-fU-mI1">
@@ -96,6 +182,14 @@
                             <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="60R-3V-eXy">
                                 <rect key="frame" x="178" y="249" width="20" height="20"/>
                             </activityIndicatorView>
+                            <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="249" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4oy-tC-8sC">
+                                <rect key="frame" x="16" y="30" width="162" height="42"/>
+                                <fontDescription key="fontDescription" name="Christopherhand" family="Christopherhand" pointSize="26"/>
+                                <state key="normal" title="How it works"/>
+                                <connections>
+                                    <segue destination="fEi-dR-0wL" kind="show" id="tai-OR-CTq"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
@@ -145,6 +239,117 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ULJ-XG-LzZ" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2017.5" y="1086.443661971831"/>
+        </scene>
+        <!--Parking Tips View Controller-->
+        <scene sceneID="qXV-Ta-w4p">
+            <objects>
+                <viewController id="3u7-rO-8Ee" customClass="ParkingTipsViewController" customModule="Swoop_" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="NSO-vI-825"/>
+                        <viewControllerLayoutGuide type="bottom" id="mIp-mo-stM"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="TcJ-1F-w1B">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" pagingEnabled="YES" editable="NO" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="4ix-Pw-e0z">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <mutableString key="text">Parking near a fire hydrant
+According to NYC Dep of Transportation, it is illegal to parking within 15 feet of either side of a fire hydrant. Painted curbs around hydrants do not indicate where you can park. 
+
+According to reference.com  (https://www.reference.com/vehicles/average-length-car-2e853812726d079d#)
+Compact sedans/sports cars =~14’ 7”
+Medium sedans and SUVs =~15’ 10”
+Vans/trucks/large cars =~17’ 1”
+
+
+Parking ticket fines
+Street cleaning- $65 Manhattan 96th St. and below	$45 elsewhere
+Street Cleaning: No parking where parking is not allowed by sign, street marking or traffic control device.
+
+Fire hydrant - $115
+Stopping, standing or parking closer than 15 feet of a fire hydrant. Between sunrise and sunset, a passenger vehicle may stand alongside a fire hydrant as long as a driver remains behind the wheel and is ready to move the vehicle if required to do so.
+
+Parking meter- $65 Manhattan 96th St. and below	$45 else where 
+Parking in a metered space where the meter works and the time has ended. Drivers get a 5-minute grace period past the expired time on Alternate Side Parking signs and any other parking spaces with specific times listed (i.e.. 8:30am - 9:30am). During the 5-minute grace period, parking tickets cannot be issued.
+
+Parking in traffic lane- more than 8 ft from curb- $115
+- Stopping, standing or parking in a traffic lane; or if a vehicle extends more than 8 feet from the nearest curb, blocking traffic.	
+
+Double parking - $115
+Standing or parking on the roadway side of a vehicle stopped, standing or parked at the curb; in other words also known as "double parking". However, a person may stand a Commercial Vehicle alongside a vehicle parked at the curb at such locations and during such hours that stopping, standing and parking is allowed when quickly making pickups, deliveries or service calls. This is allowed if there is no parking space or marked loading zone on either side of the street within 100 feet. "Double parking" any type of vehicle is not allowed in Midtown Manhattan (the area from 14th Street to 60th Street, between First Avenue and Eighth Avenue inclusive). Midtown double parking is not allowed between 7:00am – 7:00pm daily except Sundays. (Read Code 47)	
+
+All parking ticket fines (www1.nyc.gov/site/finance/vehicles/services-violation-codes.page)
+
+
+</mutableString>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                <dataDetectorType key="dataDetectorTypes" link="YES"/>
+                            </textView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="4ix-Pw-e0z" secondAttribute="trailing" id="Pi2-em-Ib0"/>
+                            <constraint firstItem="4ix-Pw-e0z" firstAttribute="leading" secondItem="TcJ-1F-w1B" secondAttribute="leading" id="Xmx-Gu-0je"/>
+                            <constraint firstItem="mIp-mo-stM" firstAttribute="top" secondItem="4ix-Pw-e0z" secondAttribute="bottom" id="lwX-Np-rLc"/>
+                            <constraint firstItem="4ix-Pw-e0z" firstAttribute="top" secondItem="TcJ-1F-w1B" secondAttribute="top" id="tbx-U7-nGP"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="textView" destination="4ix-Pw-e0z" id="xV5-ya-H8c"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="kNm-V6-LX2" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2953" y="788"/>
+        </scene>
+        <!--View Controller-->
+        <scene sceneID="lbH-ld-glN">
+            <objects>
+                <viewController id="PQ3-0K-VKt" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="F2y-TS-jIk"/>
+                        <viewControllerLayoutGuide type="bottom" id="4sA-g4-BFX"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="VX3-0f-29C">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="L7v-nO-lzw">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <string key="text">This app is a tool to help you find when and where street cleaning is happening. Please be careful and read all of the posted street signs. Do not use app while driving. I take no responsibility for any tickets that were issued while using this app.
+
+
+Credits:
+Icons from the Noun Project 
+
+more by unlimicon from the Noun Project
+
+Protractor and compass by Roselin Christina.S from the Noun Project
+
+Squircle by Luuk Lamers from the Noun Project
+
+Crosshair by Guilhem from the Noun Project
+</string>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="L7v-nO-lzw" secondAttribute="trailing" id="T2M-V9-e3V"/>
+                            <constraint firstItem="L7v-nO-lzw" firstAttribute="leading" secondItem="VX3-0f-29C" secondAttribute="leading" id="TKi-mB-Vvv"/>
+                            <constraint firstItem="4sA-g4-BFX" firstAttribute="top" secondItem="L7v-nO-lzw" secondAttribute="bottom" id="VZp-6Q-bGe"/>
+                            <constraint firstItem="L7v-nO-lzw" firstAttribute="top" secondItem="VX3-0f-29C" secondAttribute="top" id="yos-y0-bUe"/>
+                        </constraints>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="lgw-Xe-kbh" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2910" y="1513"/>
         </scene>
         <!--Web View Controller-->
         <scene sceneID="3Dg-y4-Hy0">
@@ -196,7 +401,10 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="qXq-aM-9nS" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2873" y="1138"/>
+            <point key="canvasLocation" x="3618" y="1594"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="iQuantGraph" width="500" height="374"/>
+    </resources>
 </document>

@@ -466,6 +466,7 @@ class SPMainViewController: UIViewController, UIGestureRecognizerDelegate, SPDat
         let zoom = radius.toZoomFromWidthInMeters(forView: mapViewController.mapView)
         mapViewController.mapView.animate(toZoom: zoom)
     }
+    
     func signsCollectionViewControllerDidSelect(timeAndDay: DNTimeAndDay) {
         signsCollectionViewController.collectionViewSwitch.setOn(false, animated: true)
         dao.primaryTimeAndDay = timeAndDay

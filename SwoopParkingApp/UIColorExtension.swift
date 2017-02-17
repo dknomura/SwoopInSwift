@@ -9,7 +9,7 @@
 import Foundation
 
 extension UIColor {
-    static var swoopRed: UIColor {
+    @nonobjc static var swoopRed: UIColor {
         return UIColor(red: 170/256, green: 90/256, blue: 88/256, alpha: 1)
     }
 }

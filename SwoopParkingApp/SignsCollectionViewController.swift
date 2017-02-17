@@ -185,28 +185,60 @@ class SignsCollectionViewController: UIViewController, UICollectionViewDelegate,
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        let defaultHeader = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: signCollectionHeaderReuse, for: indexPath)
-        guard kind == UICollectionElementKindSectionHeader else { return defaultHeader }
-        guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: signCollectionHeaderReuse, for: indexPath) as? SignsCollectionViewHeader else { return defaultHeader }
+        
         let section = indexPath.section
-        header.headerButton.backgroundColor = backgroundColor(forSection: section)
-        header.headerButton.titleLabel?.font = UIFont(name: "Christopherhand", size: 25)
-        header.headerButton.setTitleColor(UIColor.white, for: .normal)
-        header.headerButton.tag = section
-        //Title headers
         if section == 0 {
-            header.headerButton.setTitle("Select a time and day", for: .normal)
-        } else {
-        //Day headers
-            header.headerButton.addTarget(self, action: #selector(sectionButtonTouchedUpInside), for: .touchUpInside)
-            guard let day = DNDay(rawValue: section) else { return defaultHeader }
-            header.headerButton.setTitle(day.stringValue(forFormat: .fullDay), for: .normal)
-            print("day: \(day). title: \(header.headerButton.currentTitle). background color: \(header.headerButton.backgroundColor)")
-            if dao.locationCountsForTimeAndDay[day] == nil {
-                collapsedSections.insert(section)
+            if let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: signCollectionHeaderReuse, for: indexPath) as? SignsCollectionViewHeader {
+                header.headerButton.setTitle("Select a time and day", for: .normal)
+                header.headerButton.backgroundColor = backgroundColor(forSection: section)
+                header.headerButton.titleLabel?.font = UIFont(name: "Christopherhand", size: 25)
+                header.headerButton.setTitleColor(UIColor.white, for: .normal)
+                header.headerButton.tag = section
+                return header
             }
         }
-        return header
+        if kind == UICollectionElementKindSectionHeader {
+            if let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: signCollectionHeaderReuse, for: indexPath) as? SignsCollectionViewHeader,
+                let day = DNDay(rawValue: section) {
+                
+                if dao.locationCountsForTimeAndDay[day] == nil {
+                    collapsedSections.insert(section)
+                }
+                header.headerButton.setTitle(day.stringValue(forFormat: .fullDay), for: .normal)
+                header.headerButton.backgroundColor = backgroundColor(forSection: section)
+                header.headerButton.addTarget(self, action: #selector(sectionButtonTouchedUpInside), for: .touchUpInside)
+                header.headerButton.titleLabel?.font = UIFont(name: "Christopherhand", size: 25)
+                header.headerButton.setTitleColor(UIColor.white, for: .normal)
+                header.headerButton.tag = section
+                return header
+            }
+        }
+        return collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: signCollectionHeaderReuse, for: indexPath)
+//
+//        
+//        
+//        let defaultHeader = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: signCollectionHeaderReuse, for: indexPath)
+//        guard kind == UICollectionElementKindSectionHeader else { return defaultHeader }
+//        guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: signCollectionHeaderReuse, for: indexPath) as? SignsCollectionViewHeader else { return defaultHeader }
+//        let section = indexPath.section
+//        header.headerButton.backgroundColor = backgroundColor(forSection: section)
+//        header.headerButton.titleLabel?.font = UIFont(name: "Christopherhand", size: 25)
+//        header.headerButton.setTitleColor(UIColor.white, for: .normal)
+//        header.headerButton.tag = section
+//        //Title headers
+//        if section == 0 {
+//            header.headerButton.setTitle("Select a time and day", for: .normal)
+//        } else {
+//        //Day headers
+//            guard let day = DNDay(rawValue: section) else { return defaultHeader }
+//            if dao.locationCountsForTimeAndDay[day] == nil {
+//                collapsedSections.insert(section)
+//            }
+//            header.headerButton.addTarget(self, action: #selector(sectionButtonTouchedUpInside), for: .touchUpInside)
+//            header.headerButton.setTitle(day.stringValue(forFormat: .fullDay), for: .normal)
+//            print("day: \(day). title: \(header.headerButton.currentTitle). background color: \(header.headerButton.backgroundColor)")
+//        }
+//        return header
     }
     
     @objc func sectionButtonTouchedUpInside(sender: UIButton) {
