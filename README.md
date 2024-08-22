@@ -7,7 +7,7 @@ Swoop Parking App lets users know when and where cleaning is about to finish so 
 <img align="left" src="NYCLevelScreenShot.png" height="40%" width="40%" alt=""/>
 <img align="right" src="StreetLevelScreenShot.png" height="40%" width="40%" alt=""/>
 </p> -->
-Currently showing incorrect street level parking data. Will make it dynamic and synchronized with the time and day. 
+Street level parking data may be out of date. Plan to keep it up to date with current data. 
 
 ## Installation
 `git clone https://github.com/dknomura/SwoopInSwift.git `
