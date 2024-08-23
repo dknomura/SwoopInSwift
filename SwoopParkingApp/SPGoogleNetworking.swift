@@ -9,8 +9,8 @@
 import Foundation
 
 struct SPGoogleNetworking {
-    let googlePlacesAPIKey = "AIzaSyCHTQ_3E4We3iwfp8miz15Nm6Un6oYBCmk"
-    let googleGeocodingAPIKey = "AIzaSyA1mzaCuwm88uF1LSlkHvxzwQoTMm-ZptY"
+    let googlePlacesAPIKey = "googlePlacesAPIKey"
+    let googleGeocodingAPIKey = "googleGeocodingAPIKey-ZptY"
     var centerLat: Double { return 40.7054094949 }
     var centerLong: Double { return -73.977564233 }
     var searchRadius: Double { return 42280 }
